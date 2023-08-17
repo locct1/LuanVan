@@ -8,19 +8,14 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import { ToastContainer, toast } from 'react-toastify';
 import AdminProtectedRoutes from './routes/AdminProtectedRoutes';
 import { useDispatch, useSelector } from 'react-redux';
-
-// import { HostLoadUser } from '~/redux/Slices/HostAuthSlice';
-// import { AdminLoadUser } from '~/redux/Slices/AdminAuthSlice';
-// import { ClientLoadUser } from '~/redux/Slices/ClientAuthSlice';
-
+import { useEffect, useState } from 'react';
+import { AdminLoadUser } from '~/redux/Slices/AdminAuthSlice';
 const queryClient = new QueryClient();
 function App() {
     const dispatch = useDispatch();
-    // useEffect(() => {
-    //     dispatch(HostLoadUser());
-    //     dispatch(AdminLoadUser());
-    //     dispatch(ClientLoadUser());
-    // }, []);
+    useEffect(() => {
+        dispatch(AdminLoadUser());
+    }, []);
     return (
         <QueryClientProvider client={queryClient}>
             <Router>

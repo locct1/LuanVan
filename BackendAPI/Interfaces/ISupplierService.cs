@@ -7,8 +7,8 @@ namespace BackendAPI.Interfaces
         Task<IEnumerable<Supplier>> GetAll();
         Task<IEnumerable<Supplier>> GetPagedList(int page, int limit);
         Task<Supplier> GetSupplierById(int id);
-        Task CreateSupplier(Supplier brand);
-        Task UpdateSupplier(int id, Supplier brand);
+        Task CreateSupplier(Supplier supplier);
+        Task UpdateSupplier(int id, Supplier supplier);
         Task DeleteSupplier(int id);
     }
 }

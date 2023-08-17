@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LOCAL_STORAGE_TOKEN_HOST } from '~/helpers/constants';
+import { LOCAL_STORAGE_TOKEN_ADMIN } from '~/helpers/constants';
 
 const commonConfig = {
     headers: {
@@ -14,7 +14,7 @@ const apiAdmin = axios.create({
 });
 apiAdmin.interceptors.request.use(
     (config) => {
-        config.headers['Authorization'] = `Bearer ${localStorage[LOCAL_STORAGE_TOKEN_HOST]}`;
+        config.headers['Authorization'] = `Bearer ${localStorage[LOCAL_STORAGE_TOKEN_ADMIN]}`;
         return config;
     },
     (error) => {

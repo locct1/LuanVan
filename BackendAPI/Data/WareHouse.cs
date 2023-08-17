@@ -12,5 +12,7 @@ namespace BackendAPI.Data
         public string Name { get; set; }
         public string Address { get; set; }
         public List<Product>? Products { get; set; }
+        public List<ProductPurchaseOrder>? ProductPurchaseOrders { get; set; }
+
     }
 }

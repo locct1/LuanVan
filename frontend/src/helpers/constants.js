@@ -3,6 +3,8 @@ export const LOCAL_STORAGE_TOKEN_ADMIN = 'admin-token';
 export const LOCAL_STORAGE_TOKEN_CLIENT = 'client-token';
 export const LINK_BRAND_IMAGE = 'https://localhost:7077/Uploads/Brand/';
 export const LINK_PRODUCT_IMAGE = 'https://localhost:7077/Uploads/Product/';
+export const LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE = 'https://localhost:7077/Uploads/ProductSample/';
+export const LINK_SLIDE_PRODUCT_SAMPLE_IMAGE = 'https://localhost:7077/Uploads/ProductSample/';
 
 export const LINK_APP_FRONTEND = 'http://localhost:3000/';
 export const htmlTable = `

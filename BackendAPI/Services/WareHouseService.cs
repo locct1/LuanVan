@@ -13,7 +13,7 @@ namespace BackendAPI.Services
         }
         public async Task<IEnumerable<WareHouse>> GetAll()
         {
-            return await _unitOfWork.GetRepository<WareHouse>().GetAll();
+            return await _unitOfWork.GetRepository<WareHouse>().GetAll(orderBy: x => x.OrderByDescending(x => x.Id));
         }
         public async Task<IEnumerable<WareHouse>> GetPagedList(int page, int limit)
         {

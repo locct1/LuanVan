@@ -100,7 +100,7 @@ function ListBrands() {
 
                         <table className="table table-bordered" id="dataTable" width="100%" cellSpacing={0}>
                             <thead>
-                                <tr>
+                                <tr className="bg bg-dark text-light">
                                     <th scope="col">#</th>
                                     <th scope="col">Id</th>
                                     <th scope="col">Tên thương hiệu</th>
@@ -169,7 +169,7 @@ function ListBrands() {
                                     )
                                 ) : (
                                     <tr>
-                                        <td className="text-center" colSpan="5">
+                                        <td className="text-center" colSpan="7">
                                             Không có dữ liệu
                                         </td>
                                     </tr>

@@ -3,12 +3,13 @@ import styles from './AdminSideBar.module.scss';
 import { NavLink } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-//import { infoAdminSelector } from '~/redux/selectors';
+import { infoAdminSelector } from '~/redux/selectors';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import './AdminSideBar.scss';
 function AdminSideBar({ sidebarToggle, toggled }) {
     const cx = classNames.bind(styles);
-    // const infoAdmin = useSelector(infoAdminSelector);
-    const infoAdmin = true;
+    const infoAdmin = useSelector(infoAdminSelector);
     const classNameFunc = ({ isActive }) => (isActive ? 'nav-link admin-active' : 'nav-link');
     return (
         <ul className={`navbar-nav bg-primary-custom sidebar sidebar-dark accordion ${toggled}`} id="accordionSidebar">
@@ -64,6 +65,24 @@ function AdminSideBar({ sidebarToggle, toggled }) {
                 <NavLink to="/admin-list-products" className={classNameFunc}>
                     <i className="fas fa-fw fa-chart-area" />
                     <span>Quản lý sản phẩm</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
+                <NavLink to="/admin-list-roles" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý vai trò</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
+                <NavLink to="/admin-list-product-purchase-orders" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý phiếu nhập kho</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
+                <NavLink to="/list-product-inventories" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Danh sách tồn kho</span>
                 </NavLink>
             </li>
             {/* Divider */}

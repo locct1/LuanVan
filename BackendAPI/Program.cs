@@ -1,4 +1,5 @@
 ﻿using BackendAPI.Data;
+using BackendAPI.Helpers;
 using BackendAPI.Interfaces;
 using BackendAPI.Services;
 using BackendAPI.UnitOfWorks;
@@ -24,15 +25,27 @@ builder.Services.AddControllers().AddJsonOptions(x =>
                 {
                     options.SuppressModelStateInvalidFilter = true;
                 });
-var tokenValidationParameters = new TokenValidationParameters
+
+builder.Services.AddDbContext<ApplicationContext>(options =>
 {
-    ValidateIssuerSigningKey = true,
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:Secret"])),
-    ValidateIssuer = false,
-    ValidateAudience = false,
-    RequireExpirationTime = true,
-    ValidateLifetime = true
-};
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer"));
+});
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationContext>().AddDefaultTokenProviders().AddErrorDescriber<CustomIdentityErrorDescriber>(); ;
+
+builder.Services.AddUnitOfWork<ApplicationContext>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IWareHouseService, WareHouseService>();
+builder.Services.AddScoped<IColorProductService, ColorProductService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductSampleService, ProductSampleService>();
+builder.Services.AddTransient<IGetValueToken, GetValueToken>();
+builder.Services.AddScoped<IAdminAccountService, AdminAccountService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IProductPurchaseOrderService, ProductPurchaseOrderService>();
+builder.Services.AddScoped<IProductPurchaseOrderDetailService, ProductPurchaseOrderDetailService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -42,24 +55,15 @@ builder.Services.AddAuthentication(options =>
 {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = tokenValidationParameters;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:ValidAudience"],
+        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+    };
 });
-builder.Services.AddDbContext<ApplicationContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SQLServer"));
-});
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationContext>().AddDefaultTokenProviders();
-
-builder.Services.AddUnitOfWork<ApplicationContext>();
-builder.Services.AddSingleton(tokenValidationParameters);
-
-builder.Services.AddScoped<IBrandService, BrandService>();
-builder.Services.AddScoped<ISupplierService, SupplierService>();
-builder.Services.AddScoped<IWareHouseService, WareHouseService>();
-builder.Services.AddScoped<IColorProductService, ColorProductService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IProductSampleService, ProductSampleService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

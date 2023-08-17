@@ -16,7 +16,7 @@ namespace BackendAPI.Services
         }
         public async Task<IEnumerable<Product>> GetAll()
         {
-            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse));
+            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse), orderBy: x => x.OrderByDescending(x => x.Id));
         }
         public async Task<IEnumerable<Product>> GetPagedList(int page, int limit)
         {
@@ -43,7 +43,8 @@ namespace BackendAPI.Services
         public async Task<Product?> Get(int id)
         {
             return await _unitOfWork.GetRepository<Product>().Get(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse)
-                                                    .Include(p => p.ProductSamples).ThenInclude(p => p.ColorProduct),
+                                                    .Include(p => p.ProductSamples).ThenInclude(p => p.ColorProduct)
+                                                    .Include(p => p.ProductSamples).ThenInclude(s => s.Photos),
                                                     filter: x => x.Id == id);
 
         }

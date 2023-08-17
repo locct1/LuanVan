@@ -14,7 +14,7 @@ namespace BackendAPI.Services
         }
         public async Task<IEnumerable<ColorProduct>> GetAll()
         {
-            return await _unitOfWork.GetRepository<ColorProduct>().GetAll();
+            return await _unitOfWork.GetRepository<ColorProduct>().GetAll(orderBy: x => x.OrderByDescending(x => x.Id));
         }
         public async Task<IEnumerable<ColorProduct>> GetPagedList(int page, int limit)
         {

@@ -15,6 +15,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import parse from 'html-react-parser';
 import { htmlTable } from '~/helpers/constants';
 function AddProduct() {
+    const navigate = useNavigate();
     const [formattedPriceIn, setFormattedPriceIn] = useState('');
     const [formattedPriceOut, setFormattedPriceOut] = useState('');
     const [selectedOption, setSelectedOption] = useState(null);
@@ -66,8 +67,20 @@ function AddProduct() {
     const [errorsForm, setErrorsForm] = useState([]);
     const onSuccess = (data) => {
         if (data.success) {
-            resetField('name');
-            setAvt(null);
+            // setSelectedOption([]);
+            // setValue('colorproducts', []);
+            // resetField('name');
+            // resetField('priceIn');
+            // resetField('priceOut');
+            // resetField('brandId');
+            // resetField('warehouseId');
+            // resetField('infomation', '');
+            // setValue('technicalDetail', htmlTable);
+            // setFormattedPriceIn('');
+            // setFormattedPriceOut('');
+            // setAvt(null);
+
+            navigate('/admin-list-products');
             toast.success('Tạo thành công');
         } else {
             setErrorsForm(data.errors);

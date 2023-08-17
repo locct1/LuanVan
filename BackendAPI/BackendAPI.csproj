@@ -27,6 +27,7 @@
 
 	<ItemGroup>
 		<Folder Include="Uploads\Brand\" />
+		<Folder Include="Uploads\ProductSample\" />
 		<Folder Include="Uploads\Product\" />
 		<Folder Include="Utils\" />
 	</ItemGroup>

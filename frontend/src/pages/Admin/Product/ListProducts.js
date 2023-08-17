@@ -100,10 +100,11 @@ function ListProducts() {
 
                         <table className="table table-bordered" id="dataTable" width="100%" cellSpacing={0}>
                             <thead>
-                                <tr>
+                                <tr className="bg bg-dark text-light">
                                     <th scope="col">#</th>
                                     <th scope="col">Id</th>
                                     <th scope="col">Tên sản phẩm</th>
+                                    <th scope="col">Thư viện ảnh</th>
                                     <th width="40%" scope="col">
                                         Hình ảnh
                                     </th>
@@ -113,7 +114,7 @@ function ListProducts() {
                                     <th scope="col">Giá bán</th>
                                     <th scope="col">Ngày tạo</th>
                                     <th scope="col">Ngày cập nhật</th>
-                                    <th scope="col" className="text-center" width="20%">
+                                    <th scope="col" className="text-center" width="30%">
                                         Hành động
                                     </th>
                                 </tr>
@@ -129,6 +130,11 @@ function ListProducts() {
                                                     <td>{item.id}</td>
                                                     <td>{item.name}</td>
                                                     <td>
+                                                        <Link to={`/admin-photo-product-samples/${item.id}`}>
+                                                            <i class="fas fa-photo-video"></i>
+                                                        </Link>
+                                                    </td>
+                                                    <td>
                                                         <img
                                                             src={LINK_PRODUCT_IMAGE + item.image}
                                                             className="card-img"
@@ -136,6 +142,7 @@ function ListProducts() {
                                                             alt="..."
                                                         />
                                                     </td>
+
                                                     <td>{item.wareHouse?.name}</td>
                                                     <td>{item.brand?.name}</td>
                                                     <td>
@@ -189,7 +196,7 @@ function ListProducts() {
                                     )
                                 ) : (
                                     <tr>
-                                        <td className="text-center" colSpan="5">
+                                        <td className="text-center" colSpan="11">
                                             Không có dữ liệu
                                         </td>
                                     </tr>

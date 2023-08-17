@@ -31,7 +31,6 @@ namespace BackendAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -71,10 +70,6 @@ namespace BackendAPI.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("Number")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -160,6 +155,33 @@ namespace BackendAPI.Migrations
                     b.ToTable("ColorProduct");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.Photo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProductSampleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ProductSampleId");
+
+                    b.ToTable("Photo");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -217,6 +239,68 @@ namespace BackendAPI.Migrations
                     b.ToTable("Product");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Total")
+                        .HasColumnType("float");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("WareHouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WareHouseId");
+
+                    b.ToTable("ProductPurchaseOrder");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrderDetail", b =>
+                {
+                    b.Property<int>("ProductPurchaseOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductSampleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("PriceIn")
+                        .HasColumnType("float");
+
+                    b.HasKey("ProductPurchaseOrderId", "ProductSampleId", "Id");
+
+                    b.HasIndex("ProductSampleId");
+
+                    b.ToTable("ProductPurchaseOrderDetail");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.ProductSample", b =>
                 {
                     b.Property<int>("Id")
@@ -231,8 +315,7 @@ namespace BackendAPI.Migrations
                     b.Property<bool>("Disabled")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("FileName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ProductId")
@@ -433,6 +516,21 @@ namespace BackendAPI.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.Photo", b =>
+                {
+                    b.HasOne("BackendAPI.Data.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId");
+
+                    b.HasOne("BackendAPI.Data.ProductSample", "ProductSample")
+                        .WithMany("Photos")
+                        .HasForeignKey("ProductSampleId");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ProductSample");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Product", b =>
                 {
                     b.HasOne("BackendAPI.Data.Brand", "Brand")
@@ -448,6 +546,49 @@ namespace BackendAPI.Migrations
                     b.Navigation("Brand");
 
                     b.Navigation("WareHouse");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrder", b =>
+                {
+                    b.HasOne("BackendAPI.Data.Supplier", "Supplier")
+                        .WithMany("ProductPurchaseOrders")
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BackendAPI.Data.ApplicationUser", "User")
+                        .WithMany("ProductPurchaseOrders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BackendAPI.Data.WareHouse", "WareHouse")
+                        .WithMany("ProductPurchaseOrders")
+                        .HasForeignKey("WareHouseId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Supplier");
+
+                    b.Navigation("User");
+
+                    b.Navigation("WareHouse");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrderDetail", b =>
+                {
+                    b.HasOne("BackendAPI.Data.ProductPurchaseOrder", "ProductPurchaseOrder")
+                        .WithMany("ProductPurchaseOrderDetails")
+                        .HasForeignKey("ProductPurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendAPI.Data.ProductSample", "ProductSample")
+                        .WithMany()
+                        .HasForeignKey("ProductSampleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductPurchaseOrder");
+
+                    b.Navigation("ProductSample");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.ProductSample", b =>
@@ -518,6 +659,11 @@ namespace BackendAPI.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ApplicationUser", b =>
+                {
+                    b.Navigation("ProductPurchaseOrders");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Brand", b =>
                 {
                     b.Navigation("Products");
@@ -533,8 +679,25 @@ namespace BackendAPI.Migrations
                     b.Navigation("ProductSamples");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrder", b =>
+                {
+                    b.Navigation("ProductPurchaseOrderDetails");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductSample", b =>
+                {
+                    b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.Supplier", b =>
+                {
+                    b.Navigation("ProductPurchaseOrders");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.WareHouse", b =>
                 {
+                    b.Navigation("ProductPurchaseOrders");
+
                     b.Navigation("Products");
                 });
 #pragma warning restore 612, 618

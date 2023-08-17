@@ -150,7 +150,6 @@ namespace BackendAPI.Controllers
                     ProductSample productSample = new ProductSample
                     {
                         ProductId = product.Id,
-                        Name = product.Name + " (" + item.Label + ")",
                         ColorProductId = int.Parse(item.Value),
                         Quantity = 0,
                         Disabled = true,
@@ -259,6 +258,7 @@ namespace BackendAPI.Controllers
                     else
                     {
                         var colorToRemove = colors.FirstOrDefault(color => int.Parse(color.Value) == item.ColorProductId);
+
                         if (colorToRemove != null)
                         {
                             colors.Remove(colorToRemove);
@@ -271,14 +271,13 @@ namespace BackendAPI.Controllers
                     ProductSample productSample = new ProductSample
                     {
                         ProductId = findProduct.Id,
-                        Name = findProduct.Name + " (" + color.Label + ")",
                         ColorProductId = int.Parse(color.Value),
                         Quantity = 0,
                         Disabled = true,
                     };
                     await _productSampleService.CreateProductSample(productSample);
                 }
-                    await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
 
                 return CreatedAtAction(nameof(GetProductById), new { id = findProduct.Id }, new Response
                 {

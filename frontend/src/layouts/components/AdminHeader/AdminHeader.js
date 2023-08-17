@@ -3,17 +3,16 @@ import styles from './AdminHeader.module.scss';
 import { Dropdown } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-//import { AdminLogout } from '~/redux/Slices/AdminAuthSlice';
-//import { infoAdminSelector } from '~/redux/selectors';
+import { AdminLogout } from '~/redux/Slices/AdminAuthSlice';
+import { infoAdminSelector } from '~/redux/selectors';
 const cx = classNames.bind(styles);
 
 function AdminHeader({ sidebarToggle }) {
     const dispatch = useDispatch();
-    // const Logout = async () => {
-    //     dispatch(AdminLogout());
-    // };
-    //   const infoAdmin = useSelector(infoAdminSelector);
-    const infoAdmin = true;
+    const Logout = async () => {
+        dispatch(AdminLogout());
+    };
+    const infoAdmin = useSelector(infoAdminSelector);
     return (
         <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
             {/* Sidebar Toggle (Topbar) */}
@@ -38,7 +37,7 @@ function AdminHeader({ sidebarToggle }) {
 
                     <Dropdown.Menu>
                         <Dropdown.Item href="#/action-1">Cập nhật thông tin</Dropdown.Item>
-                        {/* <Dropdown.Item onClick={() => Logout()}>Đăng xuất</Dropdown.Item> */}
+                        <Dropdown.Item onClick={() => Logout()}>Đăng xuất</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </ul>

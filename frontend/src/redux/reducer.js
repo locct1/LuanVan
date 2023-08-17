@@ -1,9 +1,9 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-
+import adminAuthSlice from './Slices/AdminAuthSlice';
 import { combineReducers } from 'redux';
 const rootReducer = combineReducers({
     // hostAuth: hostAuthSlice.reducer,
-    // adminAuth: adminAuthSlice.reducer,
+    adminAuth: adminAuthSlice.reducer,
     // clientAuth: clientAuthSlice.reducer,
     // bookingNow: bookingNowSlice.reducer,
     // hostReservation: hostReservationSlice.reducer,

@@ -1,6 +1,7 @@
 ﻿using BackendAPI.Data;
 using BackendAPI.Interfaces;
 using BackendAPI.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendAPI.Services
 {
@@ -14,7 +15,7 @@ namespace BackendAPI.Services
         }
         public async Task<IEnumerable<ProductSample>> GetAll()
         {
-            return await _unitOfWork.GetRepository<ProductSample>().GetAll();
+            return await _unitOfWork.GetRepository<ProductSample>().GetAll(include: p => p.Include(p => p.Product).ThenInclude(p => p.WareHouse).Include(x=>x.ColorProduct),orderBy: x => x.OrderByDescending(x => x.Id),filter:x=>x.ProductId!=null);
         }
         public async Task<IEnumerable<ProductSample>> GetAllByProductId(int id)
         {
@@ -28,7 +29,10 @@ namespace BackendAPI.Services
         {
             return await _unitOfWork.GetRepository<ProductSample>().GetByID(id);
         }
-
+        public async Task<ProductSample?> Get(int id)
+        {
+            return await _unitOfWork.GetRepository<ProductSample>().Get(include: p => p.Include(p => p.ColorProduct).Include(p => p.Product), filter: x => x.Id == id);
+        }
         public async Task CreateProductSample(ProductSample newProductSample)
         {
             await _unitOfWork.GetRepository<ProductSample>().Insert(newProductSample);
