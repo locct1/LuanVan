@@ -1,6 +1,6 @@
 /*  ---------------------------------------------------
-    Template Name: Sona
-    Description: Sona Hotel Html Template
+    Template Name: Ogani
+    Description:  Ogani eCommerce  HTML Template
     Author: Colorlib
     Author URI: https://colorlib.com
     Version: 1.0
@@ -10,13 +10,24 @@
 'use strict';
 
 (function ($) {
-
     /*------------------
         Preloader
     --------------------*/
     $(window).on('load', function () {
-        $(".loader").fadeOut();
-        $("#preloder").delay(200).fadeOut("slow");
+        $('.loader').fadeOut();
+        $('#preloder').delay(200).fadeOut('slow');
+
+        /*------------------
+            Gallery filter
+        --------------------*/
+        $('.featured__controls li').on('click', function () {
+            $('.featured__controls li').removeClass('active');
+            $(this).addClass('active');
+        });
+        if ($('.featured__filter').length > 0) {
+            var containerEl = document.querySelector('.featured__filter');
+            //  var mixer = mixitup(containerEl);
+        }
     });
 
     /*------------------
@@ -27,83 +38,163 @@
         $(this).css('background-image', 'url(' + bg + ')');
     });
 
-    //Offcanvas Menu
-    $(".canvas-open").on('click', function () {
-        $(".offcanvas-menu-wrapper").addClass("show-offcanvas-menu-wrapper");
-        $(".offcanvas-menu-overlay").addClass("active");
+    //Humberger Menu
+    $('.humberger__open').on('click', function () {
+        $('.humberger__menu__wrapper').addClass('show__humberger__menu__wrapper');
+        $('.humberger__menu__overlay').addClass('active');
+        $('body').addClass('over_hid');
     });
 
-    $(".canvas-close, .offcanvas-menu-overlay").on('click', function () {
-        $(".offcanvas-menu-wrapper").removeClass("show-offcanvas-menu-wrapper");
-        $(".offcanvas-menu-overlay").removeClass("active");
-    });
-
-    // Search model
-    $('.search-switch').on('click', function () {
-        $('.search-model').fadeIn(400);
-    });
-
-    $('.search-close-switch').on('click', function () {
-        $('.search-model').fadeOut(400, function () {
-            $('#search-input').val('');
-        });
+    $('.humberger__menu__overlay').on('click', function () {
+        $('.humberger__menu__wrapper').removeClass('show__humberger__menu__wrapper');
+        $('.humberger__menu__overlay').removeClass('active');
+        $('body').removeClass('over_hid');
     });
 
     /*------------------
 		Navigation
 	--------------------*/
-    $(".mobile-menu").slicknav({
+    $('.mobile-menu').slicknav({
         prependTo: '#mobile-menu-wrap',
-        allowParentLinks: true
+        allowParentLinks: true,
     });
 
-    /*------------------
-        Hero Slider
-    --------------------*/
-   $(".hero-slider").owlCarousel({
+    /*-----------------------
+        Categories Slider
+    ------------------------*/
+    $('.categories__slider').owlCarousel({
         loop: true,
         margin: 0,
-        items: 1,
-        dots: true,
+        items: 4,
+        dots: false,
+        nav: true,
+        navText: ["<span class='fa fa-angle-left'><span/>", "<span class='fa fa-angle-right'><span/>"],
         animateOut: 'fadeOut',
         animateIn: 'fadeIn',
         smartSpeed: 1200,
         autoHeight: false,
         autoplay: true,
-        mouseDrag: false
+        responsive: {
+            0: {
+                items: 1,
+            },
+
+            480: {
+                items: 2,
+            },
+
+            768: {
+                items: 3,
+            },
+
+            992: {
+                items: 4,
+            },
+        },
     });
 
-    /*------------------------
-		Testimonial Slider
-    ----------------------- */
-    $(".testimonial-slider").owlCarousel({
+    $('.hero__categories__all').on('click', function () {
+        $('.hero__categories ul').slideToggle(400);
+    });
+
+    /*--------------------------
+        Latest Product Slider
+    ----------------------------*/
+    $('.latest-product__slider').owlCarousel({
+        loop: true,
+        margin: 0,
         items: 1,
         dots: false,
-        autoplay: true,
-        loop: true,
-        smartSpeed: 1200,
         nav: true,
-        navText: ["<i class='arrow_left'></i>", "<i class='arrow_right'></i>"]
+        navText: ["<span class='fa fa-angle-left'><span/>", "<span class='fa fa-angle-right'><span/>"],
+        smartSpeed: 1200,
+        autoHeight: false,
+        autoplay: true,
     });
 
-    /*------------------
-        Magnific Popup
-    --------------------*/
-    $('.video-popup').magnificPopup({
-        type: 'iframe'
+    /*-----------------------------
+        Product Discount Slider
+    -------------------------------*/
+    $('.product__discount__slider').owlCarousel({
+        loop: true,
+        margin: 0,
+        items: 3,
+        dots: true,
+        smartSpeed: 1200,
+        autoHeight: false,
+        autoplay: true,
+        responsive: {
+            320: {
+                items: 1,
+            },
+
+            480: {
+                items: 2,
+            },
+
+            768: {
+                items: 2,
+            },
+
+            992: {
+                items: 3,
+            },
+        },
     });
 
+    /*---------------------------------
+        Product Details Pic Slider
+    ----------------------------------*/
+    $('.product__details__pic__slider').owlCarousel({
+        loop: true,
+        margin: 20,
+        items: 4,
+        dots: true,
+        smartSpeed: 1200,
+        autoHeight: false,
+        autoplay: true,
+    });
+
+    /*-----------------------
+		Price Range Slider
+	------------------------ */
+    var rangeSlider = $('.price-range'),
+        minamount = $('#minamount'),
+        maxamount = $('#maxamount'),
+        minPrice = rangeSlider.data('min'),
+        maxPrice = rangeSlider.data('max');
+    rangeSlider.slider({
+        range: true,
+        min: minPrice,
+        max: maxPrice,
+        values: [minPrice, maxPrice],
+        slide: function (event, ui) {
+            minamount.val('$' + ui.values[0]);
+            maxamount.val('$' + ui.values[1]);
+        },
+    });
+    minamount.val('$' + rangeSlider.slider('values', 0));
+    maxamount.val('$' + rangeSlider.slider('values', 1));
+
+    /*--------------------------
+        Select
+    ----------------------------*/
+    $('select').niceSelect();
+
     /*------------------
-		Date Picker
+		Single Product
 	--------------------*/
-    $(".date-input").datepicker({
-        minDate: 0,
-        dateFormat: 'dd MM, yy'
+    $('.product__details__pic__slider img').on('click', function () {
+        var imgurl = $(this).data('imgbigurl');
+        var bigImg = $('.product__details__pic__item--large').attr('src');
+        if (imgurl != bigImg) {
+            $('.product__details__pic__item--large').attr({
+                src: imgurl,
+            });
+        }
     });
 
-    /*------------------
-		Nice Select
-	--------------------*/
-    $("select").niceSelect();
-
+    /*-------------------
+		Quantity change
+	--------------------- */
 })(jQuery);

@@ -1,4 +1,6 @@
 import AdminLayout from '~/layouts/AdminLayout';
+import HomeLayout from '~/layouts/HomeLayout/HomeLayout';
+import HomeLayoutNoImg from '~/layouts/HomeLayout/HomeLayoutNoImg';
 import AdminLogin from '~/pages/Admin/Account/AdminLogin';
 import AddBrand from '~/pages/Admin/Brand/AddBrand';
 import ListBrands from '~/pages/Admin/Brand/ListBrands';
@@ -25,8 +27,26 @@ import UpdateSupplier from '~/pages/Admin/Supplier/UpdateSupplier';
 import AddWareHouse from '~/pages/Admin/WareHouse/AddWareHouse';
 import ListWareHouses from '~/pages/Admin/WareHouse/ListWareHouses';
 import UpdateWareHouse from '~/pages/Admin/WareHouse/UpdateWareHouse';
+import Home from '~/pages/Client/Home';
+import ListProductsClient from '~/pages/Client/ListProductsClients';
+import ListProductsByBrand from '~/pages/Client/ListProductsByBrand';
+import ListProductsBySearch from '~/pages/Client/ListProductsBySearch';
+import ProductDetail from '~/pages/Client/ProducrDetail';
+import Cart from '~/pages/Client/Cart';
+import LoginClient from '~/pages/Client/ClientLogin';
+import RegisterClient from '~/pages/Client/ClientRegister';
 // Public routes
-const publicRoutes = [{ path: '/admin-login', component: AdminLogin, layout: null }];
+const publicRoutes = [
+    { path: '/admin-login', component: AdminLogin, layout: null },
+    { path: '/', component: Home, layout: HomeLayout },
+    { path: '/list-products', component: ListProductsClient, layout: HomeLayoutNoImg },
+    { path: '/list-product-by-brand/:id', component: ListProductsByBrand, layout: HomeLayoutNoImg },
+    { path: '/search-product', component: ListProductsBySearch, layout: HomeLayoutNoImg },
+    { path: '/product-detail/:id', component: ProductDetail, layout: HomeLayoutNoImg },
+    { path: '/cart', component: Cart, layout: HomeLayoutNoImg },
+    { path: '/client-login', component: LoginClient, layout: HomeLayoutNoImg },
+    { path: '/client-register', component: RegisterClient, layout: HomeLayoutNoImg },
+];
 const adminPrivateRoutes = [
     { path: '/admin-list-brands', component: ListBrands, layout: AdminLayout },
     { path: '/admin-add-brand', component: AddBrand, layout: AdminLayout },

@@ -1,7 +1,9 @@
 ﻿using BackendAPI.Data;
 using BackendAPI.Helpers;
 using BackendAPI.Interfaces;
+using BackendAPI.Interfaces.Client;
 using BackendAPI.Services;
+using BackendAPI.Services.Client;
 using BackendAPI.UnitOfWorks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -46,6 +48,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IProductPurchaseOrderService, ProductPurchaseOrderService>();
 builder.Services.AddScoped<IProductPurchaseOrderDetailService, ProductPurchaseOrderDetailService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<IPageService, PageService>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

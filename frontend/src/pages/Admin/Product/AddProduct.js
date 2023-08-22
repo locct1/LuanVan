@@ -237,7 +237,7 @@ function AddProduct() {
                                         <label htmlFor="exampleInputEmail1" className="font-weight-bold">
                                             Nhà kho:
                                         </label>
-                                        <select class="form-control" name="warehouseId" {...register('warehouseId')}>
+                                        <select className="form-control" name="warehouseId" {...register('warehouseId')}>
                                             <option disabled selected value="">
                                                 Chọn nhà kho
                                             </option>
@@ -255,7 +255,7 @@ function AddProduct() {
                                         <label htmlFor="exampleInputEmail1" className="font-weight-bold">
                                             Thương hiệu:
                                         </label>
-                                        <select class="form-control" name="brandId" {...register('brandId')}>
+                                        <select className="form-control" name="brandId" {...register('brandId')}>
                                             <option disabled selected value="">
                                                 Chọn thương hiệu
                                             </option>
@@ -333,7 +333,7 @@ function AddProduct() {
                                         </label>
                                         <input
                                             type="file"
-                                            class="form-control-file"
+                                            className="form-control-file"
                                             id="exampleFormControlFile1"
                                             onChange={handleImg}
                                         />

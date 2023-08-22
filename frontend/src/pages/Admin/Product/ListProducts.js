@@ -131,7 +131,7 @@ function ListProducts() {
                                                     <td>{item.name}</td>
                                                     <td>
                                                         <Link to={`/admin-photo-product-samples/${item.id}`}>
-                                                            <i class="fas fa-photo-video"></i>
+                                                            <i className="fas fa-photo-video"></i>
                                                         </Link>
                                                     </td>
                                                     <td>
