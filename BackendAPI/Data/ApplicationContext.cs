@@ -44,10 +44,15 @@ namespace BackendAPI.Data
          .HasOne(b => b.User)
          .WithMany(a => a.ProductPurchaseOrders)
          .OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<ProductPurchaseOrderDetail>(entity =>
-            {
-                entity.HasKey(c => new { c.ProductPurchaseOrderId, c.ProductSampleId,c.Id });
-            });
+            //modelBuilder.Entity<ProductPurchaseOrderDetail>(entity =>
+            //{
+            //    entity.HasKey(c => new { c.ProductPurchaseOrderId, c.ProductSampleId, c.Id });
+            //});
+
+            //modelBuilder.Entity<OrderDetail>(entity =>
+            //{
+            //    entity.HasKey(c => new { c.OrderId, c.ProductPurchaseOrderDetailId, c.Id });
+            //});
         }
         public DbSet<Brand>? Brands { get; set; }
         public DbSet<Supplier>? Suppliers { get; set; }

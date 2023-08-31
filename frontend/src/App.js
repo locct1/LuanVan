@@ -10,11 +10,13 @@ import AdminProtectedRoutes from './routes/AdminProtectedRoutes';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { AdminLoadUser } from '~/redux/Slices/AdminAuthSlice';
+import { ClientLoadUser } from './redux/Slices/ClientAuthSlice';
 const queryClient = new QueryClient();
 function App() {
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(AdminLoadUser());
+        dispatch(ClientLoadUser());
     }, []);
     return (
         <QueryClientProvider client={queryClient}>

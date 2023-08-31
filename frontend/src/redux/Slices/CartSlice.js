@@ -5,13 +5,24 @@ export default createSlice({
     name: 'cart',
     initialState: {
         listProducts: [],
+        recipient: null,
+        note: null,
         total: 0,
+        isCheckOut: false,
     },
     reducers: {
         // IMMER
         resetCart: (state, action) => {
             state.listProducts = [];
             state.total = 0;
+        },
+        updateInfoRecipient: (state, action) => {
+            state.note = action.payload.note;
+            state.recipient = action.payload.recipient;
+            state.isCheckOut = false;
+        },
+        updateCheckOut: (state, action) => {
+            state.isCheckOut = false;
         },
         addProduct: (state, action) => {
             const productSample = state.listProducts.find((productSample) => productSample.id === action.payload.id);

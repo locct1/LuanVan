@@ -200,7 +200,6 @@ namespace BackendAPI.Controllers
 
                         ProductPurchaseOrderDetail productPurchaseOrderDetail = new ProductPurchaseOrderDetail
                         {
-                            Id = randomNumber,
                             ProductSampleId = item.ProductSampleId,
                             ProductPurchaseOrderId = productPurchaseOrder.Id,
                             PriceIn = item.PriceIn,

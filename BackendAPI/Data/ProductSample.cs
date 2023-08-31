@@ -18,6 +18,5 @@ namespace BackendAPI.Data
         public bool Disabled { get; set; }
         public string? FileName { get; set; }
         public List<Photo> Photos { get; set; }
-
     }
 }

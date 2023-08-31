@@ -9,7 +9,17 @@ import Form from 'react-bootstrap/Form';
 import { Button } from 'react-bootstrap';
 import { callAPIGetDistrict, callAPIGetProvince, callAPIGetWard } from '~/services/client/getaddress.service';
 import { Watermark } from 'antd';
+import { RegisterClient } from '~/services/client/clientAuth.service';
+import { useSelector } from 'react-redux';
+import { isAuthenticatedClientSelector } from '~/redux/selectors';
 function ClientRegister() {
+    const navigate = useNavigate();
+    const isAuthenticated = useSelector(isAuthenticatedClientSelector);
+    useEffect(() => {
+        if (isAuthenticated) {
+            return navigate('/');
+        }
+    }, [isAuthenticated]);
     const schema = yup
         .object()
         .shape({
@@ -51,19 +61,12 @@ function ClientRegister() {
             setListProvinces(response);
         }
     };
-    const onSuccess = (data) => {
-        if (data.success) {
-            resetField('name');
-            resetField('address');
-            toast.success('Tạo thành công');
-        } else {
-            setErrorsForm(data.errors);
-        }
-    };
 
-    const { mutate: addWareHouse } = useAddWareHouseData(onSuccess);
     const handleProvinceChange = async (e) => {
         clearErrors('province');
+        if (e.target.value === '') {
+            return;
+        }
         let code = parseInt(e.target.value);
         let province = listProvinces.find((x) => x.code === code);
         setValue('province', e.target.value);
@@ -92,10 +95,17 @@ function ClientRegister() {
         setWard(ward);
     };
     const onSubmit = async (data) => {
-        console.log(province);
-        console.log(district);
-        console.log(ward);
-        console.log(data);
+        setErrorsForm([]);
+        const fullAddress = data.address + ', ' + ward.name + ', ' + district.name + ', ' + province.name;
+        let createAccount = {
+            ...data,
+            fullAddress: fullAddress,
+        };
+        let response = await RegisterClient(createAccount);
+        console.log(response);
+        if (!response.success) {
+            setErrorsForm(response.errors);
+        }
     };
     return (
         <>
@@ -181,7 +191,7 @@ function ClientRegister() {
                                 </div>
                                 <div class="form-group">
                                     <label className="text-dark font-weight-bold" for="inputState">
-                                        Thành phố:
+                                        Tỉnh/Thành phố:
                                     </label>
                                     <select
                                         id="inputState"
@@ -190,7 +200,7 @@ function ClientRegister() {
                                         onChange={handleProvinceChange}
                                     >
                                         <option selected value="">
-                                            Chọn thành phố
+                                            Chọn tỉnh/thành phố
                                         </option>
                                         {listProvinces?.map((province, index) => (
                                             <option value={province.code} key={index}>
@@ -204,7 +214,7 @@ function ClientRegister() {
                                 </div>
                                 <div class="form-group">
                                     <label className="text-dark font-weight-bold" for="inputState">
-                                        Quận:
+                                        Quận/Huyện:
                                     </label>
                                     <select
                                         id="inputState"
@@ -213,7 +223,7 @@ function ClientRegister() {
                                         onChange={handleDistrictChange}
                                     >
                                         <option selected value="">
-                                            Chọn quận
+                                            Chọn quận/huyện
                                         </option>
                                         {listDistricts?.map((district, index) => (
                                             <option value={district.code} key={index}>
@@ -227,7 +237,7 @@ function ClientRegister() {
                                 </div>
                                 <div class="form-group">
                                     <label className="text-dark font-weight-bold" for="inputState">
-                                        Phường:
+                                        Phường/Xã:
                                     </label>
                                     <select
                                         id="inputState"
@@ -236,7 +246,7 @@ function ClientRegister() {
                                         onChange={handleWardChange}
                                     >
                                         <option selected value="">
-                                            Chọn phường
+                                            Chọn phường/xã
                                         </option>
                                         {listWards?.map((ward, index) => (
                                             <option value={ward.code} key={index}>
@@ -247,7 +257,7 @@ function ClientRegister() {
                                     {errors.ward?.message && <p className="mt-2 text-danger">{errors.ward?.message}</p>}
                                 </div>
                                 <div className="form-group">
-                                    <label className="text-dark font-weight-bold">Số nhà:</label>
+                                    <label className="text-dark font-weight-bold">Số nhà/đường:</label>
                                     <textarea
                                         class="form-control"
                                         id="exampleFormControlTextarea1"

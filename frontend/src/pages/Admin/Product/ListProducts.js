@@ -196,7 +196,7 @@ function ListProducts() {
                                     )
                                 ) : (
                                     <tr>
-                                        <td className="text-center" colSpan="11">
+                                        <td className="text-center" colSpan="12">
                                             Không có dữ liệu
                                         </td>
                                     </tr>

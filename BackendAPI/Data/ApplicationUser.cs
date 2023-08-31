@@ -11,5 +11,7 @@ namespace BackendAPI.Data
         public string? Address { get; set; }
         public bool Disabled { get; set; }
         public List<ProductPurchaseOrder>? ProductPurchaseOrders { get; set; }
+        public List<Order>? Orders { get; set; }
+
     }
 }

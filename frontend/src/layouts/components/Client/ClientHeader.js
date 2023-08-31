@@ -1,9 +1,17 @@
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { infoCart } from '~/redux/selectors';
+import { Dropdown } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { ClientLogout } from '~/redux/Slices/ClientAuthSlice';
+import { infoCart, infoClientSelector } from '~/redux/selectors';
 
 function ClientHeader() {
     const cart = useSelector(infoCart);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const Logout = async () => {
+        dispatch(ClientLogout());
+    };
+    const infoClient = useSelector(infoClientSelector);
     return (
         <>
             {' '}
@@ -154,9 +162,49 @@ function ClientHeader() {
                                         </ul>
                                     </div> */}
                                     <div className="header__top__right__auth">
-                                        <Link to="/client-login">
-                                            <i className="fa fa-user" /> Đăng nhập
-                                        </Link>
+                                        {infoClient !== null ? (
+                                            <>
+                                                {' '}
+                                                <Dropdown>
+                                                    <Dropdown.Toggle className="bg-dark" id="dropdown-basic" size="sm">
+                                                        {infoClient.fullName}
+                                                    </Dropdown.Toggle>
+
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item
+                                                            className="bg-light text-dark"
+                                                            onClick={() => navigate('/update-info-client')}
+                                                        >
+                                                            Cập nhật thông tin
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            className="bg-light text-dark"
+                                                            onClick={() => navigate('/change-password-client')}
+                                                        >
+                                                            Thay đổi mật khẩu
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            className="bg-light text-dark"
+                                                            onClick={() => navigate('/order-history')}
+                                                        >
+                                                            Lịch sử đơn hàng
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item
+                                                            className="bg-light text-dark"
+                                                            onClick={() => Logout()}
+                                                        >
+                                                            Đăng xuất
+                                                        </Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Link to="/client-login">
+                                                    <i className="fa fa-user" /> Đăng nhập
+                                                </Link>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>

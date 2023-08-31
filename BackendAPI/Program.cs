@@ -49,6 +49,12 @@ builder.Services.AddScoped<IProductPurchaseOrderService, ProductPurchaseOrderSer
 builder.Services.AddScoped<IProductPurchaseOrderDetailService, ProductPurchaseOrderDetailService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<IPageService, PageService>();
+builder.Services.AddScoped<IClientAccountService, ClientAccountService>();
+builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+builder.Services.AddScoped<IRecipientService, RecipientService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
+builder.Services.AddScoped<IVnPayClientService, VnPayClientService>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Carousel } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ProductCard from '~/components/Client/ProductCard';
 import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE } from '~/helpers/constants';
 import { stringToSlug } from '~/helpers/covertString';
 import { useProductByIdClientData, useProductsClientData } from '~/hooks/react-query/client/pageData';
 import CartSlice from '~/redux/Slices/CartSlice';
-import { infoCart } from '~/redux/selectors';
+import { infoCart, isAuthenticatedClientSelector } from '~/redux/selectors';
 function Cart() {
     const dispatch = useDispatch();
     const cart = useSelector(infoCart);
+    const navigate = useNavigate();
+
+    const isAuthenticatedClient = useSelector(isAuthenticatedClientSelector);
     const handleChangeQuantityMinus = (productSample) => {
         let productMinustoCart = {
             ...productSample,
@@ -28,6 +31,14 @@ function Cart() {
             quantityCart: 1,
         };
         dispatch(CartSlice.actions.plusProduct(productaddtoCart));
+    };
+    const handleClickCheckIsAuthenticatedClient = () => {
+        if (!isAuthenticatedClient) {
+            toast.warning('Vui lòng đăng nhập để đặt hàng');
+            return;
+        }
+        window.scrollTo(0, 0);
+        navigate('/confirm-order');
     };
     return (
         <>
@@ -62,11 +73,10 @@ function Cart() {
                             </div>
                         </div>
                     </div>
-                    <div className="row">
-                        <div className="col-12">
-                            {cart && cart.listProducts.length > 0 ? (
-                                <>
-                                    {' '}
+                    {cart && cart.listProducts.length > 0 ? (
+                        <>
+                            <div className="row">
+                                <div className="col-12">
                                     <table
                                         id="tblGioHang"
                                         className="table table-bordered"
@@ -163,12 +173,27 @@ function Cart() {
                                             </tr>
                                         </tbody>
                                     </table>
-                                </>
-                            ) : (
-                                <h3>Chưa có sản phẩm nào trong giỏ hàng.</h3>
-                            )}
-                        </div>
-                    </div>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-12">
+                                    <Link to="/" className="btn btn-dark">
+                                        Trang chủ
+                                    </Link>
+
+                                    <button
+                                        className="btn btn-primary ml-2"
+                                        onClick={() => handleClickCheckIsAuthenticatedClient()}
+                                    >
+                                        Xác nhận đặt hàng
+                                    </button>
+                                    <button className="btn btn-danger ml-2">Xóa tất cả</button>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <h3>Chưa có sản phẩm nào trong giỏ hàng.</h3>
+                    )}
                 </div>
             </section>
         </>

@@ -13,10 +13,10 @@ namespace BackendAPI.Data
         [ForeignKey(nameof(ProductSampleId))]
         public int ProductSampleId { get; set; }
         public string Name { get; set; }
+        public int StatusId { get; set; }
         public double PriceIn { get; set; }
         public ProductPurchaseOrder ProductPurchaseOrder { get; set; }
         [ForeignKey(nameof(ProductPurchaseOrderId))]
         public int ProductPurchaseOrderId { get; set; }
-
     }
 }

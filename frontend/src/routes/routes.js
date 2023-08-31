@@ -35,6 +35,17 @@ import ProductDetail from '~/pages/Client/ProducrDetail';
 import Cart from '~/pages/Client/Cart';
 import LoginClient from '~/pages/Client/ClientLogin';
 import RegisterClient from '~/pages/Client/ClientRegister';
+import ConfirmOrder from '~/pages/Client/ConfirmOrder';
+import ChangePassWordClient from '~/pages/Client/ChangePassWordClient';
+import UpdateInfoClient from '~/pages/Client/UpdateInfoClient';
+import ListPaymentMethods from '~/pages/Admin/PaymentMethod/ListPaymentMethods';
+import AddPaymentMethod from '~/pages/Admin/PaymentMethod/AddPaymentMethod';
+import UpdatePaymentMethod from '~/pages/Admin/PaymentMethod/UpdatePaymentMethod';
+import CheckoutSuccess from '~/pages/Client/CheckoutSuccess';
+import ListOrders from '~/pages/Admin/Order/ListOrders';
+import DetailOrder from '~/pages/Admin/Order/DetailOrder';
+import OrderHistory from '~/pages/Client/OrderHistory';
+import CheckoutVnPaySuccess from '~/pages/Client/CheckoutVnPaySuccess';
 // Public routes
 const publicRoutes = [
     { path: '/admin-login', component: AdminLogin, layout: null },
@@ -46,6 +57,13 @@ const publicRoutes = [
     { path: '/cart', component: Cart, layout: HomeLayoutNoImg },
     { path: '/client-login', component: LoginClient, layout: HomeLayoutNoImg },
     { path: '/client-register', component: RegisterClient, layout: HomeLayoutNoImg },
+    { path: '/confirm-order', component: ConfirmOrder, layout: HomeLayoutNoImg },
+    { path: '/change-password-client', component: ChangePassWordClient, layout: HomeLayoutNoImg },
+    { path: '/update-info-client', component: UpdateInfoClient, layout: HomeLayoutNoImg },
+    { path: '/confirm-order', component: ConfirmOrder, layout: HomeLayoutNoImg },
+    { path: '/checkout-success', component: CheckoutSuccess, layout: HomeLayoutNoImg },
+    { path: '/checkout-vnpay-success', component: CheckoutVnPaySuccess, layout: HomeLayoutNoImg },
+    { path: '/order-history', component: OrderHistory, layout: HomeLayoutNoImg },
 ];
 const adminPrivateRoutes = [
     { path: '/admin-list-brands', component: ListBrands, layout: AdminLayout },
@@ -64,6 +82,10 @@ const adminPrivateRoutes = [
     { path: '/admin-add-colorproduct', component: AddColorProduct, layout: AdminLayout },
     { path: '/admin-colorproducts/:id', component: UpdateColorProduct, layout: AdminLayout },
 
+    { path: '/admin-list-paymentmethods', component: ListPaymentMethods, layout: AdminLayout },
+    { path: '/admin-add-paymentmethod', component: AddPaymentMethod, layout: AdminLayout },
+    { path: '/admin-paymentmethods/:id', component: UpdatePaymentMethod, layout: AdminLayout },
+
     { path: '/admin-list-roles', component: ListRoles, layout: AdminLayout },
     { path: '/admin-add-role', component: AddRole, layout: AdminLayout },
     { path: '/admin-roles/:id', component: UpdateRole, layout: AdminLayout },
@@ -75,5 +97,8 @@ const adminPrivateRoutes = [
     { path: '/admin-photo-product-samples/:id', component: PhotoProductSamples, layout: AdminLayout },
     { path: '/test-pdf', component: TestPDF, layout: null },
     { path: '/admin-dashboard', component: DashBoard, layout: AdminLayout },
+
+    { path: '/admin-list-orders', component: ListOrders, layout: AdminLayout },
+    { path: '/detail-order/:id', component: DetailOrder, layout: AdminLayout },
 ];
 export { publicRoutes, adminPrivateRoutes };

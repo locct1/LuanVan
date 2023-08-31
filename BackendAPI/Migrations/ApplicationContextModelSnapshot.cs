@@ -155,6 +155,145 @@ namespace BackendAPI.Migrations
                     b.ToTable("ColorProduct");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Onl_Amount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Onl_BankCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Onl_OrderId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Onl_OrderInfo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Onl_PayDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Onl_SecureHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Onl_TransactionNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Onl_TransactionStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("OrderStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RecipientId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Total")
+                        .HasMaxLength(100)
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderStatusId");
+
+                    b.HasIndex("PaymentMethodId");
+
+                    b.HasIndex("RecipientId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OrderDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("PriceOut")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ProductPurchaseOrderDetailId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductPurchaseOrderDetailId");
+
+                    b.ToTable("OrderDetail");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OrderStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderStatus");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.PaymentMethod", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentMethod");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Photo", b =>
                 {
                     b.Property<int>("Id")
@@ -278,14 +417,11 @@ namespace BackendAPI.Migrations
 
             modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrderDetail", b =>
                 {
-                    b.Property<int>("ProductPurchaseOrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductSampleId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -294,7 +430,18 @@ namespace BackendAPI.Migrations
                     b.Property<double>("PriceIn")
                         .HasColumnType("float");
 
-                    b.HasKey("ProductPurchaseOrderId", "ProductSampleId", "Id");
+                    b.Property<int>("ProductPurchaseOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductSampleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductPurchaseOrderId");
 
                     b.HasIndex("ProductSampleId");
 
@@ -331,6 +478,34 @@ namespace BackendAPI.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductSample");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.Recipient", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Recipient");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Supplier", b =>
@@ -516,6 +691,50 @@ namespace BackendAPI.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.Order", b =>
+                {
+                    b.HasOne("BackendAPI.Data.OrderStatus", "OrderStatus")
+                        .WithMany("Orders")
+                        .HasForeignKey("OrderStatusId");
+
+                    b.HasOne("BackendAPI.Data.PaymentMethod", "PaymentMethod")
+                        .WithMany("Orders")
+                        .HasForeignKey("PaymentMethodId");
+
+                    b.HasOne("BackendAPI.Data.Recipient", "Recipient")
+                        .WithMany("Orders")
+                        .HasForeignKey("RecipientId");
+
+                    b.HasOne("BackendAPI.Data.ApplicationUser", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("OrderStatus");
+
+                    b.Navigation("PaymentMethod");
+
+                    b.Navigation("Recipient");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OrderDetail", b =>
+                {
+                    b.HasOne("BackendAPI.Data.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId");
+
+                    b.HasOne("BackendAPI.Data.ProductPurchaseOrderDetail", "ProductPurchaseOrderDetail")
+                        .WithMany()
+                        .HasForeignKey("ProductPurchaseOrderDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("ProductPurchaseOrderDetail");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Photo", b =>
                 {
                     b.HasOne("BackendAPI.Data.Product", "Product")
@@ -661,6 +880,8 @@ namespace BackendAPI.Migrations
 
             modelBuilder.Entity("BackendAPI.Data.ApplicationUser", b =>
                 {
+                    b.Navigation("Orders");
+
                     b.Navigation("ProductPurchaseOrders");
                 });
 
@@ -672,6 +893,21 @@ namespace BackendAPI.Migrations
             modelBuilder.Entity("BackendAPI.Data.ColorProduct", b =>
                 {
                     b.Navigation("ProductSamples");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OrderStatus", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.PaymentMethod", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Product", b =>
@@ -687,6 +923,11 @@ namespace BackendAPI.Migrations
             modelBuilder.Entity("BackendAPI.Data.ProductSample", b =>
                 {
                     b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.Recipient", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Supplier", b =>

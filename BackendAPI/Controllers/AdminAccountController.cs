@@ -32,6 +32,13 @@ namespace BackendAPI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                  .Select(e => e.ErrorMessage)
+                                                  .ToArray();
+                    return BadRequest(new Response { Success = false, Errors = errors });
+                }
                 var result = await _adminAccountService.SignInAsync(signInAdminModel);
 
                 if (!result.Success)

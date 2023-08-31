@@ -22,5 +22,14 @@ namespace BackendAPI.Services
             return await _unitOfWork.GetRepository<ProductPurchaseOrderDetail>().Get(filter: x => x.Id == id);
 
         }
+        public async Task<ProductPurchaseOrderDetail> GetProductPurchaseOrderDetailFirstĐefaultByStatus(int ProductSampleId)
+        {
+            return await _unitOfWork.GetRepository<ProductPurchaseOrderDetail>().Get(filter: x => x.StatusId == 0 && x.ProductSampleId == ProductSampleId);
+        }
+        public async Task UpdateProductPurchaseOrderDetail(int id, ProductPurchaseOrderDetail productPurchaseOrderDetail)
+        {
+            await _unitOfWork.GetRepository<ProductPurchaseOrderDetail>().Update(productPurchaseOrderDetail);
+
+        }
     }
 }

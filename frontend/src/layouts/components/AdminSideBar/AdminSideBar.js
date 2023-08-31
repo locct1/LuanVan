@@ -68,6 +68,12 @@ function AdminSideBar({ sidebarToggle, toggled }) {
                 </NavLink>
             </li>
             <li className="nav-item">
+                <NavLink to="/admin-list-paymentmethods" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý phương thức thanh toán</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
                 <NavLink to="/admin-list-roles" className={classNameFunc}>
                     <i className="fas fa-fw fa-chart-area" />
                     <span>Quản lý vai trò</span>
@@ -83,6 +89,12 @@ function AdminSideBar({ sidebarToggle, toggled }) {
                 <NavLink to="/list-product-inventories" className={classNameFunc}>
                     <i className="fas fa-fw fa-chart-area" />
                     <span>Danh sách tồn kho</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
+                <NavLink to="/admin-list-orders" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý đơn hàng</span>
                 </NavLink>
             </li>
             {/* Divider */}
