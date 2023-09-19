@@ -1,5 +1,5 @@
 import { Button, Modal } from 'react-bootstrap';
-import { LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
 import moment from 'moment';
 
 import 'moment/locale/vi';
@@ -109,7 +109,7 @@ function OrderDetailClientModal({ show, onClose, dataOrder }) {
                                                             style={{ maxWidth: '83%' }}
                                                             className="product__details__pic__item--large"
                                                             src={
-                                                                LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE +
+                                                                LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE +
                                                                 (item.items.length > 0 ? item.items[0].fileName : '')
                                                             }
                                                             alt=""
@@ -119,14 +119,14 @@ function OrderDetailClientModal({ show, onClose, dataOrder }) {
                                                     <td>
                                                         {String(
                                                             item.items.length > 0 ? item.items[0].priceOut : 0,
-                                                        ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}{' '}
+                                                        ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
                                                         <sup>đ</sup>
                                                     </td>
                                                     <td>
                                                         {String(
                                                             (item.items.length > 0 ? item.items[0].priceOut : 0) *
                                                                 (item.items.length > 0 ? item.items.length : 0),
-                                                        ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}{' '}
+                                                        ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
                                                         <sup>đ</sup>
                                                     </td>
                                                 </tr>
@@ -140,7 +140,7 @@ function OrderDetailClientModal({ show, onClose, dataOrder }) {
                                                     {String(dataOrder.order.total).replace(
                                                         /(\d)(?=(\d\d\d)+(?!\d))/g,
                                                         '$1,',
-                                                    )}{' '}
+                                                    )}
                                                     <sup>đ</sup>
                                                 </td>
                                             </tr>

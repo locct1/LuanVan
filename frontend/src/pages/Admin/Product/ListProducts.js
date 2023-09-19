@@ -105,13 +105,11 @@ function ListProducts() {
                                     <th scope="col">Id</th>
                                     <th scope="col">Tên sản phẩm</th>
                                     <th scope="col">Thư viện ảnh</th>
-                                    <th width="40%" scope="col">
+                                    <th width="20%" scope="col">
                                         Hình ảnh
                                     </th>
                                     <th scope="col">Nhà kho</th>
                                     <th scope="col">Thương hiệu</th>
-                                    <th scope="col">Giá nhập</th>
-                                    <th scope="col">Giá bán</th>
                                     <th scope="col">Ngày tạo</th>
                                     <th scope="col">Ngày cập nhật</th>
                                     <th scope="col" className="text-center" width="30%">
@@ -145,20 +143,6 @@ function ListProducts() {
 
                                                     <td>{item.wareHouse?.name}</td>
                                                     <td>{item.brand?.name}</td>
-                                                    <td>
-                                                        {String(item.priceIn).replace(
-                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
-                                                            '$1,',
-                                                        )}
-                                                        <sup>đ</sup>
-                                                    </td>
-                                                    <td>
-                                                        {String(item.priceOut).replace(
-                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
-                                                            '$1,',
-                                                        )}
-                                                        <sup>đ</sup>
-                                                    </td>
                                                     <td>{moment(item.createdAt).format('DD/MM/YYYY HH:mm:ss')}</td>
                                                     <td>{moment(item.updatedAt).format('DD/MM/YYYY HH:mm:ss')}</td>
 

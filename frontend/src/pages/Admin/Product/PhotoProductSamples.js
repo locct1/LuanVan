@@ -17,29 +17,39 @@ import { useMatch, useParams } from 'react-router-dom';
 import { LINK_PRODUCT_IMAGE, htmlTable } from '~/helpers/constants';
 import PhotoDefaultProductSample from '~/components/ProductSample/PhotoDefaultProductSample';
 import SlidePhotoProductSample from '~/components/ProductSample/SlidePhotoProductSample';
+import ImageProduct360 from '~/components/ProductSample/ImageProduct360';
+import { usePhotosByProductIdData } from '~/hooks/react-query/productsampleData';
 
 function PhotoProductSamples() {
     const { id } = useParams();
     const { isLoading, data, isError, error } = useGetProductData(id);
+    const { isLoading: isLoadingPhotosByProductId, data: dataPhotosByProductId } = usePhotosByProductIdData(id);
     const [selectProducSample, setSelectedProductSample] = useState('');
-    const [productSample, setProductSample] = useState(null);
+    const [productColorProduct, setProductSample] = useState(null);
+    const [image360, setImage360] = useState(false);
     useEffect(() => {
         if (data && data !== null) {
-            let productSample = data.data.productSamples.find((p) => p.id === parseInt(selectProducSample));
-            if (productSample !== null) {
-                setProductSample(productSample);
+            let productColorProduct = data.data.productColorProducts.find((p) => p.id === parseInt(selectProducSample));
+            if (productColorProduct !== null) {
+                setProductSample(productColorProduct);
             }
         }
     }, [data]);
-    if (isLoading) {
+    if (isLoading || isLoadingPhotosByProductId) {
         return <LoadingAdmin />;
     }
     const handleChangeProductSample = (e) => {
         setSelectedProductSample(e.target.value);
-        let productSample = data.data.productSamples.find((p) => p.id === parseInt(e.target.value));
-        setProductSample(productSample);
+        if (e.target.value === 'image-360') {
+            setImage360(true);
+            console.log('fdfdfd', dataPhotosByProductId);
+            return;
+        } else {
+            setImage360(false);
+        }
+        let productColorProduct = data.data.productColorProducts.find((p) => p.id === parseInt(e.target.value));
+        setProductSample(productColorProduct);
     };
-
     return (
         <>
             <div className="card shadow mb-4">
@@ -63,11 +73,14 @@ function PhotoProductSamples() {
                                         <option selected value="">
                                             Chọn mẫu sản phẩm
                                         </option>
-                                        {data.data.productSamples?.map((productSample, index) => (
-                                            <option value={productSample.id} key={productSample.id}>
-                                                {productSample.colorProduct.name}
+                                        {data.data.productColorProducts?.map((productColorProduct, index) => (
+                                            <option value={productColorProduct.id} key={productColorProduct.id}>
+                                                {productColorProduct.colorProduct.name}
                                             </option>
                                         ))}
+                                        <option value="image-360" key="image-360">
+                                            Hình 360
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -79,10 +92,17 @@ function PhotoProductSamples() {
                 </div>
             </div>
 
-            {productSample && productSample !== null ? (
+            {productColorProduct && productColorProduct !== null && image360 === false ? (
                 <>
-                    <PhotoDefaultProductSample productSample={productSample} />
-                    <SlidePhotoProductSample productSample={productSample} />
+                    <PhotoDefaultProductSample productColorProduct={productColorProduct} />
+                    <SlidePhotoProductSample productColorProduct={productColorProduct} />
+                </>
+            ) : (
+                <></>
+            )}
+            {image360 && dataPhotosByProductId && image360 === true ? (
+                <>
+                    <ImageProduct360 productId={id} photos={dataPhotosByProductId} />
                 </>
             ) : (
                 <></>

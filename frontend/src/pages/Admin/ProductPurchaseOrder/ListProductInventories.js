@@ -71,9 +71,14 @@ function ListProductInventories() {
         if (inputSearch === '') return setListProducts(data.data);
         else {
             let newArray = data.data.filter((product) => {
-                return stringToSlug(product.product.name + ' (' + product.colorProduct?.name + ')').includes(
-                    stringToSlug(inputSearch),
-                );
+                return stringToSlug(
+                    product.productVersion.product.name +
+                        ' (' +
+                        product.productVersion.ram?.name +
+                        '-' +
+                        product.productVersion.rom?.name +
+                        ')',
+                ).includes(stringToSlug(inputSearch));
             });
 
             setListProducts(newArray);
@@ -87,15 +92,16 @@ function ListProductInventories() {
     const handleChangeQuantityProduct = async (e) => {
         let { name, value } = e.target;
         let list = data.data;
-        console.log(name);
-        console.log(value);
+        console.log(list);
         if (name === 'statusQuantityProduct') {
             setSelectStatus(value);
             if (inputQuantity !== '') {
                 list = data.data.filter((product) => product.quantity <= parseInt(inputQuantity));
             }
             if (selectWareHouse !== '') {
-                list = list.filter((product) => product.product.wareHouse.id === parseInt(selectWareHouse));
+                list = list.filter(
+                    (product) => product.productVersion.product.wareHouse.id === parseInt(selectWareHouse),
+                );
             }
             if (value === '1') {
                 list = list.filter((product) => product.quantity > 10);
@@ -115,7 +121,9 @@ function ListProductInventories() {
                 list = list.filter((product) => product.quantity <= parseInt(value));
             }
             if (selectWareHouse !== '') {
-                list = list.filter((product) => product.product.wareHouse.id === parseInt(selectWareHouse));
+                list = list.filter(
+                    (product) => product.productVersion.product.wareHouse.id === parseInt(selectWareHouse),
+                );
             }
             if (selectStatus === '1') {
                 list = list.filter((product) => product.quantity > 10);
@@ -132,7 +140,7 @@ function ListProductInventories() {
         if (name === 'wareHouseId') {
             setSelectWareHouse(value);
             if (value !== '') {
-                list = list.filter((product) => product.product.wareHouse.id === parseInt(value));
+                list = list.filter((product) => product.productVersion.product.wareHouse.id === parseInt(value));
             }
             console.log(list);
             if (inputQuantity !== '') {
@@ -238,6 +246,7 @@ function ListProductInventories() {
                                     <th scope="col">#</th>
                                     <th scope="col">Id</th>
                                     <th scope="col"> Tên mẫu sản phẩm</th>
+                                    <th scope="col"> Màu</th>
                                     <th scope="col">Nhà kho</th>
                                     <th scope="col">Số lượng</th>
                                 </tr>
@@ -252,9 +261,21 @@ function ListProductInventories() {
                                                     <td scope="row">{++index}</td>
                                                     <td>{item.id}</td>
                                                     <td>
-                                                        {item.product?.name} ({item.colorProduct?.name})
+                                                        {item.productVersion?.product.name}{' '}
+                                                        {item.productVersion?.product.isVersionRam === true ? (
+                                                            <>
+                                                                ({item.productVersion?.ram.name}GB-
+                                                                {item.productVersion?.rom.name}GB)
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                ({item.productVersion?.ram.name}GB-
+                                                                {item.productVersion?.rom.name}GB)
+                                                            </>
+                                                        )}
                                                     </td>
-                                                    <td>{item.product?.wareHouse?.name}</td>
+                                                    <td> {item.colorProduct?.name}</td>
+                                                    <td>{item.productVersion.product?.wareHouse?.name}</td>
                                                     <td>{item.quantity}</td>
                                                 </tr>
                                             ),

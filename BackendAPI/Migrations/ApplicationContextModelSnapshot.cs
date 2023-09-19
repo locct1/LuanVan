@@ -134,6 +134,45 @@ namespace BackendAPI.Migrations
                     b.ToTable("Brand");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.Chip", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("ChipTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChipTypeId");
+
+                    b.ToTable("Chip");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ChipType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChipType");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.ColorProduct", b =>
                 {
                     b.Property<int>("Id")
@@ -153,6 +192,45 @@ namespace BackendAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ColorProduct");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OperatingSystemProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("OperatingSystemTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperatingSystemTypeId");
+
+                    b.ToTable("OperatingSystemProduct");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OperatingSystemType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OperatingSystemType");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Order", b =>
@@ -303,8 +381,10 @@ namespace BackendAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("FileName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductColorProductId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
@@ -313,6 +393,8 @@ namespace BackendAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductColorProductId");
 
                     b.HasIndex("ProductId");
 
@@ -329,7 +411,16 @@ namespace BackendAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("Battery")
+                        .HasColumnType("int");
+
                     b.Property<int?>("BrandId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Charging")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ChipId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -337,6 +428,10 @@ namespace BackendAPI.Migrations
 
                     b.Property<bool>("Disabled")
                         .HasColumnType("bit");
+
+                    b.Property<string>("FrontCamera")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .IsRequired()
@@ -346,20 +441,34 @@ namespace BackendAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsVersionRam")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("PriceIn")
-                        .HasColumnType("float");
-
-                    b.Property<double>("PriceOut")
-                        .HasColumnType("float");
+                    b.Property<int?>("OperatingSystemProductId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<string>("TechnicalDetail")
+                    b.Property<string>("RearCamera")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Resolution")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ScreenTechnologyId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("ScreenWidth")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Sim")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -373,9 +482,41 @@ namespace BackendAPI.Migrations
 
                     b.HasIndex("BrandId");
 
+                    b.HasIndex("ChipId");
+
+                    b.HasIndex("OperatingSystemProductId");
+
+                    b.HasIndex("ScreenTechnologyId");
+
                     b.HasIndex("WareHouseId");
 
                     b.ToTable("Product");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductColorProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("ColorProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ColorProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductColorProduct");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrder", b =>
@@ -462,10 +603,7 @@ namespace BackendAPI.Migrations
                     b.Property<bool>("Disabled")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ProductId")
+                    b.Property<int?>("ProductVersionId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -475,9 +613,111 @@ namespace BackendAPI.Migrations
 
                     b.HasIndex("ColorProductId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductVersionId");
 
                     b.ToTable("ProductSample");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<double>("PriceIn")
+                        .HasColumnType("float");
+
+                    b.Property<double>("PriceOut")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RamId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("RamId");
+
+                    b.HasIndex("RomId");
+
+                    b.ToTable("ProductVersion");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.PromotionProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Disabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PromotionProduct");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.PromotionProductDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<double>("DiscountedPrice")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("ProductVersionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PromotionProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductVersionId");
+
+                    b.HasIndex("PromotionProductId");
+
+                    b.ToTable("PromotionProductDetail");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.Ram", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Name")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ram");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Recipient", b =>
@@ -506,6 +746,39 @@ namespace BackendAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Recipient");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.Rom", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Name")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rom");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ScreenTechnology", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScreenTechnology");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Supplier", b =>
@@ -691,6 +964,24 @@ namespace BackendAPI.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.Chip", b =>
+                {
+                    b.HasOne("BackendAPI.Data.ChipType", "ChipType")
+                        .WithMany("Chips")
+                        .HasForeignKey("ChipTypeId");
+
+                    b.Navigation("ChipType");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OperatingSystemProduct", b =>
+                {
+                    b.HasOne("BackendAPI.Data.OperatingSystemType", "OperatingSystemType")
+                        .WithMany("OperatingSystems")
+                        .HasForeignKey("OperatingSystemTypeId");
+
+                    b.Navigation("OperatingSystemType");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Order", b =>
                 {
                     b.HasOne("BackendAPI.Data.OrderStatus", "OrderStatus")
@@ -737,17 +1028,21 @@ namespace BackendAPI.Migrations
 
             modelBuilder.Entity("BackendAPI.Data.Photo", b =>
                 {
+                    b.HasOne("BackendAPI.Data.ProductColorProduct", "ProductColorProduct")
+                        .WithMany("Photos")
+                        .HasForeignKey("ProductColorProductId");
+
                     b.HasOne("BackendAPI.Data.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId");
 
-                    b.HasOne("BackendAPI.Data.ProductSample", "ProductSample")
+                    b.HasOne("BackendAPI.Data.ProductSample", null)
                         .WithMany("Photos")
                         .HasForeignKey("ProductSampleId");
 
                     b.Navigation("Product");
 
-                    b.Navigation("ProductSample");
+                    b.Navigation("ProductColorProduct");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Product", b =>
@@ -757,6 +1052,18 @@ namespace BackendAPI.Migrations
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("BackendAPI.Data.Chip", "Chip")
+                        .WithMany("Products")
+                        .HasForeignKey("ChipId");
+
+                    b.HasOne("BackendAPI.Data.OperatingSystemProduct", "OperatingSystemProduct")
+                        .WithMany("Products")
+                        .HasForeignKey("OperatingSystemProductId");
+
+                    b.HasOne("BackendAPI.Data.ScreenTechnology", "ScreenTechnology")
+                        .WithMany("Products")
+                        .HasForeignKey("ScreenTechnologyId");
+
                     b.HasOne("BackendAPI.Data.WareHouse", "WareHouse")
                         .WithMany("Products")
                         .HasForeignKey("WareHouseId")
@@ -764,7 +1071,28 @@ namespace BackendAPI.Migrations
 
                     b.Navigation("Brand");
 
+                    b.Navigation("Chip");
+
+                    b.Navigation("OperatingSystemProduct");
+
+                    b.Navigation("ScreenTechnology");
+
                     b.Navigation("WareHouse");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductColorProduct", b =>
+                {
+                    b.HasOne("BackendAPI.Data.ColorProduct", "ColorProduct")
+                        .WithMany()
+                        .HasForeignKey("ColorProductId");
+
+                    b.HasOne("BackendAPI.Data.Product", "Product")
+                        .WithMany("ProductColorProducts")
+                        .HasForeignKey("ProductId");
+
+                    b.Navigation("ColorProduct");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrder", b =>
@@ -817,14 +1145,51 @@ namespace BackendAPI.Migrations
                         .HasForeignKey("ColorProductId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("BackendAPI.Data.Product", "Product")
+                    b.HasOne("BackendAPI.Data.ProductVersion", "ProductVersion")
                         .WithMany("ProductSamples")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("ProductVersionId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ColorProduct");
 
+                    b.Navigation("ProductVersion");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductVersion", b =>
+                {
+                    b.HasOne("BackendAPI.Data.Product", "Product")
+                        .WithMany("ProductVersions")
+                        .HasForeignKey("ProductId");
+
+                    b.HasOne("BackendAPI.Data.Ram", "Ram")
+                        .WithMany("ProductVersions")
+                        .HasForeignKey("RamId");
+
+                    b.HasOne("BackendAPI.Data.Rom", "Rom")
+                        .WithMany("ProductVersions")
+                        .HasForeignKey("RomId");
+
                     b.Navigation("Product");
+
+                    b.Navigation("Ram");
+
+                    b.Navigation("Rom");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.PromotionProductDetail", b =>
+                {
+                    b.HasOne("BackendAPI.Data.ProductVersion", "ProductVersion")
+                        .WithMany("ProductDetails")
+                        .HasForeignKey("ProductVersionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BackendAPI.Data.PromotionProduct", "PromotionProduct")
+                        .WithMany("PromotionProductDetails")
+                        .HasForeignKey("PromotionProductId");
+
+                    b.Navigation("ProductVersion");
+
+                    b.Navigation("PromotionProduct");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -890,9 +1255,29 @@ namespace BackendAPI.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.Chip", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ChipType", b =>
+                {
+                    b.Navigation("Chips");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.ColorProduct", b =>
                 {
                     b.Navigation("ProductSamples");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OperatingSystemProduct", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.OperatingSystemType", b =>
+                {
+                    b.Navigation("OperatingSystems");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Order", b =>
@@ -912,7 +1297,14 @@ namespace BackendAPI.Migrations
 
             modelBuilder.Entity("BackendAPI.Data.Product", b =>
                 {
-                    b.Navigation("ProductSamples");
+                    b.Navigation("ProductColorProducts");
+
+                    b.Navigation("ProductVersions");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductColorProduct", b =>
+                {
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.ProductPurchaseOrder", b =>
@@ -925,9 +1317,36 @@ namespace BackendAPI.Migrations
                     b.Navigation("Photos");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ProductVersion", b =>
+                {
+                    b.Navigation("ProductDetails");
+
+                    b.Navigation("ProductSamples");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.PromotionProduct", b =>
+                {
+                    b.Navigation("PromotionProductDetails");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.Ram", b =>
+                {
+                    b.Navigation("ProductVersions");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Recipient", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.Rom", b =>
+                {
+                    b.Navigation("ProductVersions");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ScreenTechnology", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Supplier", b =>

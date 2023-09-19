@@ -4,16 +4,69 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ProductCard from '~/components/Client/ProductCard';
-import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
 import { stringToSlug } from '~/helpers/covertString';
-import { useProductByIdClientData, useProductsClientData } from '~/hooks/react-query/client/pageData';
+import {
+    useProductByIdClientData,
+    useProductVersionsClientData,
+    useProductsClientData,
+    usePromotionProductsClientData,
+} from '~/hooks/react-query/client/pageData';
 import CartSlice from '~/redux/Slices/CartSlice';
 import { infoCart, isAuthenticatedClientSelector } from '~/redux/selectors';
 function Cart() {
     const dispatch = useDispatch();
     const cart = useSelector(infoCart);
     const navigate = useNavigate();
-
+    const { isLoading: isLoadingPromotionProduct, data: dataPromotionProducts } = usePromotionProductsClientData();
+    const { isLoading: isLoadingProductVersions, data: dataProductVersions } = useProductVersionsClientData();
+    useEffect(() => {
+        // Lặp qua dataPromotionProducts để trích xuất các productVersionId đang được khuyến mãi
+        if (dataPromotionProducts && dataProductVersions) {
+            let list = [];
+            dataPromotionProducts.data.forEach((promotion) => {
+                promotion.promotionProductDetails.forEach((detail) => {
+                    list.push(detail);
+                });
+            });
+            cart.listProducts.forEach((productSample) => {
+                console.log(productSample);
+                const productVersionIdToCheck = productSample.productVersionId;
+                console.log(productVersionIdToCheck);
+                let promotionDetail = list.find((x) => x.productVersionId === productVersionIdToCheck);
+                if (promotionDetail) {
+                    // productVersionId tồn tại trong danh sách dataPromotionProducts.data
+                    console.log('Có giá trị trong danh sách dataPromotionProducts.data', promotionDetail);
+                    let productVersion = dataProductVersions.data.find(
+                        (promotion) => promotion.id === productVersionIdToCheck,
+                    );
+                    if (productVersion) {
+                        let data = {
+                            productSample: productSample,
+                            productVersion: productVersion,
+                            promotionDetail: promotionDetail,
+                        };
+                        dispatch(CartSlice.actions.updateProductInPromotionProduct(data));
+                    } else {
+                        dispatch(CartSlice.actions.removeProduct({ id: productSample.id }));
+                    }
+                } else {
+                    let productVersion = dataProductVersions.data.find(
+                        (promotion) => promotion.id === productVersionIdToCheck,
+                    );
+                    if (productVersion) {
+                        let data = {
+                            productSample: productSample,
+                            productVersion: productVersion,
+                        };
+                        dispatch(CartSlice.actions.updateProductInPromotionProduct(data));
+                    } else {
+                        dispatch(CartSlice.actions.removeProduct({ id: productSample.id }));
+                    }
+                }
+            });
+        }
+    }, [dataPromotionProducts, dataProductVersions]);
     const isAuthenticatedClient = useSelector(isAuthenticatedClientSelector);
     const handleChangeQuantityMinus = (productSample) => {
         let productMinustoCart = {
@@ -40,6 +93,9 @@ function Cart() {
         window.scrollTo(0, 0);
         navigate('/confirm-order');
     };
+    if (isLoadingPromotionProduct || isLoadingProductVersions) {
+        <></>;
+    }
     return (
         <>
             <section
@@ -88,6 +144,7 @@ function Cart() {
                                                     #
                                                 </th>
                                                 <th scope="col">Tên sản phẩm</th>
+                                                <th scope="col">Phiên bản</th>
                                                 <th scope="col" width="10%">
                                                     Hình ảnh
                                                 </th>
@@ -105,10 +162,19 @@ function Cart() {
                                                         {item.productName} ({item.colorProduct.name})
                                                     </td>
                                                     <td>
+                                                        <span className="ram-rom-separator">
+                                                            {item.productVersion.ram?.name}GB
+                                                            <span>-</span>
+                                                            {item.productVersion.rom?.name}GB
+                                                        </span>
+                                                    </td>
+                                                    <td>
                                                         <img
                                                             style={{ maxWidth: '83%' }}
                                                             className="product__details__pic__item--large"
-                                                            src={LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE + item.fileName}
+                                                            src={
+                                                                LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE + item.fileName
+                                                            }
                                                             alt=""
                                                         />
                                                     </td>
@@ -137,18 +203,85 @@ function Cart() {
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        {String(item.priceOut).replace(
-                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
-                                                            '$1,',
-                                                        )}{' '}
-                                                        <sup>đ</sup>
+                                                        <div>
+                                                            {item.discountedPrice && item.discountedPrice !== null ? (
+                                                                <>
+                                                                    <div
+                                                                        className="product__details__price mr-2"
+                                                                        style={{ color: '#d70018', fontWeight: 600 }}
+                                                                    >
+                                                                        {String(item.discountedPrice).replace(
+                                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                            '$1,',
+                                                                        )}
+                                                                        <sup>đ</sup>
+                                                                    </div>
+                                                                    <div
+                                                                        className="product__details__price"
+                                                                        style={{
+                                                                            textDecoration: 'line-through', // Gạch ngang chữ
+                                                                            color: '#6c757d', // Màu chữ xám
+                                                                            fontWeight: 300,
+                                                                        }}
+                                                                    >
+                                                                        {String(item?.priceOut).replace(
+                                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                            '$1,',
+                                                                        )}
+                                                                        <sup>đ</sup>
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <div className="product__details__price">
+                                                                        {String(item?.priceOut).replace(
+                                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                            '$1,',
+                                                                        )}
+                                                                        <sup>đ</sup>
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                     <td>
-                                                        {String(item.priceOut * item.quantityCart).replace(
-                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
-                                                            '$1,',
-                                                        )}{' '}
-                                                        <sup>đ</sup>
+                                                        {item.discountedPrice && item.discountedPrice !== null ? (
+                                                            <>
+                                                                <div
+                                                                    className="product__details__price mr-2"
+                                                                    style={{ color: '#d70018', fontWeight: 600 }}
+                                                                >
+                                                                    {String(
+                                                                        item.discountedPrice * item.quantityCart,
+                                                                    ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}{' '}
+                                                                    <sup>đ</sup>
+                                                                </div>
+                                                                <div
+                                                                    className="product__details__price"
+                                                                    style={{
+                                                                        textDecoration: 'line-through', // Gạch ngang chữ
+                                                                        color: '#6c757d', // Màu chữ xám
+                                                                        fontWeight: 300,
+                                                                    }}
+                                                                >
+                                                                    {String(item.priceOut * item.quantityCart).replace(
+                                                                        /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                        '$1,',
+                                                                    )}{' '}
+                                                                    <sup>đ</sup>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <div className="product__details__price">
+                                                                    {String(item.priceOut * item.quantityCart).replace(
+                                                                        /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                        '$1,',
+                                                                    )}{' '}
+                                                                    <sup>đ</sup>
+                                                                </div>
+                                                            </>
+                                                        )}
                                                     </td>
                                                     <td className="text-center td-actions">
                                                         <button
@@ -163,7 +296,7 @@ function Cart() {
                                             ))}
                                             <tr>
                                                 <td
-                                                    colSpan={7}
+                                                    colSpan={8}
                                                     className="bg bg-dark text-light text-center font-weight-bold"
                                                 >
                                                     Tổng tiền:{' '}

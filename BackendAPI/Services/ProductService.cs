@@ -16,7 +16,7 @@ namespace BackendAPI.Services
         }
         public async Task<IEnumerable<Product>> GetAll()
         {
-            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse), orderBy: x => x.OrderByDescending(x => x.Id));
+            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse).Include(p => p.ProductColorProducts).Include(p => p.ProductVersions), orderBy: x => x.OrderByDescending(x => x.Id)); ;
         }
         public async Task<IEnumerable<Product>> GetPagedList(int page, int limit)
         {
@@ -43,10 +43,48 @@ namespace BackendAPI.Services
         public async Task<Product?> Get(int id)
         {
             return await _unitOfWork.GetRepository<Product>().Get(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse)
-                                                    .Include(p => p.ProductSamples).ThenInclude(p => p.ColorProduct)
-                                                    .Include(p => p.ProductSamples).ThenInclude(s => s.Photos),
+            .Include(p => p.ProductColorProducts).ThenInclude(p => p.ColorProduct).Include(p => p.ProductVersions).Include(x=>x.ProductColorProducts).ThenInclude(x=>x.ColorProduct).Include(x => x.ProductColorProducts).ThenInclude(x =>x.Photos),
                                                     filter: x => x.Id == id);
 
+        }
+
+        public async Task<IEnumerable<Chip>> GetAllChips()
+        {
+            return await _unitOfWork.GetRepository<Chip>().GetAll(include: p => p.Include(p => p.ChipType));
+        }
+
+        public async Task<IEnumerable<ChipType>> GetAllChipTypes()
+        {
+            return await _unitOfWork.GetRepository<ChipType>().GetAll();
+
+        }
+
+        public async Task<IEnumerable<Ram>> GetAllRams()
+        {
+            return await _unitOfWork.GetRepository<Ram>().GetAll();
+
+        }
+
+        public async Task<IEnumerable<Rom>> GetAllRoms()
+        {
+            return await _unitOfWork.GetRepository<Rom>().GetAll();
+
+        }
+
+        public async Task<IEnumerable<OperatingSystemType>> GetAllOpertingSystemTypes()
+        {
+            return await _unitOfWork.GetRepository<OperatingSystemType>().GetAll();
+        }
+
+        public async Task<IEnumerable<OperatingSystemProduct>> GetAllOpertingSystems()
+        {
+            return await _unitOfWork.GetRepository<OperatingSystemProduct>().GetAll(include: p => p.Include(p => p.OperatingSystemType));
+
+        }
+
+        public async Task<IEnumerable<ScreenTechnology>> GetAllScreenTechnologies()
+        {
+            return await _unitOfWork.GetRepository<ScreenTechnology>().GetAll();
         }
     }
 }

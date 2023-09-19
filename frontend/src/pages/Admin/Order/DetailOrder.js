@@ -12,7 +12,7 @@ import { stringToSlug } from '~/helpers/covertString';
 import { DateSchema } from 'yup';
 import LoadingAdmin from '~/components/LoadingAdmin';
 import { useGetOrderData } from '~/hooks/react-query/orderData';
-import { LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
 function DetailOrder() {
     const { id } = useParams();
     console.log(id);
@@ -109,7 +109,7 @@ function DetailOrder() {
                                                                     style={{ maxWidth: '83%' }}
                                                                     className="product__details__pic__item--large"
                                                                     src={
-                                                                        LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE +
+                                                                        LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE +
                                                                         (item.items.length > 0
                                                                             ? item.items[0].fileName
                                                                             : '')

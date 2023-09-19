@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { stringToSlug } from '~/helpers/covertString';
 import { DateSchema } from 'yup';
 import LoadingAdmin from '~/components/LoadingAdmin';
-import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
 import moment from 'moment';
 import 'moment/locale/vi';
 import './UploadImage.scss';
@@ -13,12 +13,12 @@ import {
     useDeleteProductSampleDefaultImageData,
     useUploadProductSampleDefaultImageData,
 } from '~/hooks/react-query/productsampleData';
-function PhotoDefaultProductSample({ productSample }) {
+function PhotoDefaultProductSample({ productColorProduct }) {
     const [linkImage, setLinkImage] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
-        setLinkImage(productSample);
-    }, [productSample]);
+        setLinkImage(productColorProduct);
+    }, [productColorProduct]);
     const onSuccess = (data) => {
         if (data.success) {
             toast.success('Upload thành công');
@@ -41,12 +41,11 @@ function PhotoDefaultProductSample({ productSample }) {
         }
         const formData = new FormData();
         formData.append('image', selectedFile);
-        formData.append(`id`, productSample.id);
+        formData.append(`id`, productColorProduct.id);
         uploadProductSampleDefaultImage(formData);
     };
-
     const deleteHandler = async () => {
-        deleteProductSampleDefaultImage(productSample.id);
+        deleteProductSampleDefaultImage(productColorProduct.id);
     };
 
     return (
@@ -75,7 +74,7 @@ function PhotoDefaultProductSample({ productSample }) {
                                 <>
                                     <div className="image">
                                         <img
-                                            src={LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE + linkImage.fileName}
+                                            src={LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE + linkImage.fileName}
                                             height="200"
                                             alt="upload"
                                         />

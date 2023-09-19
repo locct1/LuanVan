@@ -3,41 +3,109 @@ import { Carousel } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import ImageProduct360Modal from '~/components/Client/ImageProduct360Modal';
 import ProductCard from '~/components/Client/ProductCard';
-import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
 import { stringToSlug } from '~/helpers/covertString';
-import { useProductByIdClientData, useProductsClientData } from '~/hooks/react-query/client/pageData';
+import {
+    useProductByIdClientData,
+    useProductSamplesClientData,
+    useProductsClientData,
+    usePromotionProductsClientData,
+} from '~/hooks/react-query/client/pageData';
+import { usePhotosByProductIdData } from '~/hooks/react-query/productsampleData';
+import useScript from '~/hooks/useScript';
 import CartSlice from '~/redux/Slices/CartSlice';
 function ProductDetail() {
+    // useScript('https://cdn.scaleflex.it/plugins/js-cloudimage-360-view/2.7.1/js-cloudimage-360-view.min.js');
     const [slideImages, setSlideImages] = useState([]);
+    const [productVersion, setProductVersion] = useState();
     const [productSample, setProductSample] = useState();
+    const [productColorProduct, setProductColorProduct] = useState();
+    const [discountedPrice, setDiscountedPrice] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const { id } = useParams();
     const dispatch = useDispatch();
     const { isLoading, data, isError, error } = useProductByIdClientData(id);
+    const { isLoading: isLoadingProductSamples, data: dataProductSamples } = useProductSamplesClientData();
+    const { isLoading: isLoadingPromotionProduct, data: dataPromotionProducts } = usePromotionProductsClientData();
+    const { isLoading: isLoadingPhotosByProductId, data: dataPhotosByProductId } = usePhotosByProductIdData(id);
+    const [show, setShow] = useState(false);
+    const [imageProduct360, setImageProduct360] = useState(null);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const [promotionProductDetails, setPromotionProductDetails] = useState([]);
     useEffect(() => {
-        if (data && data.data) {
+        if (data && data.data && dataProductSamples && dataProductSamples.data && dataPromotionProducts) {
             window.scrollTo(0, 0);
             setSlideImages([data.data.image]);
-            setProductSample(data.data.productSamples[0]);
+            setProductVersion(data.data.productVersions[0]);
+            setProductColorProduct(data.data.productColorProducts[0]);
+            let productSample = dataProductSamples.data.find(
+                (x) =>
+                    x.productVersionId === data.data.productVersions[0].id &&
+                    x.colorProductId === data.data.productColorProducts[0].colorProductId,
+            );
+
+            if (productSample) {
+                setProductSample(productSample);
+            }
+            let list = [];
+            dataPromotionProducts.data.forEach((promotion) => {
+                promotion.promotionProductDetails.forEach((detail) => {
+                    list.push(detail);
+                });
+            });
+            setPromotionProductDetails(list);
+            let promotionDetail = list.find((x) => x.productVersionId === data.data.productVersions[0].id);
+            console.log(promotionDetail);
+            if (promotionDetail) {
+                setDiscountedPrice(promotionDetail.discountedPrice);
+            }
         }
-    }, [data]);
+    }, [data, dataProductSamples, dataPromotionProducts]);
     const handleClickChangeSlideImages = (id) => {
-        let productSample = data.data.productSamples.find((x) => x.id === id);
-        if (productSample) {
-            setSlideImages(productSample.photos);
+        let productColorProduct = data.data.productColorProducts.find((x) => x.id === id);
+        setImageProduct360(null);
+        if (productColorProduct) {
+            setSlideImages(productColorProduct.photos);
         }
         // const mainRoot = document.getElementById('locationSlideImages');
         // mainRoot.scrollIntoView({ block: 'center' });
     };
-    const handleClickChangeProductSample = (id) => {
-        let productSample = data.data.productSamples.find((x) => x.id === id);
-        if (productSample) {
+    const handleClickChangeProductVersion = (id) => {
+        let findProductVersion = data.data.productVersions.find((x) => x.id === id);
+        let productSample = dataProductSamples.data.find(
+            (x) =>
+                x.productVersionId === findProductVersion.id && x.colorProductId === productColorProduct.colorProductId,
+        );
+        setProductSample(productSample);
+
+        if (findProductVersion) {
             setQuantity(1);
-            setProductSample(productSample);
+            setProductVersion(findProductVersion);
+        }
+        let promotionDetail = promotionProductDetails.find((x) => x.productVersionId === findProductVersion.id);
+        if (promotionDetail) {
+            setDiscountedPrice(promotionDetail.discountedPrice);
+        } else {
+            setDiscountedPrice(null);
+        }
+    };
+    const handleClickChangeProductColorProduct = (id) => {
+        let findProductColorProduct = data.data.productColorProducts.find((x) => x.id === id);
+        let productSample = dataProductSamples.data.find(
+            (x) =>
+                x.productVersionId === productVersion.id && x.colorProductId === findProductColorProduct.colorProductId,
+        );
+        setProductSample(productSample);
+        if (findProductColorProduct) {
+            setQuantity(1);
+            setProductColorProduct(findProductColorProduct);
         }
     };
     const handleClickChangeSlideImageDefault = (id) => {
+        setImageProduct360(null);
         setSlideImages([data.data.image]);
         // const mainRoot = document.getElementById('locationSlideImages');
         // mainRoot.scrollIntoView({ block: 'center' });
@@ -56,19 +124,51 @@ function ProductDetail() {
         setQuantity(parseInt(quantity) + 1);
     };
     const handleAddProductToCart = () => {
+        console.log(productSample);
         if (productSample === undefined || productSample === null) {
             toast.warning('Vui lòng chọn màu sản phẩm');
             return;
         }
         let productaddtoCart = {
             ...productSample,
-            priceOut: data.data.priceOut,
+            fileName: productColorProduct.fileName,
+            priceOut: productSample.productVersion.priceOut,
             productName: data.data.name,
+            discountedPrice: discountedPrice !== null ? discountedPrice : null,
             quantityCart: quantity,
         };
         dispatch(CartSlice.actions.addProduct(productaddtoCart));
     };
-    if (isLoading) {
+    const handleClickShowImageProduct360 = async () => {
+        setSlideImages([data.data.image]);
+        let scriptToRemove = document.querySelector(
+            'script[src="https://cdn.scaleflex.it/plugins/js-cloudimage-360-view/2.7.1/js-cloudimage-360-view.min.js"]',
+        );
+
+        if (scriptToRemove) {
+            scriptToRemove.parentNode.removeChild(scriptToRemove);
+        }
+        if (dataPhotosByProductId && dataPhotosByProductId.data.length > 0) {
+            let tenTep = dataPhotosByProductId.data[0].fileName.split('.')[0];
+
+            let lastIndex = tenTep.lastIndexOf('-');
+
+            let phanTruocDauHienCuoiCung = tenTep.substring(0, lastIndex);
+
+            let duoiFile = dataPhotosByProductId.data[0].fileName.split('.').pop();
+            let data = {
+                fileName: phanTruocDauHienCuoiCung,
+                extension: duoiFile,
+            };
+            const script = document.createElement('script');
+            script.src = 'https://cdn.scaleflex.it/plugins/js-cloudimage-360-view/2.7.1/js-cloudimage-360-view.min.js';
+            script.async = false;
+            document.body.appendChild(script);
+            setImageProduct360(data);
+            // handleShow();
+        }
+    };
+    if (isLoading || isLoadingProductSamples || isLoadingPromotionProduct || isLoadingPhotosByProductId) {
         return <></>;
     }
     return (
@@ -103,7 +203,33 @@ function ProductDetail() {
                         <div className="col-lg-5 col-md-5">
                             <div className="product__details__pic">
                                 <div className="product__details__pic__item" id="locationSlideImages">
-                                    {slideImages && slideImages.length === 1 ? (
+                                    {imageProduct360 && (
+                                        <>
+                                            <div className="container">
+                                                <div className="row">
+                                                    <div className="col-lg-12 col-md-12">
+                                                        <div>
+                                                            <div
+                                                                className="cloudimage-360"
+                                                                data-folder="https://localhost:7077/Uploads/ImageProduct360/"
+                                                                data-filename={`${imageProduct360.fileName}-{index}.${imageProduct360.extension}`}
+                                                                data-amount={36}
+                                                                data-box-shadow="inset 0 0 100px #222"
+                                                                data-bottom-circle="true"
+                                                                data-autoplay="true"
+                                                                data-magnifier={2}
+                                                                data-full-screen="true"
+                                                            >
+                                                                <button className="cloudimage-360-prev" />
+                                                                <button className="cloudimage-360-next" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {slideImages && slideImages.length === 1 && imageProduct360 === null ? (
                                         <>
                                             <img
                                                 style={{ maxWidth: '83%' }}
@@ -113,6 +239,9 @@ function ProductDetail() {
                                             />
                                         </>
                                     ) : (
+                                        <></>
+                                    )}
+                                    {slideImages && slideImages.length > 1 && imageProduct360 === null ? (
                                         <>
                                             <div id="demo" className="carousel slide" data-ride="carousel">
                                                 {/* Indicators */}
@@ -138,13 +267,14 @@ function ProductDetail() {
                                                         slideImages.map((item, index) => (
                                                             <>
                                                                 <div
+                                                                    data-interval={3000}
                                                                     className={`carousel-item ${
                                                                         index === 0 ? 'active' : ''
                                                                     }`}
                                                                 >
                                                                     <img
                                                                         src={
-                                                                            LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE +
+                                                                            LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE +
                                                                             item.fileName
                                                                         }
                                                                         alt="Los Angeles"
@@ -167,6 +297,8 @@ function ProductDetail() {
                                                 </a>
                                             </div>
                                         </>
+                                    ) : (
+                                        <></>
                                     )}
                                 </div>
                                 <div className="row d-flex justify-content-center mt-5">
@@ -176,13 +308,13 @@ function ProductDetail() {
                                     >
                                         Mặc định
                                     </button>
-                                    {data && data.data.productSamples.length > 0 ? (
-                                        data.data.productSamples.map((item, index) => (
+                                    {data && data.data.productColorProducts.length > 0 ? (
+                                        data.data.productColorProducts.map((item, index) => (
                                             <>
                                                 <img
                                                     style={{ cursor: 'pointer' }}
                                                     onClick={() => handleClickChangeSlideImages(item.id)}
-                                                    src={LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE + item.fileName}
+                                                    src={LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE + item.fileName}
                                                     alt=""
                                                     width="20%"
                                                     className="mt-3"
@@ -192,13 +324,18 @@ function ProductDetail() {
                                     ) : (
                                         <p>Chưa có sản phẩm nào.</p>
                                     )}
-                                    <img
-                                        style={{ cursor: 'pointer' }}
-                                        src="https://media.istockphoto.com/id/694311040/vi/vec-to/bi%E1%BB%83u-t%C6%B0%E1%BB%A3ng-360-%C4%91%E1%BB%99-tr%C3%AAn-n%E1%BB%81n-tr%E1%BA%AFng-d%E1%BA%A5u-hi%E1%BB%87u-360-%C4%91%E1%BB%99.jpg?s=1024x1024&w=is&k=20&c=PaCOH3hlbLmg6izQ8Hgq1YQ9lmDCIdCv-1GBq30Cy94="
-                                        alt=""
-                                        width="20%"
-                                        className="ml-2 mt-3"
-                                    />
+                                    {dataPhotosByProductId && dataPhotosByProductId.data.length > 0 ? (
+                                        <img
+                                            onClick={() => handleClickShowImageProduct360()}
+                                            style={{ cursor: 'pointer' }}
+                                            src="https://media.istockphoto.com/id/694311040/vi/vec-to/bi%E1%BB%83u-t%C6%B0%E1%BB%A3ng-360-%C4%91%E1%BB%99-tr%C3%AAn-n%E1%BB%81n-tr%E1%BA%AFng-d%E1%BA%A5u-hi%E1%BB%87u-360-%C4%91%E1%BB%99.jpg?s=1024x1024&w=is&k=20&c=PaCOH3hlbLmg6izQ8Hgq1YQ9lmDCIdCv-1GBq30Cy94="
+                                            alt=""
+                                            width="20%"
+                                            className="ml-2 mt-3"
+                                        />
+                                    ) : (
+                                        <></>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -213,22 +350,76 @@ function ProductDetail() {
                                     <i className="fa fa-star-half-o" />
                                     <span>(18 reviews)</span>
                                 </div> */}
-                                <div className="product__details__price">
-                                    {String(data.data?.priceOut).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
-                                    <sup>đ</sup>
+                                <div className="d-flex">
+                                    {discountedPrice && discountedPrice !== null ? (
+                                        <>
+                                            <div className="product__details__price mr-3">
+                                                {String(discountedPrice).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
+                                                <sup>đ</sup>
+                                            </div>
+                                            <div
+                                                className="product__details__price"
+                                                style={{
+                                                    textDecoration: 'line-through', // Gạch ngang chữ
+                                                    color: '#6c757d', // Màu chữ xám
+                                                    fontWeight: 300,
+                                                    fontSize: '24px', // Font-weight nhẹ (light)
+                                                }}
+                                            >
+                                                {String(productVersion?.priceOut).replace(
+                                                    /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                    '$1,',
+                                                )}
+                                                <sup>đ</sup>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="product__details__price">
+                                                {String(productVersion?.priceOut).replace(
+                                                    /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                    '$1,',
+                                                )}
+                                                <sup>đ</sup>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
+
                                 <div className="row">
-                                    {data && data.data.productSamples.length > 0 ? (
-                                        data.data.productSamples.map((item, index) => (
+                                    {data && data.data.productVersions.length > 0 ? (
+                                        data.data.productVersions.map((item, index) => (
                                             <p
-                                                onClick={() => handleClickChangeProductSample(item.id)}
+                                                onClick={() => handleClickChangeProductVersion(item.id)}
                                                 className={`ml-3 ${
-                                                    productSample && productSample.id === item.id
+                                                    productVersion && productVersion.id === item.id
                                                         ? 'btn btn-dark text-light border'
                                                         : 'btn btn-light border'
                                                 }`}
                                             >
-                                                {item.colorProduct.name}
+                                                <span className="ram-rom-separator">
+                                                    {item.ram?.name}GB
+                                                    <span>-</span>
+                                                    {item.rom?.name}GB
+                                                </span>
+                                            </p>
+                                        ))
+                                    ) : (
+                                        <></>
+                                    )}
+                                </div>
+                                <div className="row">
+                                    {data && data.data.productColorProducts.length > 0 ? (
+                                        data.data.productColorProducts.map((item, index) => (
+                                            <p
+                                                onClick={() => handleClickChangeProductColorProduct(item.id)}
+                                                className={`ml-3 ${
+                                                    productColorProduct && productColorProduct.id === item.id
+                                                        ? 'btn btn-dark text-light border'
+                                                        : 'btn btn-light border'
+                                                }`}
+                                            >
+                                                <span className="ram-rom-separator">{item.colorProduct?.name}</span>
                                             </p>
                                         ))
                                     ) : (
@@ -263,7 +454,7 @@ function ProductDetail() {
                                 </button>
                                 <ul>
                                     <li>
-                                        <b>Số lượng: </b>{' '}
+                                        <b>Số lượng: </b>
                                         <span>
                                             {productSample ? productSample.quantity : 'Vui lòng chọn màu điện thoại'}
                                         </span>
@@ -305,14 +496,59 @@ function ProductDetail() {
                                 <br />
                                 <h5 style={{ fontSize: 27, fontWeight: 600, color: '#d70018' }}>ĐẶT ĐIỂM NỔI BẬT</h5>
                                 <br />
-                                <div dangerouslySetInnerHTML={{ __html: data.data?.infomation }} />
+                                <div
+                                    className="text-justify"
+                                    dangerouslySetInnerHTML={{ __html: data.data?.infomation }}
+                                />
                             </div>
                             <div className="col-lg-5">
                                 <h5 style={{ fontSize: 27, fontWeight: 600, marginTop: 18 }}>Thông số kỹ thuật</h5>
                                 <br />
-                                <div className="table table-striped">
-                                    <div dangerouslySetInnerHTML={{ __html: data.data?.technicalDetail }} />
-                                </div>
+                                <table class="table table-striped">
+                                    <tbody>
+                                        <tr>
+                                            <td>Màn hình:</td>
+                                            <td>
+                                                {data.data.screenTechnology?.name} , {data.data?.screenWidth},
+                                                {data.data?.resolution}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Hệ điều hành:</td>
+                                            <td> {data.data?.operatingSystemProduct.name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Camera sau:</td>
+                                            <td>{data.data?.rearCamera}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Camera trước:</td>
+                                            <td>{data.data?.frontCamera}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Chip:</td>
+                                            <td>{data.data?.chip.name}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sim:</td>
+                                            <td>{data.data?.sim}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>RAM:</td>
+                                            <td>{productVersion?.ram.name}GB</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dung lượng lưu trữ: :</td>
+                                            <td>{productVersion?.rom.name}GB</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pin/Sạc:</td>
+                                            <td>
+                                                {data.data?.battery} mAh,{data.data?.charging} W
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

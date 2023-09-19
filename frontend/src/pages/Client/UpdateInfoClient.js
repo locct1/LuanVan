@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ProductCard from '~/components/Client/ProductCard';
-import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
 import { stringToSlug } from '~/helpers/covertString';
 import { useProductByIdClientData, useProductsClientData } from '~/hooks/react-query/client/pageData';
 import CartSlice from '~/redux/Slices/CartSlice';

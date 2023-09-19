@@ -10,7 +10,8 @@
     }
     public class ProductPurchaseOrderDetailRequest
     {
-        public int ProductSampleId { get; set; }
+        public int ProductVersionId { get; set; }
+        public int ColorProductId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public double PriceIn { get; set; }

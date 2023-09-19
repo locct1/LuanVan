@@ -22,13 +22,14 @@ function AddProductPurchaseOrder() {
     const [listProductPurchaseOrders, setListProductPurchaseOrders] = useState([
         {
             productId: '',
-            productSampleId: '',
+            productVersionId: '',
+            colorProductId: '',
             priceIn: null,
             otherPriceIn: null,
             formatOtherPriceIn: null,
             showInputOtherPriceIn: false,
             quantity: 1,
-            productSamples: [],
+            productVersions: [],
         },
     ]);
     const [selectedWarehouseId, setSelectedWarehouseId] = useState();
@@ -89,7 +90,8 @@ function AddProductPurchaseOrder() {
             setListProductPurchaseOrders([
                 {
                     productId: '',
-                    productSampleId: '',
+                    productVersionId: '',
+                    colorProductId: '',
                     priceIn: null,
                     otherPriceIn: null,
                     formatOtherPriceIn: null,
@@ -106,7 +108,7 @@ function AddProductPurchaseOrder() {
     const onSubmit = async (data) => {
         let check = true;
         listProductPurchaseOrders.forEach((order, index) => {
-            if (order.productId === '' || order.productSampleId === '') {
+            if (order.productId === '' || order.productVersionId === '') {
                 check = false;
             }
         });
@@ -119,7 +121,8 @@ function AddProductPurchaseOrder() {
             const updatedOrder = {
                 ...orderWithoutSamples,
                 productId: parseInt(order.productId),
-                productSampleId: parseInt(order.productSampleId),
+                productVersionId: parseInt(order.productVersionId),
+                colorProductId: parseInt(order.colorProductId),
                 quantity: parseInt(order.quantity),
                 otherPriceIn: parseInt(order.otherPriceIn) || 0,
                 priceIn: (parseInt(order.otherPriceIn) || 0) !== 0 ? parseInt(order.otherPriceIn) : order.priceIn,
@@ -154,23 +157,27 @@ function AddProductPurchaseOrder() {
     const handleStepChange = (e, index) => {
         const { name, value } = e.target;
         const list = [...listProductPurchaseOrders];
-        if (name === 'productSampleId') {
-            const foundOrder = listProductPurchaseOrders.find((order) => order.productSampleId === value.toString());
-            if (foundOrder) {
-                toast.warning('Đã có trong danh sách nhập');
-                return;
-            }
+        if (name === 'productVersionId') {
+            // const foundOrder = listProductPurchaseOrders.find((order) => order.productVersionId === value.toString());
+            // if (foundOrder) {
+            //     toast.warning('Đã có trong danh sách nhập');
+            //     return;
+            // }
+            const findProduct = listProductPurchaseOrders[index];
+            const findProductVersion = findProduct.productVersions.find(
+                (productVersion) => productVersion.id === parseInt(value),
+            );
+            list[index]['priceIn'] = findProductVersion.priceIn;
         }
         if (name === 'productId') {
             let product = listProducts.find((x) => x.id === parseInt(value, 10));
             if (product) {
-                list[index]['productSamples'] = product.productSamples;
-                list[index]['priceIn'] = product.priceIn;
-                list[index]['productSampleId'] = '';
+                list[index]['productVersions'] = product.productVersions;
+                list[index]['productColorProducts'] = product.productColorProducts;
+                list[index]['productVersionId'] = '';
                 list[index]['quantity'] = 1;
             }
         }
-
         if (name === 'otherPriceIn') {
             const rawValue = e.target.value.replace(/,/g, '');
             if (rawValue === '') {
@@ -197,7 +204,7 @@ function AddProductPurchaseOrder() {
             ...listProductPurchaseOrders,
             {
                 productId: '',
-                productSampleId: '',
+                productVersionId: '',
                 priceIn: null,
                 otherPriceIn: null,
                 formatOtherPriceIn: null,
@@ -295,7 +302,8 @@ function AddProductPurchaseOrder() {
                                             <tr className="bg bg-dark text-light">
                                                 <th scope="col">#</th>
                                                 <th scope="col">Sản phẩm</th>
-                                                <th scope="col">Mẫu sản phẩm</th>
+                                                <th scope="col">Phiên bản</th>
+                                                <th scope="col">Màu</th>
                                                 <th scope="col">Số lượng</th>
                                                 <th scope="col">Giá nhập</th>
                                                 <th scope="col">Giá nhập khác</th>
@@ -334,15 +342,39 @@ function AddProductPurchaseOrder() {
                                                             <div className="first-division">
                                                                 <select
                                                                     className="form-control"
-                                                                    name="productSampleId"
-                                                                    value={step.productSampleId}
+                                                                    name="productVersionId"
+                                                                    value={step.productVersionId}
                                                                     onChange={(e) => handleStepChange(e, index)}
                                                                 >
                                                                     <option disabled selected value="">
-                                                                        Chọn mẫu sản phẩm
+                                                                        Chọn phiên bản
                                                                     </option>
-                                                                    {step.productSamples?.map((item, index) => (
+                                                                    {step.productVersions?.map((item, index) => (
                                                                         <option value={item.id} key={item.id}>
+                                                                            {item.ram?.name}- {item.rom?.name}GB
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div key={index} className="services">
+                                                            <div className="first-division">
+                                                                <select
+                                                                    className="form-control"
+                                                                    name="colorProductId"
+                                                                    value={step.colorProductId}
+                                                                    onChange={(e) => handleStepChange(e, index)}
+                                                                >
+                                                                    <option disabled selected value="">
+                                                                        Chọn màu
+                                                                    </option>
+                                                                    {step.productColorProducts?.map((item, index) => (
+                                                                        <option
+                                                                            value={item.colorProductId}
+                                                                            key={item.id}
+                                                                        >
                                                                             {item.colorProduct.name}
                                                                         </option>
                                                                     ))}
@@ -362,16 +394,18 @@ function AddProductPurchaseOrder() {
                                                     </td>
                                                     <td>
                                                         {' '}
-                                                        {step.priceIn !== null ? (
+                                                        {step.priceIn !== null || step.priceIn !== undefined ? (
                                                             <>
-                                                                {String(step.priceIn).replace(
-                                                                    /(\d)(?=(\d\d\d)+(?!\d))/g,
-                                                                    '$1,',
-                                                                )}
+                                                                {step.priceIn === null
+                                                                    ? '0'
+                                                                    : String(step.priceIn).replace(
+                                                                          /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                          '$1,',
+                                                                      )}
                                                                 <sup>đ</sup>
                                                             </>
                                                         ) : (
-                                                            '' // Replace with your desired "not available" message
+                                                            ''
                                                         )}
                                                     </td>
                                                     <td className="text-center">
@@ -397,7 +431,7 @@ function AddProductPurchaseOrder() {
                                                         )}
                                                     </td>
                                                     <td>
-                                                        {step.priceIn !== null ? (
+                                                        {step.priceIn !== null || step.priceIn !== undefined ? (
                                                             <>
                                                                 {String(
                                                                     step.otherPriceIn !== null

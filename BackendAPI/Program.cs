@@ -27,6 +27,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
                 {
                     options.SuppressModelStateInvalidFilter = true;
                 });
+//builder.Services
 
 builder.Services.AddDbContext<ApplicationContext>(options =>
 {
@@ -52,7 +53,11 @@ builder.Services.AddScoped<IPageService, PageService>();
 builder.Services.AddScoped<IClientAccountService, ClientAccountService>();
 builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
 builder.Services.AddScoped<IRecipientService, RecipientService>();
+builder.Services.AddScoped<IProductVersionService, ProductVersionService>();
+builder.Services.AddScoped<IProductColorProductService, ProductColorProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPromotionProductService, PromotionProductService>();
+builder.Services.AddScoped<IPromotionProductDetailService, PromotionProductDetailService>();
 builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 builder.Services.AddScoped<IVnPayClientService, VnPayClientService>();
 builder.Services.AddAuthentication(options =>

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { stringToSlug } from '~/helpers/covertString';
 import { DateSchema } from 'yup';
 import LoadingAdmin from '~/components/LoadingAdmin';
-import { LINK_PRODUCT_IMAGE, LINK_SLIDE_PRODUCT_SAMPLE_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_IMAGE, LINK_SLIDE_PRODUCT_COLOR_PRODUCT_IMAGE } from '~/helpers/constants';
 import moment from 'moment';
 import 'moment/locale/vi';
 import './UploadImage.scss';
@@ -15,12 +15,12 @@ import {
     useUploadProductSampleDefaultImageData,
     useUploadSlideProductSampleImageData,
 } from '~/hooks/react-query/productsampleData';
-function SlidePhotoProductSample({ productSample }) {
+function SlidePhotoProductSample({ productColorProduct }) {
     const [linkImages, setLinkImages] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
-        setLinkImages(productSample);
-    }, [productSample]);
+        setLinkImages(productColorProduct);
+    }, [productColorProduct]);
     const onSuccess = (data) => {
         if (data.success) {
             toast.success('Upload thành công');
@@ -45,14 +45,13 @@ function SlidePhotoProductSample({ productSample }) {
         for (let i = 0; i < selectedFilesArray.length; i++) {
             formData.append(`images`, selectedFilesArray[i]);
         }
-        formData.append(`id`, productSample.id);
+        formData.append(`id`, productColorProduct.id);
         uploadSlideProductSampleImage(formData);
     };
 
     const deleteHandler = async (image) => {
         deleteSlideProductSampleImage(image.id);
     };
-    console.log(linkImages.photos);
     return (
         <>
             <div className="card shadow mb-4">
@@ -81,7 +80,7 @@ function SlidePhotoProductSample({ productSample }) {
                                     return (
                                         <div key={image.id} className="image">
                                             <img
-                                                src={LINK_SLIDE_PRODUCT_SAMPLE_IMAGE + image.fileName}
+                                                src={LINK_SLIDE_PRODUCT_COLOR_PRODUCT_IMAGE + image.fileName}
                                                 height="200"
                                                 alt="upload"
                                             />

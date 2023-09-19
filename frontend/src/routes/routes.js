@@ -46,6 +46,9 @@ import ListOrders from '~/pages/Admin/Order/ListOrders';
 import DetailOrder from '~/pages/Admin/Order/DetailOrder';
 import OrderHistory from '~/pages/Client/OrderHistory';
 import CheckoutVnPaySuccess from '~/pages/Client/CheckoutVnPaySuccess';
+import AddPromotionProduct from '~/pages/Admin/PromotionProduct/AddPromotionProduct';
+import ListPromotionProducts from '~/pages/Admin/PromotionProduct/ListPromotionProducts';
+import UpdatePromotionProduct from '~/pages/Admin/PromotionProduct/UpdatePromotionProduct';
 // Public routes
 const publicRoutes = [
     { path: '/admin-login', component: AdminLogin, layout: null },
@@ -89,6 +92,10 @@ const adminPrivateRoutes = [
     { path: '/admin-list-roles', component: ListRoles, layout: AdminLayout },
     { path: '/admin-add-role', component: AddRole, layout: AdminLayout },
     { path: '/admin-roles/:id', component: UpdateRole, layout: AdminLayout },
+
+    { path: '/admin-list-promotion-products', component: ListPromotionProducts, layout: AdminLayout },
+    { path: '/admin-add-promotion-product', component: AddPromotionProduct, layout: AdminLayout },
+    { path: '/admin-promotion-products/:id', component: UpdatePromotionProduct, layout: AdminLayout },
 
     { path: '/admin-list-product-purchase-orders', component: ListProductPurchaseOrders, layout: AdminLayout },
     { path: '/admin-add-product-purchase-order', component: AddProductPurchaseOrder, layout: AdminLayout },

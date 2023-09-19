@@ -21,12 +21,13 @@ namespace BackendAPI.Services
 
         public async Task<IEnumerable<ProductPurchaseOrder>> GetAll()
         {
-            return await _unitOfWork.GetRepository<ProductPurchaseOrder>().GetAll(include: p => p.Include(p => p.ProductPurchaseOrderDetails).Include(x => x.Supplier).Include(a => a.WareHouse).Include(a => a.User),orderBy:x => x.OrderByDescending(x => x.Id));
+            return await _unitOfWork.GetRepository<ProductPurchaseOrder>().GetAll(include: p => p.Include(p => p.ProductPurchaseOrderDetails).Include(x => x.Supplier).Include(a => a.WareHouse).Include(a => a.User), orderBy: x => x.OrderByDescending(x => x.Id));
         }
 
         public async Task<IEnumerable<Product>> GetAllProductByWareHouseId(int id)
         {
-            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.ProductSamples).ThenInclude(x => x.ColorProduct), filter: x => x.WareHouseId == id);
+            return await _unitOfWork.GetRepository<Product>().GetAll(filter: x => x.WareHouseId == id,
+                include: p => p.Include(p => p.ProductColorProducts).ThenInclude(x=>x.ColorProduct).Include(x=>x.ProductVersions).ThenInclude(x=>x.Ram).Include(x => x.ProductVersions).ThenInclude(x => x.Rom));
 
         }
 

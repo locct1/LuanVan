@@ -36,5 +36,16 @@ namespace BackendAPI.Services
         {
             await _unitOfWork.GetRepository<Photo>().Delete(id);
         }
+
+        public async Task<IEnumerable<Photo>> GetAllPhotosByProductColorProductId(int productColorProductId)
+        {
+            return await _unitOfWork.GetRepository<Photo>().GetAll(filter: x => x.ProductColorProductId == productColorProductId);
+
+        }
+        public async Task<IEnumerable<Photo>> GetAllPhotosByProductId(int productId)
+        {
+            return await _unitOfWork.GetRepository<Photo>().GetAll(filter: x => x.ProductId == productId);
+
+        }
     }
 }

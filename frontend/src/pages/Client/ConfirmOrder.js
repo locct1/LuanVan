@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ProductCard from '~/components/Client/ProductCard';
-import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
 import { stringToSlug } from '~/helpers/covertString';
 import {
     usePaymentMethodsClientData,
@@ -135,6 +135,7 @@ function ConfirmOrder() {
             order: cart,
             paymentMethodId: checkedMethodPayment,
         };
+        console.log(dataCreateCart);
         if (checkedMethodPayment === 1) {
             let response = await createOrderClient(dataCreateCart);
             if (response.success) {
@@ -431,7 +432,7 @@ function ConfirmOrder() {
                                                                         style={{ maxWidth: '83%' }}
                                                                         className="product__details__pic__item--large"
                                                                         src={
-                                                                            LINK_PRODUCT_SAMPLE_DEFAULT_IMAGE +
+                                                                            LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE +
                                                                             item.fileName
                                                                         }
                                                                         alt=""
@@ -441,18 +442,103 @@ function ConfirmOrder() {
                                                                     {item.quantityCart}
                                                                 </td>
                                                                 <td>
-                                                                    {String(item.priceOut).replace(
-                                                                        /(\d)(?=(\d\d\d)+(?!\d))/g,
-                                                                        '$1,',
-                                                                    )}{' '}
-                                                                    <sup>đ</sup>
+                                                                    <div>
+                                                                        {item.discountedPrice &&
+                                                                        item.discountedPrice !== null ? (
+                                                                            <>
+                                                                                <div
+                                                                                    className="product__details__price mr-2"
+                                                                                    style={{
+                                                                                        color: '#d70018',
+                                                                                        fontWeight: 600,
+                                                                                    }}
+                                                                                >
+                                                                                    {String(
+                                                                                        item.discountedPrice,
+                                                                                    ).replace(
+                                                                                        /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                                        '$1,',
+                                                                                    )}
+                                                                                    <sup>đ</sup>
+                                                                                </div>
+                                                                                <div
+                                                                                    className="product__details__price"
+                                                                                    style={{
+                                                                                        textDecoration: 'line-through', // Gạch ngang chữ
+                                                                                        color: '#6c757d', // Màu chữ xám
+                                                                                        fontWeight: 300,
+                                                                                    }}
+                                                                                >
+                                                                                    {String(item?.priceOut).replace(
+                                                                                        /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                                        '$1,',
+                                                                                    )}
+                                                                                    <sup>đ</sup>
+                                                                                </div>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <div className="product__details__price">
+                                                                                    {String(item?.priceOut).replace(
+                                                                                        /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                                        '$1,',
+                                                                                    )}
+                                                                                    <sup>đ</sup>
+                                                                                </div>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
                                                                 </td>
                                                                 <td>
-                                                                    {String(item.priceOut * item.quantityCart).replace(
-                                                                        /(\d)(?=(\d\d\d)+(?!\d))/g,
-                                                                        '$1,',
-                                                                    )}{' '}
-                                                                    <sup>đ</sup>
+                                                                    {item.discountedPrice &&
+                                                                    item.discountedPrice !== null ? (
+                                                                        <>
+                                                                            <div
+                                                                                className="product__details__price mr-2"
+                                                                                style={{
+                                                                                    color: '#d70018',
+                                                                                    fontWeight: 600,
+                                                                                }}
+                                                                            >
+                                                                                {String(
+                                                                                    item.discountedPrice *
+                                                                                        item.quantityCart,
+                                                                                ).replace(
+                                                                                    /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                                    '$1,',
+                                                                                )}{' '}
+                                                                                <sup>đ</sup>
+                                                                            </div>
+                                                                            <div
+                                                                                className="product__details__price"
+                                                                                style={{
+                                                                                    textDecoration: 'line-through', // Gạch ngang chữ
+                                                                                    color: '#6c757d', // Màu chữ xám
+                                                                                    fontWeight: 300,
+                                                                                }}
+                                                                            >
+                                                                                {String(
+                                                                                    item.priceOut * item.quantityCart,
+                                                                                ).replace(
+                                                                                    /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                                    '$1,',
+                                                                                )}{' '}
+                                                                                <sup>đ</sup>
+                                                                            </div>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <div className="product__details__price">
+                                                                                {String(
+                                                                                    item.priceOut * item.quantityCart,
+                                                                                ).replace(
+                                                                                    /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                                    '$1,',
+                                                                                )}{' '}
+                                                                                <sup>đ</sup>
+                                                                            </div>
+                                                                        </>
+                                                                    )}
                                                                 </td>
                                                             </tr>
                                                         ))}

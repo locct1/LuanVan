@@ -63,6 +63,98 @@ namespace BackendAPI.Controllers
                 });
             }
         }
+        [HttpGet("get-all-rams")]
+        public async Task<IActionResult> GetAllRams()
+        {
+            try
+            {
+                var rams = await _pageService.GetAllRams();
+                return Ok(new Response
+                {
+                    Data = rams,
+                    Success = true,
+
+                });
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpGet("get-all-roms")]
+        public async Task<IActionResult> GetAllRoms()
+        {
+            try
+            {
+                var rams = await _pageService.GetAllRoms();
+                return Ok(new Response
+                {
+                    Data = rams,
+                    Success = true,
+
+                });
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpGet("get-all-product-versions")]
+        public async Task<IActionResult> GetAllProductVersions()
+        {
+            try
+            {
+                var productVersions = await _pageService.GetAllProductVersions();
+                return Ok(new Response
+                {
+                    Data = productVersions,
+                    Success = true,
+
+                });
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpGet("get-all-operating-system-types")]
+        public async Task<IActionResult> GetAllOperatingSystemTypes()
+        {
+            try
+            {
+                var rams = await _pageService.GetAllOperatingSystemTypes();
+                return Ok(new Response
+                {
+                    Data = rams,
+                    Success = true,
+
+                });
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
         [HttpGet("get-all-paymentmethods")]
         public async Task<IActionResult> GetAllPaymentMethods()
         {
@@ -95,6 +187,58 @@ namespace BackendAPI.Controllers
                 return Ok(new Response
                 {
                     Data = brands,
+                    Success = true,
+
+                });
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpGet("get-all-promotion-products")]
+        public async Task<IActionResult> GetAllPromotionProducts()
+        {
+            try
+            {
+                var promotionProducts = await _pageService.GetAllPromotionProducts();
+                var currentDate = DateTime.Now;
+
+                // Lọc danh sách sản phẩm dựa trên ngày hiện tại
+                var filteredProducts = promotionProducts
+                    .Where(product => currentDate >= product.StartDate && currentDate <= product.EndDate)
+                    .ToList();
+                return Ok(new Response
+                {
+                    Data = filteredProducts,
+                    Success = true,
+
+                });
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpGet("get-all-productsamples")]
+        public async Task<IActionResult> GetAllProductSamples()
+        {
+            try
+            {
+                var productSamples = await _pageService.GetAllProductSamples();
+                return Ok(new Response
+                {
+                    Data = productSamples,
                     Success = true,
 
                 });
@@ -234,9 +378,9 @@ namespace BackendAPI.Controllers
                                 _productPurchaseOrderDetailService.UpdateProductPurchaseOrderDetail(productPurchaseDetail.Id, productPurchaseDetail);
                                 var OrderDetail = new OrderDetail
                                 {
-                                    Name = item.ProductName + " (" + item.ColorProduct.Name + ")",
+                                    Name = item.ProductName + " " + item.ProductVersion.Ram.Name + "GB" + "-" + item.ProductVersion.Rom.Name + "GB" + " (" + item.ColorProduct.Name + ")",
                                     FileName = item.FileName,
-                                    PriceOut = item.PriceOut,
+                                    PriceOut = item.DiscountedPrice ?? item.PriceOut,
                                     OrderId = order.Id,
                                     ProductPurchaseOrderDetailId = productPurchaseDetail.Id,
                                 };

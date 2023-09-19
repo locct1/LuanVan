@@ -10,13 +10,13 @@ namespace BackendAPI.Data
     {
         [Key]
         public int Id { get; set; }
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
         public Product? Product { get; set; }
         [ForeignKey(nameof(ProductId))]
         public int? ProductId { get; set; }
-        [ForeignKey(nameof(ProductSampleId))]
-        public ProductSample? ProductSample { get; set; }
-        public int? ProductSampleId { get; set; }
+        public ProductColorProduct? ProductColorProduct { get; set; }
+        [ForeignKey(nameof(ProductColorProductId))]
+        public int? ProductColorProductId { get; set; }
 
     }
 }

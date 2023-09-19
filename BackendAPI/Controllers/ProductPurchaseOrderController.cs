@@ -174,7 +174,7 @@ namespace BackendAPI.Controllers
                 await _unitOfWork.SaveChangesAsync();
                 foreach (var item in model.ListProductPurchaseOrders)
                 {
-                    ProductSample productSample = await _productSampleService.Get(item.ProductSampleId);
+                    ProductSample productSample = await _productSampleService.GetProductSampleByProductVersionAndColorProduct(item.ProductVersionId, item.ColorProductId);
                     if (productSample != null)
                     {
                         productSample.Quantity = item.Quantity + productSample.Quantity;
@@ -200,10 +200,10 @@ namespace BackendAPI.Controllers
 
                         ProductPurchaseOrderDetail productPurchaseOrderDetail = new ProductPurchaseOrderDetail
                         {
-                            ProductSampleId = item.ProductSampleId,
+                            ProductSampleId = productSample.Id,
                             ProductPurchaseOrderId = productPurchaseOrder.Id,
                             PriceIn = item.PriceIn,
-                            Name = productSample.Product.Name + " (" + productSample.ColorProduct.Name + ")",
+                            Name = productSample.ProductVersion.Product.Name + " " + productSample.ProductVersion.Ram.Name + "-" + productSample.ProductVersion.Rom.Name + "GB (" + productSample.ColorProduct.Name + ")",
                         };
                         await _productPurchaseOrderDetailService.CreateProductPurchaseOrderDetail(productPurchaseOrderDetail);
                         await _unitOfWork.SaveChangesAsync();

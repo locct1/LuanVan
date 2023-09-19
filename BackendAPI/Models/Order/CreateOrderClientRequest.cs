@@ -45,9 +45,11 @@ namespace BackendAPI.Models.Order
         public string? FileName { get; set; }
         public string ProductName { get; set; }
         public double PriceOut { get; set; }
+        public double? DiscountedPrice { get; set; }
         public int ProductId { get; set; }
         public CreateOrderDetailColorProductModel ColorProduct { get; set; }
-       
+        public CreateOrderDetailProductVersionModel ProductVersion { get; set; }
+
 
     }
     public class CreateOrderDetailColorProductModel
@@ -55,5 +57,20 @@ namespace BackendAPI.Models.Order
         public int Id { get; set; }
         public string Name { get; set; }
         public string CodeColor { get; set; }
+    }
+    public class CreateOrderDetailProductVersionModel
+    {
+       public CreateOrderDetailRamModel Ram { get; set; }
+       public CreateOrderDetailRomModel Rom { get; set; }
+    }
+    public class CreateOrderDetailRamModel
+    {
+        public int Id { get; set; }
+        public int Name { get; set; }
+    }
+    public class CreateOrderDetailRomModel
+    {
+        public int Id { get; set; }
+        public int Name { get; set; }
     }
 }

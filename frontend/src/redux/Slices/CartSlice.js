@@ -33,6 +33,11 @@ export default createSlice({
                 }
                 productSample.quantityCart = productSample.quantityCart + action.payload.quantityCart;
                 state.total = state.total + productSample.priceOut * action.payload.quantityCart;
+                if (productSample.discountedPrice !== null) {
+                    state.total = state.total + productSample.discountedPrice * action.payload.quantityCart;
+                } else {
+                    state.total = state.total + productSample.priceOut * action.payload.quantityCart;
+                }
                 toast.success('Thêm điện thoại vào giỏ hàng thành công');
                 return;
             } else {
@@ -41,17 +46,53 @@ export default createSlice({
                     return;
                 }
                 state.listProducts.push(action.payload);
-                state.total = state.total + action.payload.priceOut * action.payload.quantityCart;
+                if (action.payload.discountedPrice !== null) {
+                    state.total = state.total + action.payload.discountedPrice * action.payload.quantityCart;
+                } else {
+                    state.total = state.total + action.payload.priceOut * action.payload.quantityCart;
+                }
                 toast.success('Thêm điện thoại vào giỏ hàng thành công');
             }
         },
         removeProduct: (state, action) => {
             const productSample = state.listProducts.find((productSample) => productSample.id === action.payload.id);
             if (productSample) {
-                state.total = state.total - productSample.quantityCart * productSample.priceOut;
+                if (productSample.discountedPrice !== null) {
+                    state.total = state.total - productSample.quantityCart * productSample.discountedPrice;
+                } else {
+                    state.total = state.total - productSample.quantityCart * productSample.priceOut;
+                }
                 state.listProducts = state.listProducts.filter(
                     (productSample) => productSample.id !== action.payload.id,
                 );
+            }
+        },
+        updateProductInPromotionProduct: (state, action) => {
+            const productSample = state.listProducts.find(
+                (productSample) => productSample.id === action.payload.productSample.id,
+            );
+            if (productSample) {
+                if (action.payload.promotionDetail) {
+                    productSample.discountedPrice = action.payload.promotionDetail.discountedPrice;
+                    state.total =
+                        state.total -
+                        productSample.quantityCart * productSample.discountedPrice +
+                        productSample.quantityCart * action.payload.promotionDetail.discountedPrice;
+                } else {
+                    if (productSample.discountedPrice !== null) {
+                        state.total =
+                            state.total -
+                            productSample.quantityCart * productSample.discountedPrice +
+                            productSample.quantityCart * action.payload.productVersion.priceOut;
+                        productSample.discountedPrice = null;
+                    } else {
+                        state.total =
+                            state.total -
+                            productSample.quantityCart * productSample.priceOut +
+                            productSample.quantityCart * action.payload.productVersion.priceOut;
+                    }
+                }
+                productSample.priceOut = action.payload.productVersion.priceOut;
             }
         },
         minusProduct: (state, action) => {
@@ -61,7 +102,11 @@ export default createSlice({
                     return;
                 }
                 productSample.quantityCart = productSample.quantityCart - 1;
-                state.total = state.total - productSample.priceOut;
+                if (productSample.discountedPrice !== null) {
+                    state.total = state.total + productSample.discountedPrice;
+                } else {
+                    state.total = state.total - productSample.priceOut;
+                }
             }
         },
         plusProduct: (state, action) => {
@@ -72,7 +117,11 @@ export default createSlice({
                     return;
                 }
                 productSample.quantityCart = productSample.quantityCart + 1;
-                state.total = state.total + productSample.priceOut;
+                if (productSample.discountedPrice !== null) {
+                    state.total = state.total + productSample.discountedPrice;
+                } else {
+                    state.total = state.total + productSample.priceOut;
+                }
             }
         },
     },

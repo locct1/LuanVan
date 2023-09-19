@@ -92,6 +92,12 @@ function AdminSideBar({ sidebarToggle, toggled }) {
                 </NavLink>
             </li>
             <li className="nav-item">
+                <NavLink to="/admin-list-promotion-products" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý khuyến mãi</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
                 <NavLink to="/admin-list-orders" className={classNameFunc}>
                     <i className="fas fa-fw fa-chart-area" />
                     <span>Quản lý đơn hàng</span>
