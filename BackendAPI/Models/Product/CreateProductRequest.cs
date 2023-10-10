@@ -42,6 +42,17 @@ namespace BackendAPI.Models.Product
         public int ChipId { get; set; }
         [Required(ErrorMessage = "Vui lòng chọn hệ điều hành")]
         public int OperatingSystemId { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập độ dày")]
+
+        public int Height { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập khối lượng")]
+
+        public int Weight { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập chiều dài")]
+
+        public int Length { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập chiều rộng")]
+        public int Width { get; set; }
     }
 
 }

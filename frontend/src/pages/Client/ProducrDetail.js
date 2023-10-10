@@ -5,6 +5,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ImageProduct360Modal from '~/components/Client/ImageProduct360Modal';
 import ProductCard from '~/components/Client/ProductCard';
+import ReviewProduct from '~/components/Client/ReviewProduct';
 import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
 import { stringToSlug } from '~/helpers/covertString';
 import {
@@ -18,6 +19,20 @@ import useScript from '~/hooks/useScript';
 import CartSlice from '~/redux/Slices/CartSlice';
 function ProductDetail() {
     // useScript('https://cdn.scaleflex.it/plugins/js-cloudimage-360-view/2.7.1/js-cloudimage-360-view.min.js');
+    const [expanded, setExpanded] = useState(false);
+
+    const toggleExpanded = () => {
+        setExpanded(!expanded);
+    };
+
+    const showMoreButton = (
+        <div className="row d-flex justify-content-center">
+            {' '}
+            <button className="btn btn-info" onClick={toggleExpanded}>
+                {expanded ? 'Thu gọn' : 'Xem thêm'}
+            </button>
+        </div>
+    );
     const [slideImages, setSlideImages] = useState([]);
     const [productVersion, setProductVersion] = useState();
     const [productSample, setProductSample] = useState();
@@ -134,6 +149,10 @@ function ProductDetail() {
             fileName: productColorProduct.fileName,
             priceOut: productSample.productVersion.priceOut,
             productName: data.data.name,
+            height: data.data.height,
+            weight: data.data.weight,
+            width: data.data.width,
+            length: data.data.length,
             discountedPrice: discountedPrice !== null ? discountedPrice : null,
             quantityCart: quantity,
         };
@@ -492,16 +511,24 @@ function ProductDetail() {
                     <div>
                         <hr />
                         <div className="row">
-                            <div className="col-lg-7">
+                            <div className="col-lg-8">
                                 <br />
                                 <h5 style={{ fontSize: 27, fontWeight: 600, color: '#d70018' }}>ĐẶT ĐIỂM NỔI BẬT</h5>
                                 <br />
-                                <div
-                                    className="text-justify"
-                                    dangerouslySetInnerHTML={{ __html: data.data?.infomation }}
-                                />
+                                <div className="text-justify">
+                                    {expanded ? (
+                                        <div dangerouslySetInnerHTML={{ __html: data.data?.infomation }} />
+                                    ) : (
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: data.data?.infomation.slice(0, 700) + '.........', // Hiển thị một phần ban đầu
+                                            }}
+                                        />
+                                    )}
+                                    {data.data?.infomation.length > 500 && showMoreButton}
+                                </div>
                             </div>
-                            <div className="col-lg-5">
+                            <div className="col-lg-4">
                                 <h5 style={{ fontSize: 27, fontWeight: 600, marginTop: 18 }}>Thông số kỹ thuật</h5>
                                 <br />
                                 <table class="table table-striped">
@@ -509,7 +536,7 @@ function ProductDetail() {
                                         <tr>
                                             <td>Màn hình:</td>
                                             <td>
-                                                {data.data.screenTechnology?.name} , {data.data?.screenWidth},
+                                                {data.data.screenTechnology?.name} , {data.data?.screenWidth},{' '}
                                                 {data.data?.resolution}
                                             </td>
                                         </tr>
@@ -544,7 +571,7 @@ function ProductDetail() {
                                         <tr>
                                             <td>Pin/Sạc:</td>
                                             <td>
-                                                {data.data?.battery} mAh,{data.data?.charging} W
+                                                {data.data?.battery} mAh, {data.data?.charging} W
                                             </td>
                                         </tr>
                                     </tbody>
@@ -554,6 +581,7 @@ function ProductDetail() {
                     </div>
                 </div>
             </section>
+            {data?.data && <ReviewProduct product={data?.data} />}
         </>
     );
 }

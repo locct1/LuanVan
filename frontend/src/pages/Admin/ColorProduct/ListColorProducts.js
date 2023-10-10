@@ -56,7 +56,7 @@ function ListColorProducts() {
         if (inputSearch === '') return setListColorProducts(data.data);
         else {
             let newArray = data.data.filter((colorproduct) => {
-                return stringToSlug(colorproduct.name).includes(stringToSlug(inputSearch));
+                return stringToSlug(colorproduct.name.toString()).includes(stringToSlug(inputSearch));
             });
 
             setListColorProducts(newArray);

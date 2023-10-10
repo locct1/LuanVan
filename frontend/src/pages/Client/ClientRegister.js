@@ -57,6 +57,7 @@ function ClientRegister() {
     }, []);
     const fetchData = async () => {
         let response = await callAPIGetProvince();
+        console.log(response);
         if (response) {
             setListProvinces(response);
         }
@@ -67,11 +68,12 @@ function ClientRegister() {
         if (e.target.value === '') {
             return;
         }
-        let code = parseInt(e.target.value);
-        let province = listProvinces.find((x) => x.code === code);
+        let ProvinceID = parseInt(e.target.value);
+        let province = listProvinces.find((x) => x.ProvinceID === ProvinceID);
         setValue('province', e.target.value);
-        let response = await callAPIGetDistrict(code);
-        setListDistricts(response.districts);
+        let response = await callAPIGetDistrict(province.ProvinceID);
+        console.log('check', response);
+        setListDistricts(response);
         setListWards([]);
         setProvice(province);
         setValue('ward', '');
@@ -79,27 +81,34 @@ function ClientRegister() {
     };
     const handleDistrictChange = async (e) => {
         clearErrors('district');
-        let code = parseInt(e.target.value);
-        let district = listDistricts.find((x) => x.code === code);
+        let DistrictID = parseInt(e.target.value);
+        let district = listDistricts.find((x) => x.DistrictID === DistrictID);
         setValue('district', e.target.value);
         setDistrict(district);
-        let response = await callAPIGetWard(code);
-        setListWards(response.wards);
+        let response = await callAPIGetWard(DistrictID);
+        setListWards(response);
         setValue('ward', '');
     };
     const handleWardChange = async (e) => {
         clearErrors('ward');
-        let code = parseInt(e.target.value);
-        let ward = listWards.find((x) => x.code === code);
+        let WardCode = e.target.value;
+        let ward = listWards.find((x) => x.WardCode === WardCode);
+        console.log(listWards);
         setValue('ward', e.target.value);
         setWard(ward);
     };
     const onSubmit = async (data) => {
         setErrorsForm([]);
-        const fullAddress = data.address + ', ' + ward.name + ', ' + district.name + ', ' + province.name;
+        const fullAddress =
+            data.address + ', ' + ward.WardName + ', ' + district.DistrictName + ', ' + province.NameExtension[1];
+        console.log(fullAddress);
         let createAccount = {
             ...data,
             fullAddress: fullAddress,
+            provinceID: province.ProvinceID,
+            wardCode: ward.WardCode,
+            districtID: district.DistrictID,
+            houseNumberAndStreet: data.address,
         };
         let response = await RegisterClient(createAccount);
         console.log(response);
@@ -196,15 +205,15 @@ function ClientRegister() {
                                     <select
                                         id="inputState"
                                         class="form-control"
-                                        value={province?.code || ''}
+                                        value={province?.ProvinceID || ''}
                                         onChange={handleProvinceChange}
                                     >
                                         <option selected value="">
                                             Chọn tỉnh/thành phố
                                         </option>
                                         {listProvinces?.map((province, index) => (
-                                            <option value={province.code} key={index}>
-                                                {province.name}
+                                            <option value={province.ProvinceID} key={index}>
+                                                {province.NameExtension[1]}
                                             </option>
                                         ))}
                                     </select>
@@ -219,15 +228,15 @@ function ClientRegister() {
                                     <select
                                         id="inputState"
                                         class="form-control"
-                                        value={district?.code || ''}
+                                        value={district?.DistrictID || ''}
                                         onChange={handleDistrictChange}
                                     >
                                         <option selected value="">
                                             Chọn quận/huyện
                                         </option>
                                         {listDistricts?.map((district, index) => (
-                                            <option value={district.code} key={index}>
-                                                {district.name}
+                                            <option value={district.DistrictID} key={index}>
+                                                {district.DistrictName}
                                             </option>
                                         ))}
                                     </select>
@@ -242,15 +251,15 @@ function ClientRegister() {
                                     <select
                                         id="inputState"
                                         class="form-control"
-                                        value={ward?.code || ''}
+                                        value={ward?.WardCode || ''}
                                         onChange={handleWardChange}
                                     >
                                         <option selected value="">
                                             Chọn phường/xã
                                         </option>
                                         {listWards?.map((ward, index) => (
-                                            <option value={ward.code} key={index}>
-                                                {ward.name}
+                                            <option value={ward.WardCode} key={index}>
+                                                {ward.WardName}
                                             </option>
                                         ))}
                                     </select>

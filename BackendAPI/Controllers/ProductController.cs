@@ -148,6 +148,10 @@ namespace BackendAPI.Controllers
                         ScreenTechnologyId = model.ScreenTechnologyId,
                         ChipId = model.ChipId,
                         OperatingSystemProductId = model.OperatingSystemId,
+                        Height = model.Height,
+                        Length = model.Length,
+                        Width = model.Width,
+                        Weight = model.Weight,
                         CreatedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,
                         Disabled = false,
@@ -287,6 +291,10 @@ namespace BackendAPI.Controllers
                     findProduct.ScreenTechnologyId = model.ScreenTechnologyId;
                     findProduct.ChipId = model.ChipId;
                     findProduct.OperatingSystemProductId = model.OperatingSystemProductId;
+                    findProduct.Height = model.Height;
+                    findProduct.Weight = model.Weight;
+                    findProduct.Width = model.Width;
+                    findProduct.Length = model.Length;
 
                     findProduct.UpdatedAt = DateTime.Now;
                     await _productService.UpdateProduct(id, findProduct);

@@ -28,7 +28,11 @@ namespace BackendAPI.Data
         public string RearCamera { get; set; }
         public int Battery { get; set; }
         public string Sim { get; set; }
-        public int Charging { get; set; }
+        public int? Charging { get; set; }
+        public int? Height { get; set; }
+        public int? Weight { get; set; }
+        public int? Length { get; set; }
+        public int? Width { get; set; }
         public ScreenTechnology? ScreenTechnology { get; set; }
         [ForeignKey(nameof(ScreenTechnologyId))]
         public int? ScreenTechnologyId { get; set; }
@@ -42,6 +46,7 @@ namespace BackendAPI.Data
         public DateTime UpdatedAt { get; set; }
         public List<ProductVersion>? ProductVersions { get; set; }
         public List<ProductColorProduct>? ProductColorProducts { get; set; }
+        public List<ReviewProduct>? ReviewProducts { get; set; }
 
     }
 }

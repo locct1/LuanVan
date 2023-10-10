@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ProductCard from '~/components/Client/ProductCard';
-import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE } from '~/helpers/constants';
+import { LINK_PRODUCT_IMAGE, LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE, SHOP_ID, SERVICE_ID } from '~/helpers/constants';
 import { stringToSlug } from '~/helpers/covertString';
 import {
     usePaymentMethodsClientData,
@@ -15,18 +15,31 @@ import CartSlice from '~/redux/Slices/CartSlice';
 import { infoCart, infoClientSelector } from '~/redux/selectors';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import { ClientLoadUser } from '~/redux/Slices/ClientAuthSlice';
-import { callAPIGetDistrict, callAPIGetProvince, callAPIGetWard } from '~/services/client/getaddress.service';
+import {
+    callAPICaculateShippingFee,
+    callAPIGetAllShops,
+    callAPIGetDistrict,
+    callAPIGetProvince,
+    callAPIGetServiceDeliverys,
+    callAPIGetWard,
+} from '~/services/client/getaddress.service';
 import { UpdateInfoClientService } from '~/services/client/clientAuth.service';
 import { usePaymentMethodsData } from '~/hooks/react-query/paymentmethodData';
 import { createOrderClient } from '~/services/client/page.service';
 import { checkOutByVnPay } from '~/services/client/vnpayClient.service';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 function ConfirmOrder() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [errorsForm, setErrorsForm] = useState([]);
+    const [addressShop, setAddressShop] = useState({});
+    const [shippingFee, setShippingFee] = useState({});
     const [checkedMethodPayment, setCheckedMethodPayment] = useState(1);
+    const [loadingShippingFee, setLoadingShippingFee] = useState(false);
+    const cart = useSelector(infoCart);
     const { isLoading, data, isError, error } = usePaymentMethodsClientData();
 
     useEffect(() => {
@@ -46,6 +59,7 @@ function ConfirmOrder() {
         .object()
         .shape({
             fullName: yup.string().required('Vui lòng nhập họ và tên'),
+            note: yup.string().notRequired(),
             email: yup.string().email('Email không đúng định dạng').required('Vui lòng nhập email'),
             phoneNumber: yup.string().matches(/((09|03|07|08|05)+([0-9]{8})\b)/g, 'Số điện thoại không hợp lệ.'),
             newAddress: yup.string().required('Vui lòng nhập địa chỉ'),
@@ -78,15 +92,17 @@ function ConfirmOrder() {
         reset(infoClient);
     }, [infoClient]);
     const handleProvinceChange = async (e) => {
+        setWard(null);
+        setDistrict(null);
         clearErrors('province');
         if (e.target.value === '') {
             return;
         }
-        let code = parseInt(e.target.value);
-        let province = listProvinces.find((x) => x.code === code);
+        let ProvinceID = parseInt(e.target.value);
+        let province = listProvinces.find((x) => x.ProvinceID === ProvinceID);
         setValue('province', e.target.value);
-        let response = await callAPIGetDistrict(code);
-        setListDistricts(response.districts);
+        let response = await callAPIGetDistrict(ProvinceID);
+        setListDistricts(response);
         setListWards([]);
         setProvice(province);
         setValue('ward', '');
@@ -94,18 +110,19 @@ function ConfirmOrder() {
     };
     const handleDistrictChange = async (e) => {
         clearErrors('district');
-        let code = parseInt(e.target.value);
-        let district = listDistricts.find((x) => x.code === code);
+        setWard(null);
+        let DistrictID = parseInt(e.target.value);
+        let district = listDistricts.find((x) => x.DistrictID === DistrictID);
         setValue('district', e.target.value);
         setDistrict(district);
-        let response = await callAPIGetWard(code);
-        setListWards(response.wards);
+        let response = await callAPIGetWard(DistrictID);
+        setListWards(response);
         setValue('ward', '');
     };
     const handleWardChange = async (e) => {
         clearErrors('ward');
-        let code = parseInt(e.target.value);
-        let ward = listWards.find((x) => x.code === code);
+        let WardCode = e.target.value;
+        let ward = listWards.find((x) => x.WardCode === WardCode);
         setValue('ward', e.target.value);
         setWard(ward);
     };
@@ -114,28 +131,102 @@ function ConfirmOrder() {
     }, []);
     const fetchData = async () => {
         let response = await callAPIGetProvince();
+        let responseAllShops = await callAPIGetAllShops();
+        setAddressShop(responseAllShops.shops[0]);
         if (response) {
             setListProvinces(response);
         }
     };
+    useEffect(() => {
+        async function getServiceDeliverys() {
+            try {
+                if (infoClient && addressShop && cart) {
+                    setLoadingShippingFee(true);
+                    let districtID = null;
+                    let wardCode = null;
+                    if (showChangeAddress === true) {
+                        setLoadingShippingFee(true);
+                        setShippingFee(null);
+                    } else {
+                        districtID = infoClient.districtID;
+                        wardCode = infoClient.wardCode;
+                        setShippingFee(null);
+                    }
+                    if (district && ward && showChangeAddress) {
+                        districtID = district.DistrictID;
+                        wardCode = ward.WardCode;
+                        setLoadingShippingFee(false);
+                    }
+                    console.log(cart.listProducts.weight);
+                    const responseFee = await callAPICaculateShippingFee({
+                        from_district_id: addressShop.district_id,
+                        from_ward_code: addressShop.ward_code,
+                        service_id: SERVICE_ID,
+                        service_type_id: null,
+                        to_district_id: districtID,
+                        to_ward_code: wardCode,
+                        height: cart.listProducts.reduce(
+                            (total, product) => total + product.height * product.quantityCart,
+                            0,
+                        ),
+                        length: cart.listProducts.reduce(
+                            (total, product) => total + product.length * product.quantityCart,
+                            0,
+                        ),
+                        weight: cart.listProducts.reduce(
+                            (total, product) => total + product.weight * product.quantityCart,
+                            0,
+                        ),
+                        width: cart.listProducts.reduce(
+                            (total, product) => total + product.width * product.quantityCart,
+                            0,
+                        ),
+                        insurance_value: cart.total * 0.05,
+                        cod_failed_amount: 0,
+                        coupon: null,
+                    });
+                    if (responseFee) {
+                        setLoadingShippingFee(false);
+                        setShippingFee(responseFee);
+                    }
+                }
+            } catch (error) {}
+        }
+        getServiceDeliverys();
+    }, [addressShop, infoClient, cart, district, ward, showChangeAddress]);
     const onSubmit = async (data) => {
         let fullAddress = '';
         setErrorsForm([]);
         if (showChangeAddress) {
-            fullAddress = data.newAddress + ', ' + ward.name + ', ' + district.name + ', ' + province.name;
+            fullAddress =
+                data.newAddress +
+                ', ' +
+                ward.WardName +
+                ', ' +
+                district.DistrictName +
+                ', ' +
+                province.NameExtension[1];
         }
         let UpdateInfoClient = {
             email: data.email,
             fullName: data.fullName,
             phoneNumber: data.phoneNumber,
             address: showChangeAddress ? fullAddress : data.address,
+            provinceID: showChangeAddress ? province.ProvinceID : infoClient.provinceID,
+            wardCode: showChangeAddress ? ward.WardCode : infoClient.wardCode,
+            districtID: showChangeAddress ? district.DistrictID : infoClient.districtID,
+            houseNumberAndStreet: showChangeAddress ? data.newAddress : infoClient.houseNumberAndStreet,
         };
         let dataCreateCart = {
             infoRecipient: UpdateInfoClient,
             order: cart,
             paymentMethodId: checkedMethodPayment,
+            note: data.note,
+            height: cart.listProducts.reduce((total, product) => total + product.height * product.quantityCart, 0),
+            length: cart.listProducts.reduce((total, product) => total + product.length * product.quantityCart, 0),
+            weight: cart.listProducts.reduce((total, product) => total + product.weight * product.quantityCart, 0),
+            width: cart.listProducts.reduce((total, product) => total + product.width * product.quantityCart, 0),
         };
-        console.log(dataCreateCart);
         if (checkedMethodPayment === 1) {
             let response = await createOrderClient(dataCreateCart);
             if (response.success) {
@@ -145,8 +236,24 @@ function ConfirmOrder() {
         } else if (checkedMethodPayment === 2 || checkedMethodPayment === 3) {
             dispatch(
                 CartSlice.actions.updateInfoRecipient({
-                    note: 'dsđs',
+                    note: data.note,
                     recipient: UpdateInfoClient,
+                    height: cart.listProducts.reduce(
+                        (total, product) => total + product.height * product.quantityCart,
+                        0,
+                    ),
+                    length: cart.listProducts.reduce(
+                        (total, product) => total + product.length * product.quantityCart,
+                        0,
+                    ),
+                    weight: cart.listProducts.reduce(
+                        (total, product) => total + product.weight * product.quantityCart,
+                        0,
+                    ),
+                    width: cart.listProducts.reduce(
+                        (total, product) => total + product.width * product.quantityCart,
+                        0,
+                    ),
                 }),
             );
             let response = await checkOutByVnPay({
@@ -163,6 +270,9 @@ function ConfirmOrder() {
         setListDistricts([]);
         setProvice('');
         setListWards([]);
+        setWard(null);
+        setDistrict(null);
+        setProvice(null);
         let response = await callAPIGetProvince();
         if (response) {
             setListProvinces(response);
@@ -176,7 +286,6 @@ function ConfirmOrder() {
         resetField('newAddress');
     };
     //Cart
-    const cart = useSelector(infoCart);
 
     if (isLoading) {
         return <></>;
@@ -267,6 +376,18 @@ function ConfirmOrder() {
                                         <p className="mt-2 text-danger">{errors.phoneNumber?.message}</p>
                                     )}
                                 </div>
+                                <div className="form-group">
+                                    <label className="font-weight-bold">Ghi chú:</label>
+                                    <textarea
+                                        type="text"
+                                        className="form-control"
+                                        name="note"
+                                        placeholder="Ghi chú (nếu có)"
+                                        {...register('note')}
+                                        rows={5}
+                                    />
+                                    {errors.note?.message && <p className="mt-2 text-danger">{errors.note?.message}</p>}
+                                </div>
                                 {showChangeAddress === true ? (
                                     <></>
                                 ) : (
@@ -299,15 +420,15 @@ function ConfirmOrder() {
                                             <select
                                                 id="inputState"
                                                 className="form-control"
-                                                value={province?.code || ''}
+                                                value={province?.ProvinceID || ''}
                                                 onChange={handleProvinceChange}
                                             >
                                                 <option selected value="">
                                                     Chọn tỉnh/thành phố
                                                 </option>
                                                 {listProvinces?.map((province, index) => (
-                                                    <option value={province.code} key={index}>
-                                                        {province.name}
+                                                    <option value={province.ProvinceID} key={index}>
+                                                        {province.NameExtension[1]}
                                                     </option>
                                                 ))}
                                             </select>
@@ -322,15 +443,15 @@ function ConfirmOrder() {
                                             <select
                                                 id="inputState"
                                                 className="form-control"
-                                                value={district?.code || ''}
+                                                value={district?.DistrictID || ''}
                                                 onChange={handleDistrictChange}
                                             >
                                                 <option selected value="">
                                                     Chọn quận/huyện
                                                 </option>
                                                 {listDistricts?.map((district, index) => (
-                                                    <option value={district.code} key={index}>
-                                                        {district.name}
+                                                    <option value={district.DistrictID} key={index}>
+                                                        {district.DistrictName}
                                                     </option>
                                                 ))}
                                             </select>
@@ -345,15 +466,15 @@ function ConfirmOrder() {
                                             <select
                                                 id="inputState"
                                                 className="form-control"
-                                                value={ward?.code || ''}
+                                                value={ward?.WardCode || ''}
                                                 onChange={handleWardChange}
                                             >
                                                 <option selected value="">
                                                     Chọn phường/xã
                                                 </option>
                                                 {listWards?.map((ward, index) => (
-                                                    <option value={ward.code} key={index}>
-                                                        {ward.name}
+                                                    <option value={ward.WardCode} key={index}>
+                                                        {ward.WardName}
                                                     </option>
                                                 ))}
                                             </select>
@@ -563,6 +684,40 @@ function ConfirmOrder() {
                                 ) : (
                                     <h3>Chưa có sản phẩm nào trong giỏ hàng.</h3>
                                 )}
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-5 shadow-lg p-3 mb-4 bg-white rounded border">
+                                {' '}
+                                <div className="row mb-3">
+                                    <div className="col-12 mt-3">
+                                        <span className="bg bg-info text-light p-2 rounded">Vận chuyển</span>
+                                        <h6 className="mt-3 font-weight-bold">Giao hàng nhanh</h6>
+                                        <h6 className="mt-3 font-weight-bold">
+                                            Phí vận chuyển:{' '}
+                                            <span style={{ color: '#d70018' }}>
+                                                {loadingShippingFee ||
+                                                !shippingFee ||
+                                                shippingFee.total === null ||
+                                                shippingFee.total === undefined ? (
+                                                    <>
+                                                        <div class="spinner-border" role="status">
+                                                            <span class="sr-only">Loading...</span>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {String(shippingFee.total).replace(
+                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                            '$1,',
+                                                        )}
+                                                        <sup>đ</sup>
+                                                    </>
+                                                )}
+                                            </span>
+                                        </h6>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className="row">

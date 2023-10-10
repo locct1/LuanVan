@@ -35,6 +35,15 @@ namespace BackendAPI.Data
         public string? Onl_SecureHash { get; set; }
         public string? Onl_TransactionNo { get; set; }
         public string? Onl_OrderId { get; set; }
+        public string? WardCode { get; set; }
+        public string? HouseNumberAndStreet { get; set; }
+        public int? DistrictID { get; set; }
+        public int? ProvinceID { get; set; }
+        public int? Height { get; set; }
+        public int? Weight { get; set; }
+        public int? Length { get; set; }
+        public int? Width { get; set; }
+        public string? OrderCode { get; set; }
 
     }
 }

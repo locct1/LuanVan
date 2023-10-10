@@ -18,6 +18,10 @@ export default createSlice({
         },
         updateInfoRecipient: (state, action) => {
             state.note = action.payload.note;
+            state.height = action.payload.height;
+            state.width = action.payload.width;
+            state.weight = action.payload.weight;
+            state.length = action.payload.length;
             state.recipient = action.payload.recipient;
             state.isCheckOut = false;
         },
@@ -32,7 +36,6 @@ export default createSlice({
                     return;
                 }
                 productSample.quantityCart = productSample.quantityCart + action.payload.quantityCart;
-                state.total = state.total + productSample.priceOut * action.payload.quantityCart;
                 if (productSample.discountedPrice !== null) {
                     state.total = state.total + productSample.discountedPrice * action.payload.quantityCart;
                 } else {

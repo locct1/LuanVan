@@ -27,7 +27,7 @@ namespace BackendAPI.Controllers
             {
 
                 var orders = await _orderService.GetAll();
-              
+
                 return Ok(new Response
                 {
                     Data =
@@ -86,14 +86,24 @@ namespace BackendAPI.Controllers
 
                     });
                 }
+                var message = "Cập nhật trạng thái đơn hàng thành công";
                 order.OrderStatusId = model.OrderStatusId;
+                if (model.OrderStatusId == 2 && model.OrderCode != null)
+                {
+                    order.OrderCode = model.OrderCode;
+                    message = "Tạo mã vân đơn thành công";
+                }
+                if (model.OrderStatusId == 6 && model.OrderCode != null)
+                {
+                    message = "Hủy đơn hàng thành công";
+                }
                 order.UpdatedAt = DateTime.Now;
                 await _orderService.UpdateOrder(order.Id, order);
                 await _unitOfWork.SaveChangesAsync();
                 return Ok(new Response
                 {
                     Success = true,
-                    Message = "Cập nhật trạng thái thành công"
+                    Message = message
 
                 });
             }
@@ -138,9 +148,10 @@ namespace BackendAPI.Controllers
                 return Ok(new Response
                 {
                     Data =
-                   new {
-                        order=order,
-                        orderDetails= groupedItems
+                   new
+                   {
+                       order = order,
+                       orderDetails = groupedItems
                    },
                     Success = true,
 
@@ -154,6 +165,41 @@ namespace BackendAPI.Controllers
                     Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
                 });
                 throw;
+            }
+        }
+        [HttpGet("get-info-print-A5/{token}")]
+        public async Task<IActionResult> CallAPIPrintA5(string token)
+        {
+            string apiUrl = $"https://dev-online-gateway.ghn.vn/a5/public-api/printA5?token={token}";
+
+            // Tạo một đối tượng HttpClient
+            using (HttpClient client = new HttpClient())
+            {
+                try
+                {
+                    // Gọi API và lấy dữ liệu trả về
+                    HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                    // Kiểm tra xem kết quả có thành công không (status code 200)
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Đọc dữ liệu trả về dưới dạng chuỗi
+                        string content = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine("Dữ liệu từ API:");
+                        Console.WriteLine(content);
+                        return Ok(content);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Lỗi khi gọi API. Status code: " + response.StatusCode);
+                        return BadRequest("Lỗi khi gọi API");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Lỗi: " + ex.Message);
+                    return BadRequest("Lỗi khi gọi API: " + ex.Message);
+                }
             }
         }
     }

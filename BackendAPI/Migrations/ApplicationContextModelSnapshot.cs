@@ -40,6 +40,9 @@ namespace BackendAPI.Migrations
                     b.Property<bool>("Disabled")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("DistrictID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -52,6 +55,9 @@ namespace BackendAPI.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HouseNumberAndStreet")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
@@ -80,6 +86,9 @@ namespace BackendAPI.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("ProvinceID")
+                        .HasColumnType("int");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -89,6 +98,9 @@ namespace BackendAPI.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("WardCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -194,6 +206,63 @@ namespace BackendAPI.Migrations
                     b.ToTable("ColorProduct");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.FeedbackReviewProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FeedBackContent")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("ReviewProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FeedbackReviewProduct");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.LikeReviewProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReviewProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LikeReviewProduct");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.OperatingSystemProduct", b =>
                 {
                     b.Property<int>("Id")
@@ -244,6 +313,18 @@ namespace BackendAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DistrictID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Height")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HouseNumberAndStreet")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Length")
+                        .HasColumnType("int");
+
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
@@ -271,10 +352,16 @@ namespace BackendAPI.Migrations
                     b.Property<string>("Onl_TransactionStatus")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OrderCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("OrderStatusId")
                         .HasColumnType("int");
 
                     b.Property<int?>("PaymentMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProvinceID")
                         .HasColumnType("int");
 
                     b.Property<int?>("RecipientId")
@@ -289,6 +376,15 @@ namespace BackendAPI.Migrations
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("WardCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Weight")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Width")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -417,7 +513,7 @@ namespace BackendAPI.Migrations
                     b.Property<int?>("BrandId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Charging")
+                    b.Property<int?>("Charging")
                         .HasColumnType("int");
 
                     b.Property<int?>("ChipId")
@@ -433,6 +529,9 @@ namespace BackendAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("Height")
+                        .HasColumnType("int");
+
                     b.Property<string>("Image")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -443,6 +542,9 @@ namespace BackendAPI.Migrations
 
                     b.Property<bool>("IsVersionRam")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("Length")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -476,6 +578,12 @@ namespace BackendAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("WareHouseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Weight")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Width")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -748,6 +856,62 @@ namespace BackendAPI.Migrations
                     b.ToTable("Recipient");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ReviewProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CommentContent")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ReviewProduct");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ReviewProductPhoto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ReviewProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewProductId");
+
+                    b.ToTable("ReviewProductPhoto");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Rom", b =>
                 {
                     b.Property<int>("Id")
@@ -973,6 +1137,36 @@ namespace BackendAPI.Migrations
                     b.Navigation("ChipType");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.FeedbackReviewProduct", b =>
+                {
+                    b.HasOne("BackendAPI.Data.ReviewProduct", "ReviewProduct")
+                        .WithMany("FeedbackReviewProducts")
+                        .HasForeignKey("ReviewProductId");
+
+                    b.HasOne("BackendAPI.Data.ApplicationUser", "User")
+                        .WithMany("FeedbackReviewProducts")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("ReviewProduct");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.LikeReviewProduct", b =>
+                {
+                    b.HasOne("BackendAPI.Data.ReviewProduct", "ReviewProduct")
+                        .WithMany("LikeReviewProducts")
+                        .HasForeignKey("ReviewProductId");
+
+                    b.HasOne("BackendAPI.Data.ApplicationUser", "User")
+                        .WithMany("LikeReviewProducts")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("ReviewProduct");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.OperatingSystemProduct", b =>
                 {
                     b.HasOne("BackendAPI.Data.OperatingSystemType", "OperatingSystemType")
@@ -1179,7 +1373,7 @@ namespace BackendAPI.Migrations
             modelBuilder.Entity("BackendAPI.Data.PromotionProductDetail", b =>
                 {
                     b.HasOne("BackendAPI.Data.ProductVersion", "ProductVersion")
-                        .WithMany("ProductDetails")
+                        .WithMany("PromotionProductDetails")
                         .HasForeignKey("ProductVersionId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -1190,6 +1384,30 @@ namespace BackendAPI.Migrations
                     b.Navigation("ProductVersion");
 
                     b.Navigation("PromotionProduct");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ReviewProduct", b =>
+                {
+                    b.HasOne("BackendAPI.Data.Product", "Product")
+                        .WithMany("ReviewProducts")
+                        .HasForeignKey("ProductId");
+
+                    b.HasOne("BackendAPI.Data.ApplicationUser", "User")
+                        .WithMany("ReviewProducts")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ReviewProductPhoto", b =>
+                {
+                    b.HasOne("BackendAPI.Data.ReviewProduct", "ReviewProduct")
+                        .WithMany("ReviewProductPhotos")
+                        .HasForeignKey("ReviewProductId");
+
+                    b.Navigation("ReviewProduct");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1245,9 +1463,15 @@ namespace BackendAPI.Migrations
 
             modelBuilder.Entity("BackendAPI.Data.ApplicationUser", b =>
                 {
+                    b.Navigation("FeedbackReviewProducts");
+
+                    b.Navigation("LikeReviewProducts");
+
                     b.Navigation("Orders");
 
                     b.Navigation("ProductPurchaseOrders");
+
+                    b.Navigation("ReviewProducts");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Brand", b =>
@@ -1300,6 +1524,8 @@ namespace BackendAPI.Migrations
                     b.Navigation("ProductColorProducts");
 
                     b.Navigation("ProductVersions");
+
+                    b.Navigation("ReviewProducts");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.ProductColorProduct", b =>
@@ -1319,9 +1545,9 @@ namespace BackendAPI.Migrations
 
             modelBuilder.Entity("BackendAPI.Data.ProductVersion", b =>
                 {
-                    b.Navigation("ProductDetails");
-
                     b.Navigation("ProductSamples");
+
+                    b.Navigation("PromotionProductDetails");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.PromotionProduct", b =>
@@ -1337,6 +1563,15 @@ namespace BackendAPI.Migrations
             modelBuilder.Entity("BackendAPI.Data.Recipient", b =>
                 {
                     b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ReviewProduct", b =>
+                {
+                    b.Navigation("FeedbackReviewProducts");
+
+                    b.Navigation("LikeReviewProducts");
+
+                    b.Navigation("ReviewProductPhotos");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Rom", b =>

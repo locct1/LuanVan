@@ -74,11 +74,12 @@ function UpdateInfoClient() {
         if (e.target.value === '') {
             return;
         }
-        let code = parseInt(e.target.value);
-        let province = listProvinces.find((x) => x.code === code);
+        let ProvinceID = parseInt(e.target.value);
+        let province = listProvinces.find((x) => x.ProvinceID === ProvinceID);
         setValue('province', e.target.value);
-        let response = await callAPIGetDistrict(code);
-        setListDistricts(response.districts);
+        console.log(ProvinceID);
+        let response = await callAPIGetDistrict(ProvinceID);
+        setListDistricts(response);
         setListWards([]);
         setProvice(province);
         setValue('ward', '');
@@ -86,18 +87,18 @@ function UpdateInfoClient() {
     };
     const handleDistrictChange = async (e) => {
         clearErrors('district');
-        let code = parseInt(e.target.value);
-        let district = listDistricts.find((x) => x.code === code);
+        let DistrictID = parseInt(e.target.value);
+        let district = listDistricts.find((x) => x.DistrictID === DistrictID);
         setValue('district', e.target.value);
         setDistrict(district);
-        let response = await callAPIGetWard(code);
-        setListWards(response.wards);
+        let response = await callAPIGetWard(DistrictID);
+        setListWards(response);
         setValue('ward', '');
     };
     const handleWardChange = async (e) => {
         clearErrors('ward');
-        let code = parseInt(e.target.value);
-        let ward = listWards.find((x) => x.code === code);
+        let WardCode = e.target.value;
+        let ward = listWards.find((x) => x.WardCode === WardCode);
         setValue('ward', e.target.value);
         setWard(ward);
     };
@@ -114,12 +115,23 @@ function UpdateInfoClient() {
         let fullAddress = '';
         setErrorsForm([]);
         if (showChangeAddress) {
-            fullAddress = data.newAddress + ', ' + ward.name + ', ' + district.name + ', ' + province.name;
+            fullAddress =
+                data.newAddress +
+                ', ' +
+                ward.WardName +
+                ', ' +
+                district.DistrictName +
+                ', ' +
+                province.NameExtension[1];
         }
         let UpdateInfoClient = {
             fullName: data.fullName,
             phoneNumber: data.phoneNumber,
             address: showChangeAddress ? fullAddress : data.address,
+            provinceID: showChangeAddress ? province.ProvinceID : infoClient.provinceID,
+            wardCode: showChangeAddress ? ward.WardCode : infoClient.wardCode,
+            districtID: showChangeAddress ? district.DistrictID : infoClient.districtID,
+            houseNumberAndStreet: showChangeAddress ? data.newAddress : infoClient.houseNumberAndStreet,
         };
         let response = await UpdateInfoClientService(UpdateInfoClient);
         if (response.success) {
@@ -257,15 +269,15 @@ function UpdateInfoClient() {
                                             <select
                                                 id="inputState"
                                                 class="form-control"
-                                                value={province?.code || ''}
+                                                value={province?.ProvinceID || ''}
                                                 onChange={handleProvinceChange}
                                             >
                                                 <option selected value="">
                                                     Chọn tỉnh/thành phố
                                                 </option>
                                                 {listProvinces?.map((province, index) => (
-                                                    <option value={province.code} key={index}>
-                                                        {province.name}
+                                                    <option value={province.ProvinceID} key={index}>
+                                                        {province.NameExtension[1]}
                                                     </option>
                                                 ))}
                                             </select>
@@ -280,15 +292,15 @@ function UpdateInfoClient() {
                                             <select
                                                 id="inputState"
                                                 class="form-control"
-                                                value={district?.code || ''}
+                                                value={district?.DistrictID || ''}
                                                 onChange={handleDistrictChange}
                                             >
                                                 <option selected value="">
                                                     Chọn quận/huyện
                                                 </option>
                                                 {listDistricts?.map((district, index) => (
-                                                    <option value={district.code} key={index}>
-                                                        {district.name}
+                                                    <option value={district.DistrictID} key={index}>
+                                                        {district.DistrictName}
                                                     </option>
                                                 ))}
                                             </select>
@@ -303,15 +315,15 @@ function UpdateInfoClient() {
                                             <select
                                                 id="inputState"
                                                 class="form-control"
-                                                value={ward?.code || ''}
+                                                value={ward?.WardCode || ''}
                                                 onChange={handleWardChange}
                                             >
                                                 <option selected value="">
                                                     Chọn phường/xã
                                                 </option>
                                                 {listWards?.map((ward, index) => (
-                                                    <option value={ward.code} key={index}>
-                                                        {ward.name}
+                                                    <option value={ward.WardCode} key={index}>
+                                                        {ward.WardName}
                                                     </option>
                                                 ))}
                                             </select>

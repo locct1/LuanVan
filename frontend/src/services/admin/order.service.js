@@ -24,3 +24,6 @@ export const getOrderById = async (id) => {
 export const updateOrderStatus = async (data) => {
     return await apiAdmin.put(`${END_POINT.ORDERS}/update-order-status/${data.orderId}`, data);
 };
+export const callAPIPrintA5 = async (token) => {
+    return await apiAdmin.get(`${END_POINT.ORDERS}/get-info-print-A5/${token}`);
+};

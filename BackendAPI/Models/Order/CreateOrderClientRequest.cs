@@ -7,6 +7,7 @@ namespace BackendAPI.Models.Order
         public InfoRecipientRequest InfoRecipient { get; set; }
         public int PaymentMethodId { get; set; }
         public CreateOrderModel Order { get; set; }
+        public string? Note { get; set; }
         public string? Onl_Amount { get; set; }
         public string? Onl_BankCode { get; set; }
         public string? Onl_OrderInfo { get; set; }
@@ -15,6 +16,10 @@ namespace BackendAPI.Models.Order
         public string? Onl_SecureHash { get; set; }
         public string? Onl_TransactionNo { get; set; }
         public string? Onl_OrderId { get; set; }
+        public int? Height { get; set; }
+        public int? Weight { get; set; }
+        public int? Length { get; set; }
+        public int? Width { get; set; }
     }
     public class InfoRecipientRequest
     {
@@ -26,6 +31,16 @@ namespace BackendAPI.Models.Order
         public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập địa chỉ")]
         public string Address { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập phường")]
+
+        public string WardCode { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập quận")]
+
+        public int DistrictID { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập thành phố")]
+        public int ProvinceID { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập số nhà/đường")]
+        public string HouseNumberAndStreet { get; set; }
     }
     public class CreateOrderModel
     {
@@ -33,7 +48,7 @@ namespace BackendAPI.Models.Order
         public double Total { get; set; }
         public List<CreateOrderDetailModel> ListProducts { get; set; }
         public string? Note { get; set; }
-     
+
 
     }
     public class CreateOrderDetailModel
@@ -60,8 +75,8 @@ namespace BackendAPI.Models.Order
     }
     public class CreateOrderDetailProductVersionModel
     {
-       public CreateOrderDetailRamModel Ram { get; set; }
-       public CreateOrderDetailRomModel Rom { get; set; }
+        public CreateOrderDetailRamModel Ram { get; set; }
+        public CreateOrderDetailRomModel Rom { get; set; }
     }
     public class CreateOrderDetailRamModel
     {

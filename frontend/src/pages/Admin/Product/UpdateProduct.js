@@ -62,6 +62,10 @@ function UpdateProduct() {
                 .array()
                 .min(1, 'Vui lòng chọn ít nhất một màu')
                 .required('Vui lòng chọn ít nhất một màu'),
+            weight: yup.number().typeError('Vui lòng nhập số').required('Vui lòng nhập khối lượng'),
+            width: yup.number().typeError('Vui lòng nhập số').required('Vui lòng nhập chiều dài sản phẩm'),
+            height: yup.number().typeError('Vui lòng nhập số').required('Vui lòng nhập độ dày'),
+            length: yup.number().typeError('Vui lòng nhập số').required('Vui lòng nhập chiều dài'),
         })
         .required();
     const {
@@ -127,6 +131,10 @@ function UpdateProduct() {
             setValue('chipId', data.data.chipId);
             setValue('operatingSystemId', data.data.operatingSystemProductId);
             setValue('id', data.data.id);
+            setValue('weight', data.data.weight);
+            setValue('height', data.data.height);
+            setValue('length', data.data.length);
+            setValue('width', data.data.width);
             setValue('colorproducts', convertedOptions);
         }
     }, [data]);
@@ -280,6 +288,10 @@ function UpdateProduct() {
         formData.append('screenTechnologyId', data.screenTechnologyId);
         formData.append('chipId', data.chipId);
         formData.append('operatingSystemProductId', data.operatingSystemId);
+        formData.append('weight', data.weight);
+        formData.append('length', data.length);
+        formData.append('height', data.height);
+        formData.append('width', data.width);
         formData.append('image', avt);
         console.log(data);
         console.log(productVersionList);
@@ -408,6 +420,78 @@ function UpdateProduct() {
                                         />
                                         {errors.infomation?.message && (
                                             <p className="mt-2 text-danger">{errors.infomation?.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Khối lượng(gram):
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="weight"
+                                            placeholder="Nhập khối lượng"
+                                            {...register('weight')}
+                                        />
+                                        {errors.weight?.message && (
+                                            <p className="mt-2 text-danger">{errors.weight?.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="form-group ">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Chiều dài(cm):
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="length"
+                                            placeholder="Nhập chiều dài"
+                                            {...register('length')}
+                                        />
+                                        {errors.length?.message && (
+                                            <p className="mt-2 text-danger">{errors.length?.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="form-group ">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Độ dày(cm):
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="height"
+                                            placeholder="Nhập khối lượng"
+                                            {...register('height')}
+                                        />
+                                        {errors.height?.message && (
+                                            <p className="mt-2 text-danger">{errors.height?.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="form-group ">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Chiều rộng(cm):
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="width"
+                                            placeholder="Nhập chiều rộng"
+                                            {...register('width')}
+                                        />
+                                        {errors.width?.message && (
+                                            <p className="mt-2 text-danger">{errors.width?.message}</p>
                                         )}
                                     </div>
                                     <div className="form-group">

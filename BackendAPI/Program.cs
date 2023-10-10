@@ -58,6 +58,10 @@ builder.Services.AddScoped<IProductColorProductService, ProductColorProductServi
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPromotionProductService, PromotionProductService>();
 builder.Services.AddScoped<IPromotionProductDetailService, PromotionProductDetailService>();
+builder.Services.AddScoped<IReviewProductService, ReviewProductService>();
+builder.Services.AddScoped<IReviewProductPhotoService, ReviewProductPhotoService>();
+builder.Services.AddScoped<ILikeReviewProductService, LikeReviewProductService>();
+builder.Services.AddScoped<IFeedbackReviewProductService, FeedbackReviewProductService>();
 builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
 builder.Services.AddScoped<IVnPayClientService, VnPayClientService>();
 builder.Services.AddAuthentication(options =>

@@ -1,0 +1,15 @@
+.container-review-product {
+	position: relative;
+	img {
+		display: block;
+	}
+    .fa-times {
+		position: absolute;
+		cursor: pointer;
+    color: red;
+    margin-right: 0px;
+    top: -21px;
+    right: 0;
+}
+	
+}

@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import {
+    createReviewProductClient,
+    deleteReviewProduct,
     getAllBrandsClient,
     getAllOperatingSystemTypesClient,
     getAllOperatingSystemsClient,
@@ -11,9 +13,13 @@ import {
     getAllProductsClient,
     getAllPromotionProductsClient,
     getAllRamsClient,
+    getAllReviewProductsByProductIdClient,
     getAllRomsClient,
     getOrderClient,
     getProductByIdClient,
+    likeReviewProduct,
+    requestCancelOrderClient,
+    unLikeReviewProduct,
 } from '~/services/client/page.service';
 
 export const useBrandsClientData = (onSuccess, onError) => {
@@ -52,6 +58,16 @@ export const useGetOrderClientData = (orderId) => {
         enabled: orderId !== undefined,
     });
 };
+export const useRequestCancelOrderClientData = (onSuccessRequestCancelOrderClientData, ColorProductId) => {
+    const queryClient = useQueryClient();
+    return useMutation(requestCancelOrderClient, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('orders-client');
+            queryClient.invalidateQueries('order-client');
+            onSuccessRequestCancelOrderClientData(data);
+        },
+    });
+};
 export const useProductSamplesClientData = (onSuccess, onError) => {
     return useQuery('client-productsamples', getAllProductSamplesClient);
 };
@@ -67,4 +83,47 @@ export const useOperatingSystemTypesClientData = (onSuccess, onError) => {
 };
 export const useProductVersionsClientData = (onSuccess, onError) => {
     return useQuery('client-product-versions', getAllProductVersionsClient);
+};
+export const useCreateReviewProductClientData = (onSuccess) => {
+    const queryClient = useQueryClient();
+
+    return useMutation(createReviewProductClient, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('review-products-client');
+            onSuccess(data);
+        },
+    });
+};
+export const useReviewProductsByProductIdData = (productId) => {
+    return useQuery({
+        queryKey: ['review-products-client', productId],
+        queryFn: () => getAllReviewProductsByProductIdClient(productId),
+        enabled: productId !== undefined,
+    });
+};
+export const useLikeReviewProductData = (id) => {
+    const queryClient = useQueryClient();
+
+    return useMutation(likeReviewProduct, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('review-products-client');
+        },
+    });
+};
+export const useUnLikeReviewProductData = (id) => {
+    const queryClient = useQueryClient();
+    return useMutation(unLikeReviewProduct, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('review-products-client');
+        },
+    });
+};
+export const useDeleteReviewProductData = (onSuccess, id) => {
+    const queryClient = useQueryClient();
+    return useMutation(deleteReviewProduct, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('review-products-client');
+            onSuccess(data);
+        },
+    });
 };

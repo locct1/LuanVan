@@ -103,6 +103,12 @@ function AdminSideBar({ sidebarToggle, toggled }) {
                     <span>Quản lý đơn hàng</span>
                 </NavLink>
             </li>
+            <li className="nav-item">
+                <NavLink to="/admin-list-reviewproducts" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý bình luận</span>
+                </NavLink>
+            </li>
             {/* Divider */}
             <hr className="sidebar-divider d-none d-md-block" />
             {/* Sidebar Toggler (Sidebar) */}

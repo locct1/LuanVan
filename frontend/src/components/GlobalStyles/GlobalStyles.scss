@@ -11,6 +11,7 @@
 //     margin: 10px;
 //     transform: rotate(90deg);
 //   }
+
 .border-light-custom {
     border-color: #e2e2cc !important;
 }
@@ -41,7 +42,11 @@
     align-items: center;
     height: 100vh; /* Set the height of the spinner div to occupy the full viewport height */
 }
+.bg-light-tag-order-delivery{
+    background-color: #f5f5f5;
+    border-radius: 4px;
 
+}
 .loader {
     position: relative;
     left: 50%;

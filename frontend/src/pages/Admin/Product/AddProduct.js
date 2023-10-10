@@ -57,6 +57,10 @@ function AddProduct() {
                 .array()
                 .min(1, 'Vui lòng chọn ít nhất một màu')
                 .required('Vui lòng chọn ít nhất một màu'),
+            weight: yup.number().typeError('Vui lòng nhập số').required('Vui lòng nhập khối lượng'),
+            width: yup.number().typeError('Vui lòng nhập số').required('Vui lòng nhập chiều dài sản phẩm'),
+            height: yup.number().typeError('Vui lòng nhập số').required('Vui lòng nhập độ dày'),
+            length: yup.number().typeError('Vui lòng nhập số').required('Vui lòng nhập chiều dài'),
         })
         .required();
     const {
@@ -235,6 +239,10 @@ function AddProduct() {
         formData.append('screenTechnologyId', data.screenTechnologyId);
         formData.append('chipId', data.chipId);
         formData.append('operatingSystemId', data.operatingSystemId);
+        formData.append('weight', data.weight);
+        formData.append('length', data.length);
+        formData.append('height', data.height);
+        formData.append('width', data.width);
         formData.append('image', avt);
         addProduct(formData);
     };
@@ -347,6 +355,8 @@ function AddProduct() {
                                             <p className="mt-2 text-danger">{errors.colorproducts?.message}</p>
                                         )}
                                     </div>
+                                   
+
                                     <div className="form-group">
                                         <label htmlFor="exampleInputEmail1" className="font-weight-bold">
                                             Thông tin sản phẩm:
@@ -367,39 +377,13 @@ function AddProduct() {
                                             <p className="mt-2 text-danger">{errors.infomation?.message}</p>
                                         )}
                                     </div>
+
                                     <div className="form-group">
                                         <label htmlFor="exampleInputEmail1" className="font-weight-bold">
                                             Thông số kỹ thuật:
                                         </label>
                                     </div>
-                                    <div className="form-group row">
-                                        <label
-                                            htmlFor="inputPassword"
-                                            className="col-sm-2 col-form-label font-weight-bold"
-                                        >
-                                            Công nghệ màn hình:
-                                        </label>
-                                        <div className="col-sm-10">
-                                            <select
-                                                className="form-control"
-                                                name="screenTechnologyId"
-                                                {...register('screenTechnologyId')}
-                                            >
-                                                <option disabled selected value="">
-                                                    Chọn công nghệ màn hình
-                                                </option>
-                                                {dataScreenTechnologies.data?.map((screenTechnology, index) => (
-                                                    <option value={screenTechnology.id} key={screenTechnology.id}>
-                                                        {screenTechnology.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {errors.screenTechnologyId?.message && (
-                                                <p className="mt-2 text-danger">{errors.screenTechnologyId?.message}</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="form-group row">
+                                    <div className="form-group row ">
                                         <label
                                             htmlFor="inputPassword"
                                             className="col-sm-2 col-form-label font-weight-bold"
@@ -439,6 +423,34 @@ function AddProduct() {
                                             )}
                                         </div>
                                     </div>
+                                    <div className="form-group row">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Công nghệ màn hình:
+                                        </label>
+                                        <div className="col-sm-10">
+                                            <select
+                                                className="form-control"
+                                                name="screenTechnologyId"
+                                                {...register('screenTechnologyId')}
+                                            >
+                                                <option disabled selected value="">
+                                                    Chọn công nghệ màn hình
+                                                </option>
+                                                {dataScreenTechnologies.data?.map((screenTechnology, index) => (
+                                                    <option value={screenTechnology.id} key={screenTechnology.id}>
+                                                        {screenTechnology.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {errors.screenTechnologyId?.message && (
+                                                <p className="mt-2 text-danger">{errors.screenTechnologyId?.message}</p>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     <div className="form-group row">
                                         <label
                                             htmlFor="inputPassword"

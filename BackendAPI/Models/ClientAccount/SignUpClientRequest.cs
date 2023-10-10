@@ -15,5 +15,15 @@ namespace BackendAPI.Models.ClientAccount
         public bool Disabled { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
         public string Password { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập phường")]
+
+        public string WardCode { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập quận")]
+
+        public int DistrictID { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập thành phố")]
+        public int ProvinceID { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập số nhà/đường")]
+        public string HouseNumberAndStreet { get; set; }
     }
 }

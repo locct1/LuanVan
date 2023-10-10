@@ -130,6 +130,10 @@ namespace BackendAPI.Services.Client
                 Address = model.FullAddress,
                 Disabled = false,
                 FullName = model.FullName,
+                DistrictID = model.DistrictID,
+                WardCode = model.WardCode,
+                ProvinceID = model.ProvinceID,
+                HouseNumberAndStreet = model.HouseNumberAndStreet,
 
             };
             var result = await _userManager.CreateAsync(createUser, model.Password);
@@ -197,6 +201,10 @@ namespace BackendAPI.Services.Client
             user.PhoneNumber = model.PhoneNumber;
             user.Address = model.Address;
             user.FullName = model.FullName;
+            user.ProvinceID = model.ProvinceID;
+            user.DistrictID = model.DistrictID;
+            user.WardCode = model.WardCode;
+            user.HouseNumberAndStreet = model.HouseNumberAndStreet;
             await _userManager.UpdateAsync(user);
             return (new Response
             {

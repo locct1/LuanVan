@@ -37,6 +37,8 @@ function OrderHistory() {
         'badge  badge-info text-light',
         'badge  badge-secondary text-light',
         'badge  badge-success text-light',
+        'badge  badge-dark text-light',
+        'badge  badge-danger text-light',
     ];
     const pageSize = 5;
     const [listOrders, setListOrders] = useState([]);
@@ -210,7 +212,7 @@ function OrderHistory() {
                                             )
                                         ) : (
                                             <tr>
-                                                <td className="text-center" colSpan="5">
+                                                <td className="text-center" colSpan="7">
                                                     Không có dữ liệu
                                                 </td>
                                             </tr>

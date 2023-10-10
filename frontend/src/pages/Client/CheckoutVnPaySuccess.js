@@ -16,8 +16,12 @@ import {
     infoCart,
     infoCheckOutSelector,
     infoClientSelector,
+    infoHeightSelector,
+    infoLengthSelector,
     infoNoteSelector,
     infoRecipientSelector,
+    infoWeightSelector,
+    infoWidthSelector,
 } from '~/redux/selectors';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -37,6 +41,10 @@ function CheckoutVnPaySuccess() {
     const recipient = useSelector(infoRecipientSelector);
     const cart = useSelector(infoCart);
     const note = useSelector(infoNoteSelector);
+    const height = useSelector(infoHeightSelector);
+    const weight = useSelector(infoWeightSelector);
+    const width = useSelector(infoWidthSelector);
+    const length = useSelector(infoLengthSelector);
     const isCheckOut = useSelector(infoCheckOutSelector);
     const [success, setSuccess] = useState(false);
     useEffect(() => {
@@ -58,6 +66,10 @@ function CheckoutVnPaySuccess() {
                 onl_SecureHash: vnpay.vnp_SecureHash,
                 onl_TransactionNo: vnpay.vnp_TransactionNo,
                 onl_OrderId: vnpay.vnp_TxnRef,
+                height: height,
+                width: width,
+                length: length,
+                weight: weight,
             });
             if (response.success) {
                 toast.success(response.message);

@@ -49,6 +49,7 @@ import CheckoutVnPaySuccess from '~/pages/Client/CheckoutVnPaySuccess';
 import AddPromotionProduct from '~/pages/Admin/PromotionProduct/AddPromotionProduct';
 import ListPromotionProducts from '~/pages/Admin/PromotionProduct/ListPromotionProducts';
 import UpdatePromotionProduct from '~/pages/Admin/PromotionProduct/UpdatePromotionProduct';
+import ListReviewProducts from '~/pages/Admin/Comment/ListReviewProducts';
 // Public routes
 const publicRoutes = [
     { path: '/admin-login', component: AdminLogin, layout: null },
@@ -81,6 +82,7 @@ const adminPrivateRoutes = [
     { path: '/admin-list-suppliers', component: ListSuppliers, layout: AdminLayout },
     { path: '/admin-add-supplier', component: AddSupplier, layout: AdminLayout },
     { path: '/admin-suppliers/:id', component: UpdateSupplier, layout: AdminLayout },
+
     { path: '/admin-list-colorproducts', component: ListColorProducts, layout: AdminLayout },
     { path: '/admin-add-colorproduct', component: AddColorProduct, layout: AdminLayout },
     { path: '/admin-colorproducts/:id', component: UpdateColorProduct, layout: AdminLayout },
@@ -107,5 +109,7 @@ const adminPrivateRoutes = [
 
     { path: '/admin-list-orders', component: ListOrders, layout: AdminLayout },
     { path: '/detail-order/:id', component: DetailOrder, layout: AdminLayout },
+
+    { path: '/admin-list-reviewproducts', component: ListReviewProducts, layout: AdminLayout },
 ];
 export { publicRoutes, adminPrivateRoutes };

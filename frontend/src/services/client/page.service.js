@@ -47,3 +47,25 @@ export const getAllOperatingSystemTypesClient = async () => {
 export const getAllProductVersionsClient = async () => {
     return await apiClient.get(`${END_POINT.PAGES}/get-all-product-versions`);
 };
+export const createReviewProductClient = async (data) => {
+    return await apiClient.post(`${END_POINT.PAGES}/create-review-product`, data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+export const getAllReviewProductsByProductIdClient = async (id) => {
+    return await apiClient.get(`${END_POINT.PAGES}/get-all-review-products-by-product-id/${id}`);
+};
+export const likeReviewProduct = async (id) => {
+    return await apiClient.post(`${END_POINT.PAGES}/like-review-product/${id}`);
+};
+export const unLikeReviewProduct = async (id) => {
+    return await apiClient.delete(`${END_POINT.PAGES}/unlike-review-product/${id}`);
+};
+export const deleteReviewProduct = async (id) => {
+    return await apiClient.delete(`${END_POINT.PAGES}/delete-review-product/${id}`);
+};
+export const requestCancelOrderClient = async (data) => {
+    return await apiClient.put(`${END_POINT.PAGES}/request-cancel-order-client/${data.orderId}`, data);
+};

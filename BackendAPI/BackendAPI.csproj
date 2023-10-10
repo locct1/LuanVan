@@ -29,6 +29,7 @@
 	<ItemGroup>
 		<Folder Include="Uploads\Brand\" />
 		<Folder Include="Uploads\ImageProduct360\" />
+		<Folder Include="Uploads\ReviewProduct\" />
 		<Folder Include="Uploads\ProductColorProduct\" />
 		<Folder Include="Uploads\Product\" />
 		<Folder Include="Utils\" />

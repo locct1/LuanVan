@@ -48,6 +48,7 @@ export const useUpdateOrderStatusData = (onSuccessUpdateOrderStatus, ColorProduc
     return useMutation(updateOrderStatus, {
         onSuccess: (data) => {
             queryClient.invalidateQueries('orders');
+            queryClient.invalidateQueries('order');
             onSuccessUpdateOrderStatus(data);
         },
     });
