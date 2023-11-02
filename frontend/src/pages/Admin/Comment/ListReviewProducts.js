@@ -172,12 +172,6 @@ function ListReviewProducts() {
                                                     <td>{moment(item.createdAt).format('DD/MM/YYYY HH:mm:ss')}</td>
 
                                                     <td className="text-center td-actions">
-                                                        <Link
-                                                            to={`/admin-colorproducts/${item.id}`}
-                                                            className="btn btn-primary"
-                                                        >
-                                                            <i className="fas fa-edit"></i>
-                                                        </Link>
                                                         <button
                                                             className="btn btn-danger ml-2"
                                                             onClick={() => handleDelete(item.id)}

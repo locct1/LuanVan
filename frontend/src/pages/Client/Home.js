@@ -33,17 +33,43 @@ function Home() {
                     <div className="row">
                         <div className="col-lg-12">
                             <div className="section-title">
-                                <h2>Sản phẩm mới nhất</h2>
+                                <h2>Phụ kiện mới nhất</h2>
                             </div>
                         </div>
                     </div>
                     <div className="row featured__filter">
                         {data && data.data.length > 0 ? (
-                            data.data.map((item, index) => (
-                                <div className="col-lg-3 col-md-4 col-sm-6" key={item.id}>
-                                    <ProductCard product={item} promotionProductDetails={promotionProductDetails} />
-                                </div>
-                            ))
+                            data.data
+                                ?.filter((product) => product.productCategoryCode !== 'DIENTHOAI')
+                                .map((item, index) => (
+                                    <div className="col-lg-3 col-md-4 col-sm-6" key={item.id}>
+                                        <ProductCard product={item} promotionProductDetails={promotionProductDetails} />
+                                    </div>
+                                ))
+                        ) : (
+                            <></>
+                        )}
+                    </div>
+                </div>
+            </section>
+            <section className="featured spad">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-12">
+                            <div className="section-title">
+                                <h2>Điện thoại mới nhất</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row featured__filter">
+                        {data && data.data.length > 0 ? (
+                            data.data
+                                ?.filter((product) => product.productCategoryCode === 'DIENTHOAI')
+                                .map((item, index) => (
+                                    <div className="col-lg-3 col-md-4 col-sm-6" key={item.id}>
+                                        <ProductCard product={item} promotionProductDetails={promotionProductDetails} />
+                                    </div>
+                                ))
                         ) : (
                             <></>
                         )}

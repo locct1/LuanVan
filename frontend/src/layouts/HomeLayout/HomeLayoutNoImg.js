@@ -20,6 +20,7 @@ import ClientBlogSection from '../components/Client/ClientBlogSection';
 import ClientLatestProduct from '../components/Client/ClientLatestProduct';
 import ClientSideBarNoImg from '../components/Client/ClientSideBarNoImg';
 import ClientBannerSection from '../components/Client/ClientBannerSection';
+import ChatMessageClient from '~/components/Client/ChatMessageClient';
 function HomeLayoutNoImg({ children }) {
     useScript(LINK_APP_FRONTEND + 'js/client/jquery-3.3.1.min.js');
     useScript(LINK_APP_FRONTEND + 'js/client/bootstrap.min.js');
@@ -42,6 +43,7 @@ function HomeLayoutNoImg({ children }) {
                 {/* Blog Section End */}
                 {/* Footer Section Begin */}
                 <ClientFooter />
+                <ChatMessageClient />
             </div>
         </>
     );

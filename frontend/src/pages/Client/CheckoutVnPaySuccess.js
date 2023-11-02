@@ -19,6 +19,7 @@ import {
     infoHeightSelector,
     infoLengthSelector,
     infoNoteSelector,
+    infoOrderIdSelector,
     infoRecipientSelector,
     infoWeightSelector,
     infoWidthSelector,
@@ -30,7 +31,7 @@ import { ClientLoadUser } from '~/redux/Slices/ClientAuthSlice';
 import { callAPIGetDistrict, callAPIGetProvince, callAPIGetWard } from '~/services/client/getaddress.service';
 import { UpdateInfoClientService } from '~/services/client/clientAuth.service';
 import { usePaymentMethodsData } from '~/hooks/react-query/paymentmethodData';
-import { createOrderClient } from '~/services/client/page.service';
+import { createOrderClient, updateOrderClient } from '~/services/client/page.service';
 import moment from 'moment';
 function CheckoutVnPaySuccess() {
     const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +42,7 @@ function CheckoutVnPaySuccess() {
     const recipient = useSelector(infoRecipientSelector);
     const cart = useSelector(infoCart);
     const note = useSelector(infoNoteSelector);
+    const orderId = useSelector(infoOrderIdSelector);
     const height = useSelector(infoHeightSelector);
     const weight = useSelector(infoWeightSelector);
     const width = useSelector(infoWidthSelector);
@@ -53,11 +55,8 @@ function CheckoutVnPaySuccess() {
     const fetchData = async () => {
         if (isCheckOut === false && vnpay.vnp_TransactionStatus === '00') {
             console.log(vnpay);
-            let response = await createOrderClient({
-                infoRecipient: recipient,
-                order: cart,
-                note: note,
-                paymentMethodId: 3,
+            let response = await updateOrderClient({
+                orderId: orderId,
                 onl_Amount: vnpay.vnp_Amount,
                 onl_BankCode: vnpay.vnp_BankCode,
                 onl_OrderInfo: vnpay.vnp_OrderInfo,
@@ -66,10 +65,6 @@ function CheckoutVnPaySuccess() {
                 onl_SecureHash: vnpay.vnp_SecureHash,
                 onl_TransactionNo: vnpay.vnp_TransactionNo,
                 onl_OrderId: vnpay.vnp_TxnRef,
-                height: height,
-                width: width,
-                length: length,
-                weight: weight,
             });
             if (response.success) {
                 toast.success(response.message);
@@ -113,7 +108,7 @@ function CheckoutVnPaySuccess() {
                             <div className="breadcrumb__text">
                                 <div className="breadcrumb__option">
                                     <h4 className="text-light">
-                                        {vnpay.vnp_TransactionStatus === '00' && success === true ? (
+                                        {vnpay.vnp_TransactionStatus === '00' ? (
                                             <>
                                                 {' '}
                                                 Bạn đã đặt hàng thành công <i class="fa fa-check"></i> Cảm ơn bạn, chúng
@@ -124,7 +119,7 @@ function CheckoutVnPaySuccess() {
                                         )}
                                     </h4>
                                 </div>
-                                <Link to="/" className="text-light">
+                                <Link to="/order-history" className="text-light">
                                     Xem lịch sử đơn hàng tại đây.
                                 </Link>
                             </div>

@@ -355,7 +355,98 @@ function AddProduct() {
                                             <p className="mt-2 text-danger">{errors.colorproducts?.message}</p>
                                         )}
                                     </div>
-                                   
+                                    <div className="form-group">
+                                        <label htmlFor="exampleInputEmail1" className="font-weight-bold">
+                                            Thông tin sản phẩm:
+                                        </label>
+                                        <CKEditor
+                                            editor={ClassicEditor}
+                                            data={getValues('infomation')}
+                                            onReady={(editor) => {
+                                                // You can store the "editor" and use when it is needed.
+                                                console.log('Editor is ready to use!', editor);
+                                            }}
+                                            onChange={(event, editor) => {
+                                                setValue('infomation', editor.getData());
+                                                trigger('infomation');
+                                            }}
+                                        />
+                                        {errors.infomation?.message && (
+                                            <p className="mt-2 text-danger">{errors.infomation?.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Khối lượng(gram):
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="weight"
+                                            placeholder="Nhập khối lượng"
+                                            {...register('weight')}
+                                        />
+                                        {errors.weight?.message && (
+                                            <p className="mt-2 text-danger">{errors.weight?.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="form-group ">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Chiều dài(cm):
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="length"
+                                            placeholder="Nhập chiều dài"
+                                            {...register('length')}
+                                        />
+                                        {errors.length?.message && (
+                                            <p className="mt-2 text-danger">{errors.length?.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="form-group ">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Độ dày(cm):
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="height"
+                                            placeholder="Nhập khối lượng"
+                                            {...register('height')}
+                                        />
+                                        {errors.height?.message && (
+                                            <p className="mt-2 text-danger">{errors.height?.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="form-group ">
+                                        <label
+                                            htmlFor="inputPassword"
+                                            className="col-sm-2 col-form-label font-weight-bold"
+                                        >
+                                            Chiều rộng(cm):
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            name="width"
+                                            placeholder="Nhập chiều rộng"
+                                            {...register('width')}
+                                        />
+                                        {errors.width?.message && (
+                                            <p className="mt-2 text-danger">{errors.width?.message}</p>
+                                        )}
+                                    </div>
 
                                     <div className="form-group">
                                         <label htmlFor="exampleInputEmail1" className="font-weight-bold">

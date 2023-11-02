@@ -7,6 +7,7 @@ namespace BackendAPI.Interfaces
         Task<IEnumerable<ProductColorProduct>> GetAll();
         Task<IEnumerable<ProductColorProduct>> GetPagedList(int page, int limit);
         Task<ProductColorProduct> GetProductColorProductById(int id);
+        Task<ProductColorProduct> GetProductColorProductByProductIdAndColorProductId(int productId,int colorProductId);
         Task CreateProductColorProduct(ProductColorProduct colorProduct);
         Task UpdateProductColorProduct(int id, ProductColorProduct colorProduct);
         Task DeleteProductColorProduct(int id);

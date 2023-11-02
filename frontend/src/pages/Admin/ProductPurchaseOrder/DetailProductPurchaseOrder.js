@@ -77,7 +77,7 @@ function DetailProductPurchaseOrder() {
                                     <thead>
                                         <tr className="bg bg-dark text-light">
                                             <th scope="col">#</th>
-                                            <th scope="col">Mã điện thoại</th>
+                                            <th scope="col">Mã sản phẩm</th>
                                             <th scope="col">Tên mẫu sản phẩm </th>
                                             <th scope="col">Số lượng </th>
                                             <th scope="col">Giá nhập</th>

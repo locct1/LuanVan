@@ -159,7 +159,17 @@ function OrderDetailClientModal({ show, onClose, dataOrder }) {
                                             {dataOrder.orderDetails.map((item, index) => (
                                                 <tr key={index}>
                                                     <td>{++index}</td>
-                                                    <td>{item.items.length > 0 ? item.items[0].name : ''}</td>
+                                                    <td>
+                                                        {item.items.length > 0 &&
+                                                            item.items[0].isShockDeal === true && (
+                                                                <>
+                                                                    <span className="mr-1 text-danger font-weight-bold">
+                                                                        [Deal sốc]
+                                                                    </span>
+                                                                </>
+                                                            )}
+                                                        {item.items.length > 0 ? item.items[0].name : ''}
+                                                    </td>
                                                     <td>
                                                         <img
                                                             style={{ maxWidth: '83%' }}

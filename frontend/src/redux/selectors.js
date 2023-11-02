@@ -14,3 +14,6 @@ export const infoHeightSelector = (state) => state.cart.height;
 export const infoWidthSelector = (state) => state.cart.width;
 export const infoWeightSelector = (state) => state.cart.weight;
 export const infoLengthSelector = (state) => state.cart.length;
+export const infoOrderIdSelector = (state) => state.cart.orderId;
+
+export const infoRoomClientChatMessageSelector = (state) => state.clientChatMessage.roomId;

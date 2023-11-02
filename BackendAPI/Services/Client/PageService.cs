@@ -18,7 +18,7 @@ namespace BackendAPI.Services.Client
         }
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
-            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.OperatingSystemProduct).ThenInclude(x => x.OperatingSystemType).Include(p => p.ProductColorProducts).Include(p => p.ProductVersions).ThenInclude(x => x.Ram).Include(p => p.ProductVersions).ThenInclude(x => x.Rom), orderBy: x => x.OrderByDescending(x => x.Id));
+            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.JackPlug).Include(p => p.ChargerPort).Include(p => p.OperatingSystemProduct).ThenInclude(x => x.OperatingSystemType).Include(p => p.ProductColorProducts).Include(p => p.ProductVersions).ThenInclude(x => x.Ram).Include(p => p.ProductVersions).ThenInclude(x => x.Rom), orderBy: x => x.OrderByDescending(x => x.Id));
         }
 
         public async Task<IEnumerable<Product>> GetAllProductsByBrandId(int id)
@@ -36,7 +36,7 @@ namespace BackendAPI.Services.Client
         }
         public async Task<Product?> GetProductById(int id)
         {
-            return await _unitOfWork.GetRepository<Product>().Get(include: p => p.Include(p => p.Brand).Include(p => p.OperatingSystemProduct).Include(p => p.Chip).Include(p => p.ScreenTechnology).Include(p => p.ProductColorProducts).ThenInclude(x => x.Photos).Include(p => p.ProductColorProducts).ThenInclude(x => x.ColorProduct).Include(p => p.ProductVersions).ThenInclude(x => x.Ram).Include(p => p.ProductVersions).ThenInclude(x => x.Rom).Include(p => p.ProductVersions).ThenInclude(x => x.ProductSamples),
+            return await _unitOfWork.GetRepository<Product>().Get(include: p => p.Include(p => p.Brand).Include(p => p.ChargerPort).Include(p => p.JackPlug).Include(p => p.OperatingSystemProduct).Include(p => p.Chip).Include(p => p.ScreenTechnology).Include(p => p.ProductColorProducts).ThenInclude(x => x.Photos).Include(p => p.ProductColorProducts).ThenInclude(x => x.ColorProduct).Include(p => p.ProductVersions).ThenInclude(x => x.Ram).Include(p => p.ProductVersions).ThenInclude(x => x.Rom).Include(p => p.ProductVersions).ThenInclude(x => x.ProductSamples),
                                                     filter: x => x.Id == id);
 
         }
@@ -80,7 +80,11 @@ namespace BackendAPI.Services.Client
             return await _unitOfWork.GetRepository<PromotionProduct>().GetAll(include: x => x.Include(x => x.PromotionProductDetails).ThenInclude(x => x.ProductVersion).ThenInclude(x => x.Product), filter: x => x.Disabled == false, orderBy: x => x.OrderByDescending(x => x.StartDate));
 
         }
+        public async Task<IEnumerable<ShockDeal>> GelAllShockDeals()
+        {
+            return await _unitOfWork.GetRepository<ShockDeal>().GetAll(include: x => x.Include(x => x.ShockDealDetails).ThenInclude(x => x.MainProduct).Include(x => x.ShockDealDetails).ThenInclude(x => x.ProductShockDeal).ThenInclude(x=>x.ProductVersions), filter: x => x.Disabled == false, orderBy: x => x.OrderByDescending(x => x.StartDate));
 
+        }
         public async Task<IEnumerable<ProductVersion>> GetAllProductVersions()
         {
             return await _unitOfWork.GetRepository<ProductVersion>().GetAll();

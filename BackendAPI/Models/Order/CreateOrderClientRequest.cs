@@ -47,6 +47,7 @@ namespace BackendAPI.Models.Order
         [Required(ErrorMessage = "Vui lòng tổng tiền")]
         public double Total { get; set; }
         public List<CreateOrderDetailModel> ListProducts { get; set; }
+        public List<CreateShockDealModel> ListShockDeals { get; set; }
         public string? Note { get; set; }
 
 
@@ -67,6 +68,18 @@ namespace BackendAPI.Models.Order
 
 
     }
+    public class CreateShockDealModel
+    {
+        public int Id { get; set; }
+
+        public int QuantityCart { get; set; }
+        public string? FileName { get; set; }
+        public string ProductName { get; set; }
+        public double PriceOut { get; set; }
+        public double ShockDealPrice { get; set; }
+        public int ProductId { get; set; }
+        public int ProductVersionId { get; set; }
+    }
     public class CreateOrderDetailColorProductModel
     {
         public int Id { get; set; }
@@ -75,8 +88,8 @@ namespace BackendAPI.Models.Order
     }
     public class CreateOrderDetailProductVersionModel
     {
-        public CreateOrderDetailRamModel Ram { get; set; }
-        public CreateOrderDetailRomModel Rom { get; set; }
+        public CreateOrderDetailRamModel? Ram { get; set; }
+        public CreateOrderDetailRomModel? Rom { get; set; }
     }
     public class CreateOrderDetailRamModel
     {

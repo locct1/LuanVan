@@ -1,8 +1,11 @@
-﻿using BackendAPI.Data;
+﻿using AutoMapper;
+using BackendAPI.Data;
+using BackendAPI.DTO.Admin;
 using BackendAPI.Helpers;
 using BackendAPI.Interfaces;
 using BackendAPI.Models.ProductPurchaseOrder;
 using BackendAPI.UnitOfWorks;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
@@ -20,8 +23,9 @@ namespace BackendAPI.Controllers
         private readonly IColorProductService _colorProductService;
         private readonly IProductService _productService;
         private readonly IProductPurchaseOrderDetailService _productPurchaseOrderDetailService;
+        private readonly IMapper _mapper;
 
-        public ProductPurchaseOrderController(IProductPurchaseOrderService productPurchaseOrderService, IUnitOfWork unitOfWork, IGetValueToken getValueToken, IProductSampleService productSampleService, IColorProductService colorProductService, IProductService productService, IProductPurchaseOrderDetailService productPurchaseOrderDetailService)
+        public ProductPurchaseOrderController(IProductPurchaseOrderService productPurchaseOrderService, IUnitOfWork unitOfWork, IGetValueToken getValueToken, IProductSampleService productSampleService, IColorProductService colorProductService, IProductService productService, IProductPurchaseOrderDetailService productPurchaseOrderDetailService, IMapper mapper)
         {
             _productPurchaseOrderService = productPurchaseOrderService;
             _unitOfWork = unitOfWork;
@@ -30,6 +34,7 @@ namespace BackendAPI.Controllers
             _colorProductService = colorProductService;
             _productService = productService;
             _productPurchaseOrderDetailService = productPurchaseOrderDetailService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -40,10 +45,11 @@ namespace BackendAPI.Controllers
                 if (page == 0 || page == null || limit == 0 || limit == null)
                 {
                     var products = await _productPurchaseOrderService.GetAll();
+                    var data = _mapper.Map<List<AdminProductPurchageOrderModel>>(products);
 
                     return Ok(new Response
                     {
-                        Data = products,
+                        Data = data,
                         Success = true,
                     });
                 }
@@ -73,6 +79,8 @@ namespace BackendAPI.Controllers
             try
             {
                 ProductPurchaseOrder findProductPurchaseOrder = await this._productPurchaseOrderService.GetProductPurchaseOrderById(id);
+                var data = _mapper.Map< AdminProductPurchageOrderModel> (findProductPurchaseOrder);
+
                 if (findProductPurchaseOrder is null)
                 {
                     return BadRequest(new Response
@@ -95,7 +103,7 @@ namespace BackendAPI.Controllers
                 {
                     Data = new
                     {
-                        ProductPurchaseOrder = findProductPurchaseOrder,
+                        ProductPurchaseOrder = data,
                         ProductPurchaseOrderDetails = groupedDetails
                     },
                     Success = true,
@@ -203,7 +211,10 @@ namespace BackendAPI.Controllers
                             ProductSampleId = productSample.Id,
                             ProductPurchaseOrderId = productPurchaseOrder.Id,
                             PriceIn = item.PriceIn,
-                            Name = productSample.ProductVersion.Product.Name + " " + productSample.ProductVersion.Ram.Name + "-" + productSample.ProductVersion.Rom.Name + "GB (" + productSample.ColorProduct.Name + ")",
+                            Name = productSample.ProductVersion.Product.Name
+        + (productSample.ProductVersion.Ram != null ? " " + productSample.ProductVersion.Ram.Name : "")
+        + (productSample.ProductVersion.Rom != null ? "-" + productSample.ProductVersion.Rom.Name + "GB" : "")
+        + " (" + productSample.ColorProduct.Name + ")",
                         };
                         await _productPurchaseOrderDetailService.CreateProductPurchaseOrderDetail(productPurchaseOrderDetail);
                         await _unitOfWork.SaveChangesAsync();

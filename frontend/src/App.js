@@ -11,6 +11,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { AdminLoadUser } from '~/redux/Slices/AdminAuthSlice';
 import { ClientLoadUser } from './redux/Slices/ClientAuthSlice';
+import AuthProvider from './Context/AuthProvider';
+import AppProvider from './Context/AppProvider';
+import ChatMessageClient from './components/Client/ChatMessageClient';
 const queryClient = new QueryClient();
 function App() {
     const dispatch = useDispatch();
@@ -21,66 +24,70 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <Router>
-                <div className="App">
-                    <Routes>
-                        {publicRoutes.map((route, index) => {
-                            const Page = route.component;
-                            let Layout = DefaultLayout;
-                            if (route.layout) {
-                                Layout = route.layout;
-                            } else if (route.layout === null) {
-                                Layout = Fragment;
-                            }
-                            return (
-                                <Route
-                                    exact
-                                    key={index}
-                                    path={route.path}
-                                    element={
-                                        <Layout>
-                                            <Page />
-                                        </Layout>
+                <AuthProvider>
+                    <AppProvider>
+                        <div className="App">
+                            <Routes>
+                                {publicRoutes.map((route, index) => {
+                                    const Page = route.component;
+                                    let Layout = DefaultLayout;
+                                    if (route.layout) {
+                                        Layout = route.layout;
+                                    } else if (route.layout === null) {
+                                        Layout = Fragment;
                                     }
-                                />
-                            );
-                        })}
-                        {adminPrivateRoutes.map((route, index) => {
-                            const Page = route.component;
-                            let Layout = DefaultLayout;
-                            if (route.layout) {
-                                Layout = route.layout;
-                            } else if (route.layout === null) {
-                                Layout = Fragment;
-                            }
-                            return (
-                                <Route element={<AdminProtectedRoutes />} key={index}>
-                                    <Route
-                                        exact
-                                        key={index}
-                                        path={route.path}
-                                        element={
-                                            <Layout>
-                                                <Page />
-                                            </Layout>
-                                        }
-                                    />
-                                </Route>
-                            );
-                        })}
-                    </Routes>
-                    <ToastContainer
-                        position="bottom-right"
-                        autoClose={1200}
-                        hideProgressBar={true}
-                        newestOnTop={false}
-                        closeOnClick={false}
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                        theme="dark"
-                    />
-                </div>
+                                    return (
+                                        <Route
+                                            exact
+                                            key={index}
+                                            path={route.path}
+                                            element={
+                                                <Layout>
+                                                    <Page />
+                                                </Layout>
+                                            }
+                                        />
+                                    );
+                                })}
+                                {adminPrivateRoutes.map((route, index) => {
+                                    const Page = route.component;
+                                    let Layout = DefaultLayout;
+                                    if (route.layout) {
+                                        Layout = route.layout;
+                                    } else if (route.layout === null) {
+                                        Layout = Fragment;
+                                    }
+                                    return (
+                                        <Route element={<AdminProtectedRoutes />} key={index}>
+                                            <Route
+                                                exact
+                                                key={index}
+                                                path={route.path}
+                                                element={
+                                                    <Layout>
+                                                        <Page />
+                                                    </Layout>
+                                                }
+                                            />
+                                        </Route>
+                                    );
+                                })}
+                            </Routes>
+                            <ToastContainer
+                                position="bottom-right"
+                                autoClose={1200}
+                                hideProgressBar={true}
+                                newestOnTop={false}
+                                closeOnClick={false}
+                                rtl={false}
+                                pauseOnFocusLoss
+                                draggable
+                                pauseOnHover
+                                theme="dark"
+                            />
+                        </div>
+                    </AppProvider>
+                </AuthProvider>
             </Router>
             <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
         </QueryClientProvider>

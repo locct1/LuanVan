@@ -105,8 +105,39 @@ function AddProductPurchaseOrder() {
             setListProducts(dataProductByWareHouse.data);
         }
     }, [dataProductByWareHouse]);
+    const findDuplicateIndices = (list) => {
+        const seenCombinations = new Map(); // Use a Map to store combinations and their indices
+        const duplicateIndices = [];
+
+        list.forEach((order, index) => {
+            const combination = `${order.productVersionId}-${order.colorProductId}`;
+
+            if (seenCombinations.has(combination)) {
+                const firstIndex = seenCombinations.get(combination);
+                duplicateIndices.push(firstIndex, index);
+            } else {
+                seenCombinations.set(combination, index);
+            }
+        });
+
+        return duplicateIndices;
+    };
     const onSubmit = async (data) => {
         let check = true;
+        const duplicateIndices = findDuplicateIndices(listProductPurchaseOrders);
+
+        if (duplicateIndices.length > 0) {
+            // DuplicateIndices contains the indices of elements with duplicate combinations
+            const duplicateRows = duplicateIndices.map((index) => index + 1);
+            const errorMessage = `Danh sách nhập không hợp lệ. Các dòng ${duplicateRows.join(
+                ', ',
+            )} có sản phẩm trùng phiên bản và màu.`;
+
+            toast.warning(errorMessage, {
+                autoClose: 7000, // Set the duration in milliseconds (5 seconds in this example)
+            });
+            return;
+        }
         listProductPurchaseOrders.forEach((order, index) => {
             if (order.productId === '' || order.productVersionId === '') {
                 check = false;
@@ -130,19 +161,18 @@ function AddProductPurchaseOrder() {
 
             return updatedOrder;
         });
+        console.log('check', updatedListProductPurchaseOrders);
         let totalPrice = 0;
         updatedListProductPurchaseOrders.forEach((order) => {
             totalPrice +=
                 order.otherPriceIn === 0 ? order.priceIn * order.quantity : order.otherPriceIn * order.quantity;
         });
-        console.log(totalPrice);
         let createProductPurchaseOrder = {
             warehouseId: data.warehouseId,
             supplierId: data.supplierId,
             listProductPurchaseOrders: updatedListProductPurchaseOrders,
             total: totalPrice,
         };
-        console.log(createProductPurchaseOrder);
         addProductPurchaseOrder(createProductPurchaseOrder);
     };
     const formatPrice = (value) => {
@@ -172,10 +202,18 @@ function AddProductPurchaseOrder() {
         if (name === 'productId') {
             let product = listProducts.find((x) => x.id === parseInt(value, 10));
             if (product) {
-                list[index]['productVersions'] = product.productVersions;
-                list[index]['productColorProducts'] = product.productColorProducts;
-                list[index]['productVersionId'] = '';
-                list[index]['quantity'] = 1;
+                if (product === 'DIENTHOAI') {
+                    list[index]['productVersions'] = product.productVersions;
+                    list[index]['productColorProducts'] = product.productColorProducts;
+                    list[index]['productVersionId'] = '';
+                    list[index]['quantity'] = 1;
+                } else {
+                    list[index]['productVersions'] = product.productVersions;
+                    list[index]['priceIn'] = product.productVersions[0].priceIn;
+                    list[index]['productVersionId'] = product.productVersions[0].id;
+                    list[index]['productColorProducts'] = product.productColorProducts;
+                    list[index]['quantity'] = 1;
+                }
             }
         }
         if (name === 'otherPriceIn') {
@@ -338,25 +376,38 @@ function AddProductPurchaseOrder() {
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div key={index} className="services">
-                                                            <div className="first-division">
-                                                                <select
-                                                                    className="form-control"
-                                                                    name="productVersionId"
-                                                                    value={step.productVersionId}
-                                                                    onChange={(e) => handleStepChange(e, index)}
-                                                                >
-                                                                    <option disabled selected value="">
-                                                                        Chọn phiên bản
-                                                                    </option>
-                                                                    {step.productVersions?.map((item, index) => (
-                                                                        <option value={item.id} key={item.id}>
-                                                                            {item.ram?.name}- {item.rom?.name}GB
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
-                                                            </div>
-                                                        </div>
+                                                        {step.productVersions?.[0]?.ram === null &&
+                                                        step.productVersions?.[0]?.rom === null ? (
+                                                            <>Không có</>
+                                                        ) : (
+                                                            <>
+                                                                <div key={index} className="services">
+                                                                    <div className="first-division">
+                                                                        <select
+                                                                            className="form-control"
+                                                                            name="productVersionId"
+                                                                            value={step.productVersionId}
+                                                                            onChange={(e) => handleStepChange(e, index)}
+                                                                        >
+                                                                            <option disabled selected value="">
+                                                                                Chọn phiên bản
+                                                                            </option>
+                                                                            {step.productVersions?.map(
+                                                                                (item, index) => (
+                                                                                    <option
+                                                                                        value={item.id}
+                                                                                        key={item.id}
+                                                                                    >
+                                                                                        {item.ram?.name}-{' '}
+                                                                                        {item.rom?.name}GB
+                                                                                    </option>
+                                                                                ),
+                                                                            )}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        )}
                                                     </td>
                                                     <td>
                                                         <div key={index} className="services">

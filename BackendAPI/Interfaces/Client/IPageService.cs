@@ -10,6 +10,7 @@ namespace BackendAPI.Interfaces.Client
         Task<Brand> GetBrandById(int id);
         Task<IEnumerable<Product>> GetAllProducts();
         Task<IEnumerable<PromotionProduct>> GetAllPromotionProducts();
+        Task<IEnumerable<ShockDeal>> GelAllShockDeals();
         Task<IEnumerable<Product>> GetAllProductsByBrandId(int id);
         Task<Product> GetProductById(int id);
         Task<IEnumerable<PaymentMethod>> GetAllPaymentMethods();

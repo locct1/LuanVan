@@ -14,6 +14,42 @@ namespace BackendAPI.UnitOfWorks
             _context = context;
             _dbSet = context.Set<TEntity>();
         }
+        public virtual decimal Sum(Expression<Func<TEntity, bool>> predicate = null, Expression<Func<TEntity, decimal>> selector = null)
+        {
+            if (predicate == null)
+                return _dbSet.Sum(selector);
+            else
+                return _dbSet.Where(predicate).Sum(selector);
+        }
+        public virtual async Task<decimal> SumAsync(Expression<Func<TEntity, bool>> predicate = null, Expression<Func<TEntity, decimal>> selector = null)
+        {
+            if (predicate == null)
+                return await _dbSet.SumAsync(selector);
+            else
+                return await _dbSet.Where(predicate).SumAsync(selector);
+        }
+        public virtual int Count(Expression<Func<TEntity, bool>> predicate = null)
+        {
+            if (predicate == null)
+            {
+                return _dbSet.Count();
+            }
+            else
+            {
+                return _dbSet.Count(predicate);
+            }
+        }
+        public virtual async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate = null)
+        {
+            if (predicate == null)
+            {
+                return await _dbSet.CountAsync();
+            }
+            else
+            {
+                return await _dbSet.CountAsync(predicate);
+            }
+        }
         public async virtual Task<IEnumerable<TEntity>> GetAll(
            Expression<Func<TEntity, bool>> filter = null,
            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,

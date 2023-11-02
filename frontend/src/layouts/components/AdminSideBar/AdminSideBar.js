@@ -56,6 +56,12 @@ function AdminSideBar({ sidebarToggle, toggled }) {
                 </NavLink>
             </li>
             <li className="nav-item">
+                <NavLink to="/admin-list-productcategories" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý loại sản phẩm</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
                 <NavLink to="/admin-list-brands" className={classNameFunc}>
                     <i className="fas fa-fw fa-chart-area" />
                     <span>Quản lý thương hiệu</span>
@@ -64,7 +70,13 @@ function AdminSideBar({ sidebarToggle, toggled }) {
             <li className="nav-item">
                 <NavLink to="/admin-list-products" className={classNameFunc}>
                     <i className="fas fa-fw fa-chart-area" />
-                    <span>Quản lý sản phẩm</span>
+                    <span>Quản lý điện thoại</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
+                <NavLink to="/admin-list-accessories" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý phụ kiện</span>
                 </NavLink>
             </li>
             <li className="nav-item">
@@ -98,6 +110,12 @@ function AdminSideBar({ sidebarToggle, toggled }) {
                 </NavLink>
             </li>
             <li className="nav-item">
+                <NavLink to="/admin-list-shock-deals" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý Deal sốc</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
                 <NavLink to="/admin-list-orders" className={classNameFunc}>
                     <i className="fas fa-fw fa-chart-area" />
                     <span>Quản lý đơn hàng</span>
@@ -107,6 +125,18 @@ function AdminSideBar({ sidebarToggle, toggled }) {
                 <NavLink to="/admin-list-reviewproducts" className={classNameFunc}>
                     <i className="fas fa-fw fa-chart-area" />
                     <span>Quản lý bình luận</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
+                <NavLink to="/admin-list-manage-accounts" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Quản lý tài khoản</span>
+                </NavLink>
+            </li>
+            <li className="nav-item">
+                <NavLink to="/admin-list-chats" className={classNameFunc}>
+                    <i className="fas fa-fw fa-chart-area" />
+                    <span>Chat</span>
                 </NavLink>
             </li>
             {/* Divider */}

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 
 namespace BackendAPI.Data
@@ -69,6 +68,9 @@ namespace BackendAPI.Data
         public DbSet<Supplier>? Suppliers { get; set; }
         public DbSet<WareHouse>? WareHouses { get; set; }
         public DbSet<ColorProduct>? ColorProducts { get; set; }
+        public DbSet<ProductCategory>? ProductCategories { get; set; }
+        public DbSet<ShockDeal>? ShockDeals { get; set; }
+        public DbSet<ShockDealDetail>? ShockDealDetails { get; set; }
 
     }
 }

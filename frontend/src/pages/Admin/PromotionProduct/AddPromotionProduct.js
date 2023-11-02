@@ -147,10 +147,19 @@ function AddPromotionProduct() {
         if (name === 'productId') {
             let product = listProducts.find((x) => x.id === parseInt(value, 10));
             if (product) {
-                list[index]['productVersions'] = product.productVersions;
-                // list[index]['productColorProducts'] = product.productColorProducts;
-                list[index]['productVersionId'] = '';
-                list[index]['quantity'] = 1;
+                if (product === 'DIENTHOAI') {
+                    list[index]['productVersions'] = product.productVersions;
+                    // list[index]['productColorProducts'] = product.productColorProducts;
+                    list[index]['productVersionId'] = '';
+                    list[index]['quantity'] = 1;
+                } else {
+                    list[index]['productVersions'] = product.productVersions;
+                    list[index]['priceIn'] = product.productVersions[0].priceIn;
+                    list[index]['priceOut'] = product.productVersions[0].priceOut;
+                    list[index]['productVersionId'] = product.productVersions[0].id;
+                    list[index]['productColorProducts'] = product.productColorProducts;
+                    list[index]['quantity'] = 1;
+                }
             }
         }
         if (name === 'discountedPrice') {
@@ -283,7 +292,7 @@ function AddPromotionProduct() {
                                                         style={{
                                                             position: 'absolute',
                                                             top: '33%',
-                                                            right: '228px',
+                                                            right: '300px',
                                                         }}
                                                     >
                                                         <i className="fas fa-calendar-alt"></i>
@@ -317,7 +326,7 @@ function AddPromotionProduct() {
                                                         style={{
                                                             position: 'absolute',
                                                             top: '33%',
-                                                            right: '228px',
+                                                            right: '300px',
                                                         }}
                                                     >
                                                         <i className="fas fa-calendar-alt"></i>
@@ -374,31 +383,40 @@ function AddPromotionProduct() {
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                <div key={index} className="services">
-                                                                    <div className="first-division">
-                                                                        <select
-                                                                            className="form-control"
-                                                                            name="productVersionId"
-                                                                            value={step.productVersionId}
-                                                                            onChange={(e) => handleStepChange(e, index)}
-                                                                        >
-                                                                            <option disabled selected value="">
-                                                                                Chọn phiên bản
-                                                                            </option>
-                                                                            {step.productVersions?.map(
-                                                                                (item, index) => (
-                                                                                    <option
-                                                                                        value={item.id}
-                                                                                        key={item.id}
-                                                                                    >
-                                                                                        {item.ram?.name}GB-
-                                                                                        {item.rom?.name}GB
+                                                                {step.productVersions?.[0]?.ram === null &&
+                                                                step.productVersions?.[0]?.rom === null ? (
+                                                                    <>Không có</>
+                                                                ) : (
+                                                                    <>
+                                                                        <div key={index} className="services">
+                                                                            <div className="first-division">
+                                                                                <select
+                                                                                    className="form-control"
+                                                                                    name="productVersionId"
+                                                                                    value={step.productVersionId}
+                                                                                    onChange={(e) =>
+                                                                                        handleStepChange(e, index)
+                                                                                    }
+                                                                                >
+                                                                                    <option disabled selected value="">
+                                                                                        Chọn phiên bản
                                                                                     </option>
-                                                                                ),
-                                                                            )}
-                                                                        </select>
-                                                                    </div>
-                                                                </div>
+                                                                                    {step.productVersions?.map(
+                                                                                        (item, index) => (
+                                                                                            <option
+                                                                                                value={item.id}
+                                                                                                key={item.id}
+                                                                                            >
+                                                                                                {item.ram?.name}-{' '}
+                                                                                                {item.rom?.name}GB
+                                                                                            </option>
+                                                                                        ),
+                                                                                    )}
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </>
+                                                                )}
                                                             </td>
                                                             <td>
                                                                 {' '}

@@ -26,5 +26,11 @@ namespace BackendAPI.UnitOfWorks
         Task Delete(object id);
         Task Delete(TEntity entityDelete);
         Task Update(TEntity entityUpdate);
+        int Count(Expression<Func<TEntity, bool>> predicate = null);
+
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate = null);
+        decimal Sum(Expression<Func<TEntity, bool>> predicate = null, Expression<Func<TEntity, decimal>> selector = null);
+        Task<decimal> SumAsync(Expression<Func<TEntity, bool>> predicate = null, Expression<Func<TEntity, decimal>> selector = null);
+
     }
 }

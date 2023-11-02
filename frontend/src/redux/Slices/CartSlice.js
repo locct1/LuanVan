@@ -5,6 +5,7 @@ export default createSlice({
     name: 'cart',
     initialState: {
         listProducts: [],
+        listShockDeals: [],
         recipient: null,
         note: null,
         total: 0,
@@ -14,10 +15,42 @@ export default createSlice({
         // IMMER
         resetCart: (state, action) => {
             state.listProducts = [];
+            state.listShockDeals = [];
             state.total = 0;
+        },
+        updateProductShockDeal: (state, action) => {
+            const shockDealProduct = state.listShockDeals.find(
+                (product) =>
+                    product.productId === action.payload.productId &&
+                    product.productMainId === action.payload.productMainId,
+            );
+            if (shockDealProduct) {
+                shockDealProduct.shockDealPrice = action.payload.shockDealPrice;
+            }
+        },
+        deleteShockDeal: (state, action) => {
+            const shockDealProduct = state.listShockDeals.find(
+                (product) =>
+                    product.productId === action.payload.productId &&
+                    product.productMainId === action.payload.productMainId,
+            );
+            if (shockDealProduct) {
+                const shockDealProductIndex = state.listShockDeals.findIndex(
+                    (product) =>
+                        product.productId === action.payload.productId &&
+                        product.productMainId === action.payload.productMainId,
+                );
+
+                if (shockDealProductIndex !== -1) {
+                    state.listShockDeals = state.listShockDeals.filter(
+                        (product, index) => index !== shockDealProductIndex,
+                    );
+                }
+            }
         },
         updateInfoRecipient: (state, action) => {
             state.note = action.payload.note;
+            state.orderId = action.payload.orderId;
             state.height = action.payload.height;
             state.width = action.payload.width;
             state.weight = action.payload.weight;
@@ -41,7 +74,7 @@ export default createSlice({
                 } else {
                     state.total = state.total + productSample.priceOut * action.payload.quantityCart;
                 }
-                toast.success('Thêm điện thoại vào giỏ hàng thành công');
+                toast.success('Thêm sản phẩm vào giỏ hàng thành công');
                 return;
             } else {
                 if (action.payload.quantityCart > action.payload.quantity) {
@@ -54,7 +87,21 @@ export default createSlice({
                 } else {
                     state.total = state.total + action.payload.priceOut * action.payload.quantityCart;
                 }
-                toast.success('Thêm điện thoại vào giỏ hàng thành công');
+                toast.success('Thêm sản phẩm vào giỏ hàng thành công');
+            }
+        },
+        addShockDealProduct: (state, action) => {
+            const shockDealProduct = state.listShockDeals.find(
+                (product) =>
+                    product.productId === action.payload.productId &&
+                    product.productMainId === action.payload.productMainId,
+            );
+            if (shockDealProduct) {
+                shockDealProduct.quantityCart = shockDealProduct.quantityCart + action.payload.quantityCart;
+                state.total = state.total + shockDealProduct.shockDealPrice * action.payload.quantityCart;
+            } else {
+                state.listShockDeals.push(action.payload);
+                state.total = state.total + action.payload.shockDealPrice * action.payload.quantityCart;
             }
         },
         removeProduct: (state, action) => {
@@ -65,8 +112,15 @@ export default createSlice({
                 } else {
                     state.total = state.total - productSample.quantityCart * productSample.priceOut;
                 }
+                const listFilterShockDeals = state.listShockDeals.filter((x) => x.productMainId === productSample.id);
+                listFilterShockDeals.forEach((product) => {
+                    state.total = state.total - product.shockDealPrice * product.quantityCart;
+                });
                 state.listProducts = state.listProducts.filter(
                     (productSample) => productSample.id !== action.payload.id,
+                );
+                state.listShockDeals = state.listShockDeals.filter(
+                    (product) => product.productMainId !== action.payload.id,
                 );
             }
         },
@@ -105,11 +159,26 @@ export default createSlice({
                     return;
                 }
                 productSample.quantityCart = productSample.quantityCart - 1;
+                const listFilterShockDeals = state.listShockDeals.filter((x) => x.productMainId === productSample.id);
+                listFilterShockDeals.forEach((product) => {
+                    state.total = state.total - product.shockDealPrice;
+                    product.quantityCart = product.quantityCart - 1;
+                });
                 if (productSample.discountedPrice !== null) {
-                    state.total = state.total + productSample.discountedPrice;
+                    state.total = state.total - productSample.discountedPrice;
                 } else {
                     state.total = state.total - productSample.priceOut;
                 }
+            }
+        },
+        minusShockDealProduct: (state, action) => {
+            const product = state.listShockDeals.find((product) => product.productId === action.payload.productId);
+            if (product) {
+                if (product.quantityCart === 0) {
+                    return;
+                }
+                product.quantityCart = product.quantityCart - 1;
+                state.total = state.total - product.shockDealPrice;
             }
         },
         plusProduct: (state, action) => {
@@ -120,11 +189,29 @@ export default createSlice({
                     return;
                 }
                 productSample.quantityCart = productSample.quantityCart + 1;
+                const listFilterShockDeals = state.listShockDeals.filter((x) => x.productMainId === productSample.id);
+                listFilterShockDeals.forEach((product) => {
+                    state.total = state.total + product.shockDealPrice;
+                    product.quantityCart = product.quantityCart + 1;
+                });
                 if (productSample.discountedPrice !== null) {
                     state.total = state.total + productSample.discountedPrice;
                 } else {
                     state.total = state.total + productSample.priceOut;
                 }
+            }
+        },
+        plusShockDealProduct: (state, action) => {
+            const product = state.listShockDeals.find((product) => product.productId === action.payload.productId);
+            const productSample = state.listProducts.find(
+                (productSample) => productSample.id === product.productMainId,
+            );
+            if (product.quantityCart + 1 > productSample.quantityCart) {
+                return;
+            }
+            if (product) {
+                product.quantityCart = product.quantityCart + 1;
+                state.total = state.total + product.shockDealPrice;
             }
         },
     },

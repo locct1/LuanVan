@@ -16,7 +16,11 @@ namespace BackendAPI.Services
         }
         public async Task<IEnumerable<Product>> GetAll()
         {
-            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse).Include(p => p.ProductColorProducts).Include(p => p.ProductVersions), orderBy: x => x.OrderByDescending(x => x.Id)); ;
+            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse).Include(p => p.ProductColorProducts).Include(p => p.ProductVersions), orderBy: x => x.OrderByDescending(x => x.Id), filter: x => x.ProductCategoryCode == "DIENTHOAI"); ;
+        }
+        public async Task<IEnumerable<Product>> GetAllAccessories()
+        {
+            return await _unitOfWork.GetRepository<Product>().GetAll(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse).Include(p => p.ProductColorProducts).Include(p => p.ProductVersions), orderBy: x => x.OrderByDescending(x => x.Id), filter: x => x.ProductCategoryCode != "DIENTHOAI");
         }
         public async Task<IEnumerable<Product>> GetPagedList(int page, int limit)
         {
@@ -43,7 +47,7 @@ namespace BackendAPI.Services
         public async Task<Product?> Get(int id)
         {
             return await _unitOfWork.GetRepository<Product>().Get(include: p => p.Include(p => p.Brand).Include(p => p.WareHouse)
-            .Include(p => p.ProductColorProducts).ThenInclude(p => p.ColorProduct).Include(p => p.ProductVersions).Include(x=>x.ProductColorProducts).ThenInclude(x=>x.ColorProduct).Include(x => x.ProductColorProducts).ThenInclude(x =>x.Photos),
+            .Include(p => p.ProductColorProducts).ThenInclude(p => p.ColorProduct).Include(p => p.ProductVersions).Include(x => x.ProductColorProducts).ThenInclude(x => x.ColorProduct).Include(x => x.ProductColorProducts).ThenInclude(x => x.Photos),
                                                     filter: x => x.Id == id);
 
         }
@@ -85,6 +89,14 @@ namespace BackendAPI.Services
         public async Task<IEnumerable<ScreenTechnology>> GetAllScreenTechnologies()
         {
             return await _unitOfWork.GetRepository<ScreenTechnology>().GetAll();
+        }
+        public async Task<IEnumerable<JackPlug>> GetAllJackPlugs()
+        {
+            return await _unitOfWork.GetRepository<JackPlug>().GetAll();
+        }
+        public async Task<IEnumerable<ChargerPort>> GetAllChargePorts()
+        {
+            return await _unitOfWork.GetRepository<ChargerPort>().GetAll();
         }
     }
 }

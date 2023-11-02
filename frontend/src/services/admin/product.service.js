@@ -8,10 +8,15 @@ const END_POINT = {
     ALL_OPERATING_SYSTEMS_TYPES: 'products/get-all-operating-systems-types',
     ALL_OPERATING_SYSTEMS: 'products/get-all-operating-systems',
     ALL_SCREEN_TECHNOLOGIES: 'products/get-all-screen-technologies',
+    ALL_CHARGE_PORTS: 'products/get-all-charge-ports',
+    ALL_JACK_PLUGS: 'products/get-all-jack-plugs',
 };
 
 export const getAllProducts = async () => {
     return await apiAdmin.get(`${END_POINT.PRODUCTS}`);
+};
+export const getAllAccessories = async () => {
+    return await apiAdmin.get(`${END_POINT.PRODUCTS}/get-all-accessories`);
 };
 export const addProduct = async (data) => {
     return await apiAdmin.post(`${END_POINT.PRODUCTS}`, data, {
@@ -20,6 +25,15 @@ export const addProduct = async (data) => {
         },
     });
 };
+
+export const addAccessory = async (data) => {
+    return await apiAdmin.post(`${END_POINT.PRODUCTS}/add-accessory`, data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
 export const deleteProduct = async (id) => {
     return await apiAdmin.delete(`${END_POINT.PRODUCTS}/${id}`);
 };
@@ -28,6 +42,13 @@ export const changeStatusProduct = async (id) => {
 };
 export const updateProduct = async (data) => {
     return await apiAdmin.put(`${END_POINT.PRODUCTS}/${data.get('id')}`, data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+export const updateAccessory = async (data) => {
+    return await apiAdmin.put(`${END_POINT.PRODUCTS}/update-accessory/${data.get('id')}`, data, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -60,4 +81,10 @@ export const getAllScreenTechnologies = async () => {
 };
 export const deleteProductVersion = async (id) => {
     return await apiAdmin.delete(`${END_POINT.PRODUCTS}/delete-product-version/${id}`);
+};
+export const getAllChargePorts = async () => {
+    return await apiAdmin.get(`${END_POINT.ALL_CHARGE_PORTS}`);
+};
+export const getAllJackPlugs = async () => {
+    return await apiAdmin.get(`${END_POINT.ALL_JACK_PLUGS}`);
 };

@@ -295,7 +295,7 @@ function UpdatePromotionProduct() {
                                                         style={{
                                                             position: 'absolute',
                                                             top: '33%',
-                                                            right: '228px',
+                                                            right: '300px',
                                                         }}
                                                     >
                                                         <i className="fas fa-calendar-alt"></i>
@@ -329,7 +329,7 @@ function UpdatePromotionProduct() {
                                                         style={{
                                                             position: 'absolute',
                                                             top: '33%',
-                                                            right: '228px',
+                                                            right: '300px',
                                                         }}
                                                     >
                                                         <i className="fas fa-calendar-alt"></i>

@@ -14,9 +14,17 @@ import {
     getAllOperatingSystems,
     getAllScreenTechnologies,
     deleteProductVersion,
+    getAllChargePorts,
+    getAllJackPlugs,
+    addAccessory,
+    updateAccessory,
+    getAllAccessories,
 } from '~/services/admin/product.service';
 export const useProductsData = (onSuccess, onError) => {
     return useQuery('products', getAllProducts);
+};
+export const useAccessoriesData = (onSuccess, onError) => {
+    return useQuery('accessories', getAllAccessories);
 };
 export const useAddProductData = (onSuccess) => {
     const queryClient = useQueryClient();
@@ -28,12 +36,22 @@ export const useAddProductData = (onSuccess) => {
         },
     });
 };
+export const useAddAccessoryData = (onSuccess) => {
+    const queryClient = useQueryClient();
+    return useMutation(addAccessory, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('accessories');
+            onSuccess(data);
+        },
+    });
+};
 export const useDeleteProductData = (onSuccess, id) => {
     const queryClient = useQueryClient();
 
     return useMutation(deleteProduct, {
         onSuccess: () => {
             queryClient.invalidateQueries('products');
+            queryClient.invalidateQueries('accessories');
             onSuccess();
         },
     });
@@ -44,6 +62,8 @@ export const useChangeStatusProductData = (onSuccessChangeStatus, id) => {
     return useMutation(changeStatusProduct, {
         onSuccess: () => {
             queryClient.invalidateQueries('products');
+            queryClient.invalidateQueries('accessories');
+
             onSuccessChangeStatus();
         },
     });
@@ -51,6 +71,16 @@ export const useChangeStatusProductData = (onSuccessChangeStatus, id) => {
 export const useUpdateProductData = (onSuccess, ProductId) => {
     const queryClient = useQueryClient();
     return useMutation(updateProduct, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('product');
+
+            onSuccess(data);
+        },
+    });
+};
+export const useUpdateAccessoryData = (onSuccess, ProductId) => {
+    const queryClient = useQueryClient();
+    return useMutation(updateAccessory, {
         onSuccess: (data) => {
             queryClient.invalidateQueries('product');
             onSuccess(data);
@@ -91,6 +121,12 @@ export const useOperatingSystemsData = () => {
 
 export const useScreenTechnologiesData = () => {
     return useQuery('screenTechnologies', getAllScreenTechnologies);
+};
+export const useChargePortsData = () => {
+    return useQuery('chargeports', getAllChargePorts);
+};
+export const useJackPlugsData = () => {
+    return useQuery('jackplugs', getAllJackPlugs);
 };
 export const useDeleteProductVersionData = (onSuccessDelete, id) => {
     const queryClient = useQueryClient();

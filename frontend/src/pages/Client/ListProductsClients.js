@@ -208,8 +208,13 @@ function ListProductsClient() {
             if (checkedOperatingSystemTypes && checkedOperatingSystemTypes.length > 0) {
                 setCheckedAllOperatingSystemTypes(false);
                 listProducts = listProducts.filter((product) => {
-                    // Check if the product's brand ID is included in checkedOperatingSystemTypes
-                    return checkedOperatingSystemTypes.includes(product.operatingSystemProduct.operatingSystemTypeId);
+                    if (product.operatingSystemProduct && product.operatingSystemProduct.operatingSystemTypeId) {
+                        return checkedOperatingSystemTypes.includes(
+                            product.operatingSystemProduct.operatingSystemTypeId,
+                        );
+                    }
+                    // Handle the case where operatingSystemProduct or operatingSystemTypeId is null/undefined.
+                    return false;
                 });
             }
             if (checkedPinTypes && checkedPinTypes.length > 0) {
@@ -544,15 +549,19 @@ function ListProductsClient() {
                             </div>
                             <br />
                             <div className="row featured__filter mt-2">
-                                {filterProducts && filterProducts.length > 0 ? (
-                                    filterProducts.map((item, index) => (
-                                        <div className="col-lg-4 col-md-4 col-sm-6" key={item.id}>
-                                            <ProductCard
-                                                product={item}
-                                                promotionProductDetails={promotionProductDetails}
-                                            />
-                                        </div>
-                                    ))
+                                {filterProducts &&
+                                filterProducts.filter((product) => product.productCategoryCode === 'DIENTHOAI').length >
+                                    0 ? (
+                                    filterProducts
+                                        ?.filter((product) => product.productCategoryCode === 'DIENTHOAI')
+                                        .map((item, index) => (
+                                            <div className="col-lg-4 col-md-4 col-sm-6" key={item.id}>
+                                                <ProductCard
+                                                    product={item}
+                                                    promotionProductDetails={promotionProductDetails}
+                                                />
+                                            </div>
+                                        ))
                                 ) : (
                                     <>Chưa có sản phẩm.</>
                                 )}

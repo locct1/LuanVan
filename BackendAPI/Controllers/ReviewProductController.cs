@@ -1,10 +1,13 @@
-﻿using BackendAPI.Data;
+﻿using AutoMapper;
+using BackendAPI.Data;
+using BackendAPI.DTO.Admin;
 using BackendAPI.Helpers;
 using BackendAPI.Interfaces;
 using BackendAPI.Models.ColorProduct;
 using BackendAPI.Models.ReviewProduct;
 using BackendAPI.Services;
 using BackendAPI.UnitOfWorks;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,13 +21,19 @@ namespace BackendAPI.Controllers
         private readonly IFeedbackReviewProductService _feedbackReviewProductService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGetValueToken _getValueToken;
+        private readonly IMapper _mapper;
+        private readonly IReviewProductPhotoService _reviewProductPhotoService;
+        private readonly ILikeReviewProductService _likeReviewProductService;
 
-        public ReviewProductController(IReviewProductService reviewProductService, IFeedbackReviewProductService feedbackReviewProductService, IUnitOfWork unitOfWork, IGetValueToken getValueToken)
+        public ReviewProductController(IReviewProductService reviewProductService, IFeedbackReviewProductService feedbackReviewProductService, IUnitOfWork unitOfWork, IGetValueToken getValueToken, IMapper mapper, IReviewProductPhotoService reviewProductPhotoService, ILikeReviewProductService likeReviewProductService)
         {
             _reviewProductService = reviewProductService;
             _feedbackReviewProductService = feedbackReviewProductService;
             _unitOfWork = unitOfWork;
             _getValueToken = getValueToken;
+            _mapper = mapper;
+            _reviewProductPhotoService = reviewProductPhotoService;
+            _likeReviewProductService = likeReviewProductService;
         }
 
         [HttpGet]
@@ -35,9 +44,10 @@ namespace BackendAPI.Controllers
                 if (page == 0 || page == null || limit == 0 || limit == null)
                 {
                     var reviewProducts = await _reviewProductService.GetAll();
+                    var data = _mapper.Map<List<AdminReviewProductModel>>(reviewProducts);
                     return Ok(new Response
                     {
-                        Data = reviewProducts,
+                        Data = data,
                         Success = true,
 
                     });
@@ -111,6 +121,7 @@ namespace BackendAPI.Controllers
             try
             {
                 ReviewProduct findReviewProduct = await this._reviewProductService.GetReviewProductById(id);
+                var data = _mapper.Map<AdminReviewProductModel>(findReviewProduct);
                 if (findReviewProduct is null)
                 {
                     return BadRequest(new Response
@@ -142,7 +153,7 @@ namespace BackendAPI.Controllers
         {
             try
             {
-                ReviewProduct findReviewProduct = await _reviewProductService.GetReviewProductById(id);
+                ReviewProduct findReviewProduct = await _reviewProductService.Get(id);
                 if (findReviewProduct is null)
                 {
                     return BadRequest(new Response
@@ -151,6 +162,16 @@ namespace BackendAPI.Controllers
                         Errors = new[] { "Không tìm thấy" }
 
                     });
+                }
+                foreach (var item in findReviewProduct.LikeReviewProducts)
+                {
+                    await _likeReviewProductService.DeleteLikeReviewProduct(item.Id);
+                }
+                foreach (var item in findReviewProduct.ReviewProductPhotos)
+                {
+                    var filename = "Uploads/ReviewProduct/" + item.FileName;
+                    System.IO.File.Delete(filename);
+                    await _reviewProductPhotoService.DeleteReviewProductPhoto(item.Id);
                 }
                 await _reviewProductService.DeleteReviewProduct(findReviewProduct.Id);
                 await _unitOfWork.SaveChangesAsync();

@@ -40,21 +40,23 @@ function ProductCardSearch({ product, promotionProductDetails }) {
                     </div>
                 </div>
                 <div className="row">
-                    {product.productVersions.map((item, index) => {
-                        return (
-                            <div
-                                className={`col-2 d-flex justify-content-center ${
-                                    item.id === productVersion?.id
-                                        ? 'border border-primary text-primary'
-                                        : 'border border-light-custom text-dark'
-                                } p-1 mr-4 rounded`}
-                                onClick={() => handleChangeProductVersion(item)}
-                                style={{ fontSize: '1vw', cursor: 'pointer' }}
-                            >
-                                {product.isShowRam === true ? <>{item.ram.name}GB</> : <>{item.rom.name}GB</>}
-                            </div>
-                        );
-                    })}
+                    {product.productVersions[0].ram &&
+                        product.productVersions[0].rom &&
+                        product.productVersions.map((item, index) => {
+                            return (
+                                <div
+                                    className={`col-2 d-flex justify-content-center ${
+                                        item.id === productVersion?.id
+                                            ? 'border border-primary text-primary'
+                                            : 'border border-light-custom text-dark'
+                                    } p-1 mr-4 rounded`}
+                                    onClick={() => handleChangeProductVersion(item)}
+                                    style={{ fontSize: '1vw', cursor: 'pointer' }}
+                                >
+                                    {product.isShowRam === true ? <>{item.ram.name}GB</> : <>{item.rom.name}GB</>}
+                                </div>
+                            );
+                        })}
                 </div>
                 <div className="row mt-3">
                     <div className="col-12 pl-0">

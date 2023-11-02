@@ -262,17 +262,14 @@ function ListProductInventories() {
                                                     <td>{item.id}</td>
                                                     <td>
                                                         {item.productVersion?.product.name}{' '}
-                                                        {item.productVersion?.product.isVersionRam === true ? (
-                                                            <>
-                                                                ({item.productVersion?.ram.name}GB-
-                                                                {item.productVersion?.rom.name}GB)
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                ({item.productVersion?.ram.name}GB-
-                                                                {item.productVersion?.rom.name}GB)
-                                                            </>
-                                                        )}
+                                                        {item.productVersion?.ram?.name &&
+                                                            item.productVersion?.rom?.name && (
+                                                                <>
+                                                                    {' '}
+                                                                    ({item.productVersion?.ram.name}GB-
+                                                                    {item.productVersion?.rom.name}GB)
+                                                                </>
+                                                            )}
                                                     </td>
                                                     <td> {item.colorProduct?.name}</td>
                                                     <td>{item.productVersion.product?.wareHouse?.name}</td>

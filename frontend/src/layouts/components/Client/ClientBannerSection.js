@@ -11,7 +11,7 @@ function ClientBannerSection() {
                         </div>
                         <div className="col-lg-6 col-md-6 col-sm-6">
                             <div className="banner__pic">
-                                <img src="img/client/banner/banner12.png" height={206} alt />
+                                <img src="img/client/banner/banner12.png" alt />
                             </div>
                         </div>
                     </div>

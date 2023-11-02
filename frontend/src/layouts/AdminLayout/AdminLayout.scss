@@ -1,0 +1,52 @@
+.search-admin{
+    border-radius: 15px 0 0 15px !important;
+    background-color: rgba(0,0,0,0.3) !important;
+    border:0 !important;
+    color:white !important;
+}
+.search-admin:focus{
+     box-shadow:none !important;
+   outline:0px !important;
+}
+.search_btn_admin{
+    border-radius: 0 15px 15px 0 !important;
+    background-color: rgba(0,0,0,0.3) !important;
+    border:0 !important;
+    color: white !important;
+    cursor: pointer;
+}
+.card-admin{
+    height: 500px;
+    border-radius: 15px !important;
+    background-color: rgba(0,0,0,0.6) !important;
+    background: #7F7FD5;
+    background: -webkit-linear-gradient(to right, #46c6be, #4776cc, #4141c9);
+     background: linear-gradient(to right, #46c6be, #4776cc, #4141c9);
+}
+.card-header-admin{
+    background-color: rgba(0,0,0,0.6) !important;
+    background: #7F7FD5;
+    background: -webkit-linear-gradient(to right, #46c6be, #4776cc, #4141c9);
+     background: linear-gradient(to right, #46c6be, #4776cc, #4141c9);
+     border-radius: 15px 15px 0 0 !important;
+     border-bottom: 0 !important;
+}
+.avatar-message-admin{
+    width: 40px;
+    height: 40px;
+        background-color: #b51148; /* Background color for the letter */
+        color: #fff; /* Text color (letter color) */
+        text-align: center;
+        line-height: 40px; /* Center the letter vertically */
+        font-size: 15px; /* Adjust font size as needed */
+        font-weight: bold;
+        border-radius: 50%; /* Create a circular shape */
+  }
+  .type_msg_search_admin::placeholder {
+    color: white; /* Thay đổi màu sắc tại đây */
+}
+.bg-selected-client-message {
+    background-color: #3a5460; 
+    border-radius: 5px;
+    /* Background color for the letter */
+}

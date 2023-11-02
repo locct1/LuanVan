@@ -15,6 +15,9 @@ export const getAllProductsClient = async () => {
 export const getAllPromotionProductsClient = async () => {
     return await apiClient.get(`${END_POINT.PAGES}/get-all-promotion-products`);
 };
+export const getAllShockDealsClient = async () => {
+    return await apiClient.get(`${END_POINT.PAGES}/get-all-shock-deals`);
+};
 export const getAllProductsByBrandIdClient = async (id) => {
     return await apiClient.get(`${END_POINT.PAGES}/get-all-products-by-brand-id/${id}`);
 };
@@ -26,6 +29,9 @@ export const getAllOrdersClient = async () => {
 };
 export const createOrderClient = (data) => {
     return apiClient.post(`${END_POINT.PAGES}/create-order-client`, data);
+};
+export const updateOrderClient = (data) => {
+    return apiClient.put(`${END_POINT.PAGES}/update-order-client/${data.orderId}`, data);
 };
 export const getOrderClient = async (id) => {
     console.log('da', id);

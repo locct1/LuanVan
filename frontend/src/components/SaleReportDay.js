@@ -159,7 +159,7 @@ function SaleReportDay() {
                                 style={{
                                     position: 'absolute',
                                     top: '33%',
-                                    right: '57px',
+                                    right: '148px',
                                 }}
                             >
                                 <i className="fas fa-calendar-alt"></i>
@@ -190,7 +190,7 @@ function SaleReportDay() {
                                 style={{
                                     position: 'absolute',
                                     top: '33%',
-                                    right: '57px',
+                                    right: '148px',
                                 }}
                             >
                                 <i className="fas fa-calendar-alt"></i>

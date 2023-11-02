@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,6 +12,34 @@ function ClientHeader() {
     const Logout = async () => {
         dispatch(ClientLogout());
     };
+    const [total, setTotal] = useState(0);
+    useEffect(() => {
+        let totalCartValue = 0;
+        if (cart) {
+            if (cart.listProducts && cart.listProducts.length > 0) {
+                cart.listProducts.forEach((product) => {
+                    const { priceOut, discountedPrice, quantityCart } = product;
+                    if (discountedPrice === null) {
+                        totalCartValue += priceOut * quantityCart;
+                    } else {
+                        totalCartValue += discountedPrice * quantityCart;
+                    }
+                });
+            }
+        }
+
+        if (cart.listShockDeals && cart.listShockDeals.length > 0) {
+            cart.listShockDeals.forEach((product) => {
+                const { shockDealPrice, quantityCart } = product;
+                totalCartValue += shockDealPrice * quantityCart;
+            });
+        }
+
+        setTotal(totalCartValue);
+    }, [cart]);
+    // Khởi tạo biến để tính tổng giá trị giỏ hàng
+    // Lặp qua danh sách sản phẩm trong giỏ hàng
+    console.log(total);
     const infoClient = useSelector(infoClientSelector);
     return (
         <>
@@ -230,7 +259,7 @@ function ClientHeader() {
                                         <Link to="/list-products">Điện thoại</Link>
                                     </li>
                                     <li>
-                                        <Link to="/">Phụ kiện</Link>
+                                        <Link to="/list-accessories">Phụ kiện</Link>
                                     </li>
                                     <li>
                                         <Link to="/">Tin tức</Link>
@@ -251,8 +280,7 @@ function ClientHeader() {
                                     </li>
                                 </ul>
                                 <div className="header__cart__price">
-                                    Tổng tiền:{' '}
-                                    <span>{String(cart.total).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}</span>{' '}
+                                    Tổng tiền: <span>{String(total).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}</span>{' '}
                                     <sup>đ</sup>
                                 </div>
                             </div>

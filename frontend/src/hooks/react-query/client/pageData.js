@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { getAllShockDeals } from '~/services/admin/shockdeal.service';
 import {
     createReviewProductClient,
     deleteReviewProduct,
@@ -15,6 +16,7 @@ import {
     getAllRamsClient,
     getAllReviewProductsByProductIdClient,
     getAllRomsClient,
+    getAllShockDealsClient,
     getOrderClient,
     getProductByIdClient,
     likeReviewProduct,
@@ -33,6 +35,9 @@ export const useProductsClientData = (onSuccess, onError) => {
 };
 export const usePromotionProductsClientData = (onSuccess, onError) => {
     return useQuery('client-promotion-products', getAllPromotionProductsClient);
+};
+export const useShockDealsClientData = (onSuccess, onError) => {
+    return useQuery('client-shock-deals', getAllShockDealsClient);
 };
 export const useProductsByBrandIdClientData = (brandId) => {
     return useQuery({

@@ -1,9 +1,12 @@
-﻿using BackendAPI.Data;
+﻿using AutoMapper;
+using BackendAPI.Data;
+using BackendAPI.DTO.Admin;
 using BackendAPI.Helpers;
 using BackendAPI.Interfaces;
 using BackendAPI.Models.ColorProduct;
 using BackendAPI.Models.Order;
 using BackendAPI.UnitOfWorks;
+using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendAPI.Controllers
@@ -14,12 +17,15 @@ namespace BackendAPI.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public OrderController(IOrderService orderService, IUnitOfWork unitOfWork)
+        public OrderController(IOrderService orderService, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _orderService = orderService;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {
@@ -27,11 +33,39 @@ namespace BackendAPI.Controllers
             {
 
                 var orders = await _orderService.GetAll();
+                var data = _mapper.Map<List<AdminOrderModel>>(orders);
+                //var selectedOrders = orders.Select(c => new Order
+                //{
+                //    Id = c.Id,
+                //    Total=c.Total,
+                //    UserId=c.UserId,
+                //    User= new ApplicationUser
+                //    {
+                //       FullName=c.User.FullName,
+                //       Email=c.User.Email,
+                //       Address=c.User.Address,
+                //       PhoneNumber=c.User.PhoneNumber
+                //    },
+                //    Recipient = new Recipient
+                //    {
+                //        FullName = c.Recipient.FullName,
+                //        Email = c.Recipient.Email,
+                //        Address = c.Recipient.Address,
+                //        PhoneNumber = c.Recipient.PhoneNumber
+                //    },
+                //    PaymentMethodId=c.PaymentMethodId,
+                //    PaymentMethod=new PaymentMethod
+                //    {
+                //        Name = c.PaymentMethod.Name,
+                //        Id = c.PaymentMethod.Id,
 
+                //    }
+
+                //}).ToList();
                 return Ok(new Response
                 {
                     Data =
-                       orders,
+                       data,
                     Success = true,
 
                 });
@@ -122,6 +156,8 @@ namespace BackendAPI.Controllers
             try
             {
                 Order order = await _orderService.Get(id);
+                var data = _mapper.Map<AdminOrderModel>(order);
+
                 var groupedItems = order.OrderDetails
               .GroupBy(detail => detail.ProductPurchaseOrderDetail.ProductSampleId)
               .Select(group => new
@@ -132,6 +168,7 @@ namespace BackendAPI.Controllers
                       item.Name,
                       item.ProductPurchaseOrderDetailId,
                       item.PriceOut,
+                      item.IsShockDeal,
                       item.FileName
                   }).ToList()
               })
@@ -150,7 +187,7 @@ namespace BackendAPI.Controllers
                     Data =
                    new
                    {
-                       order = order,
+                       order = data,
                        orderDetails = groupedItems
                    },
                     Success = true,

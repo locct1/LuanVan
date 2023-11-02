@@ -21,7 +21,7 @@ namespace BackendAPI.Services
 
         public async Task<IEnumerable<ProductPurchaseOrder>> GetAll()
         {
-            return await _unitOfWork.GetRepository<ProductPurchaseOrder>().GetAll(include: p => p.Include(p => p.ProductPurchaseOrderDetails).Include(x => x.Supplier).Include(a => a.WareHouse).Include(a => a.User), orderBy: x => x.OrderByDescending(x => x.Id));
+            return await _unitOfWork.GetRepository<ProductPurchaseOrder>().GetAll(include: p => p.Include(x => x.Supplier).Include(a => a.WareHouse).Include(a => a.User), orderBy: x => x.OrderByDescending(x => x.Id));
         }
 
         public async Task<IEnumerable<Product>> GetAllProductByWareHouseId(int id)

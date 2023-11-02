@@ -12,7 +12,6 @@ function ProductCard({ product, promotionProductDetails }) {
             let promotionDetail = promotionProductDetails.find(
                 (x) => x.productVersionId === product.productVersions[0].id,
             );
-            console.log(promotionDetail);
             if (promotionDetail) {
                 setDiscountedPrice(promotionDetail.discountedPrice);
             }
@@ -27,7 +26,6 @@ function ProductCard({ product, promotionProductDetails }) {
             setDiscountedPrice(null);
         }
     };
-    console.log(discountedPrice);
     return (
         <>
             <div className="featured__item ">
@@ -64,22 +62,40 @@ function ProductCard({ product, promotionProductDetails }) {
                         <a href="#">{product.name}</a>
                     </h6>
                     <h6>
-                        <div className="row justify-content-md-center">
-                            {product.productVersions.map((item, index) => {
-                                return (
-                                    <div
-                                        className={`col-3 ${
-                                            item.id === productVersion?.id
-                                                ? 'border border-primary text-primary'
-                                                : 'border border-light-custom text-dark'
-                                        } p-1 ml-2 rounded`}
-                                        onClick={() => handleChangeProductVersion(item)}
-                                        style={{ fontSize: '1vw', cursor: 'pointer' }}
-                                    >
-                                        {product.isShowRam === true ? <>{item.ram.name}GB</> : <>{item.rom.name}GB</>}
-                                    </div>
-                                );
-                            })}
+                        <div className="row justify-content-center">
+                            {product.productVersions[0].ram &&
+                                product.productVersions[0].rom &&
+                                product.productVersions.map((item, index) => {
+                                    return (
+                                        <div
+                                            className={`col-3 ${
+                                                item.id === productVersion?.id
+                                                    ? 'border border-primary text-primary'
+                                                    : 'border border-light-custom text-dark'
+                                            } p-1 ml-2 rounded`}
+                                            onClick={() => handleChangeProductVersion(item)}
+                                            style={{ fontSize: '0.8vw', cursor: 'pointer' }}
+                                        >
+                                            {product.isShowRam === true ? (
+                                                <>
+                                                    {item.ram && item.ram.name !== null ? (
+                                                        <>{item.ram.name}GB</>
+                                                    ) : (
+                                                        <></>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {item.rom && item.rom.name !== null ? (
+                                                        <>{item.rom.name}GB</>
+                                                    ) : (
+                                                        <></>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                         </div>
                     </h6>
                     {discountedPrice && discountedPrice !== null ? (

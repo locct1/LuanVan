@@ -176,7 +176,7 @@ function ListOrders() {
                             <thead>
                                 <tr className="bg bg-dark text-light">
                                     <th scope="col">#</th>
-                                    <th scope="col">Id</th>
+                                    <th scope="col">Mã vận đơn</th>
                                     <th scope="col">Người nhận</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Số điện thoại</th>
@@ -207,44 +207,19 @@ function ListOrders() {
                                             index < maxIndex && (
                                                 <tr key={item.id}>
                                                     <td scope="row">{++index}</td>
-                                                    <td scope="row">{item.id}</td>
-                                                    <td scope="row">{item.recipient.fullName}</td>
-                                                    <td scope="row">{item.recipient.email}</td>
-                                                    <td scope="row">{item.recipient.phoneNumber}</td>
-                                                    <td>
-                                                        {String(item.total).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
-                                                        <sup>đ</sup>
-                                                    </td>
-                                                    <td className="text-center">
-                                                        <Form.Control
-                                                            as="select"
-                                                            value={item.orderStatus.id}
-                                                            onChange={(e) => onChangeStatus(e, item.id)}
-                                                        >
-                                                            {dataOrderStatuses.data.slice(0, 6).map((status, index) => (
-                                                                <option
-                                                                    value={status.id}
-                                                                    key={status.id}
-                                                                    className="text-dark bg bg-light"
-                                                                >
-                                                                    {status.name}
-                                                                </option>
-                                                            ))}
-                                                        </Form.Control>
-
+                                                    <td scope="row" className="text-center">
                                                         {value === 0 ? (
                                                             <>
                                                                 <button
                                                                     className="btn btn-primary mt-2"
                                                                     onClick={() => handleGetOrderById(item.id)}
                                                                 >
-                                                                    Tạo mã vận đơn
+                                                                    Tạo
                                                                 </button>
                                                             </>
                                                         ) : (
                                                             <></>
                                                         )}
-
                                                         {value === 1 ? (
                                                             <>
                                                                 <button
@@ -281,6 +256,30 @@ function ListOrders() {
                                                         ) : (
                                                             <></>
                                                         )}
+                                                    </td>
+                                                    <td scope="row">{item.recipient.fullName}</td>
+                                                    <td scope="row">{item.recipient.email}</td>
+                                                    <td scope="row">{item.recipient.phoneNumber}</td>
+                                                    <td>
+                                                        {String(item.total).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
+                                                        <sup>đ</sup>
+                                                    </td>
+                                                    <td className="text-center">
+                                                        <Form.Control
+                                                            as="select"
+                                                            value={item.orderStatus.id}
+                                                            onChange={(e) => onChangeStatus(e, item.id)}
+                                                        >
+                                                            {dataOrderStatuses.data.slice(0, 6).map((status, index) => (
+                                                                <option
+                                                                    value={status.id}
+                                                                    key={status.id}
+                                                                    className="text-dark bg bg-light"
+                                                                >
+                                                                    {status.name}
+                                                                </option>
+                                                            ))}
+                                                        </Form.Control>
                                                     </td>
                                                     <td>{moment(item.createdAt).format('DD/MM/YYYY HH:mm:ss')}</td>
                                                     <td>{moment(item.updatedAt).format('DD/MM/YYYY HH:mm:ss')}</td>

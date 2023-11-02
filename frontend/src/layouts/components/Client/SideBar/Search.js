@@ -5,8 +5,15 @@ import { useProductsClientData, usePromotionProductsClientData } from '~/hooks/r
 import ProductCardSearch from '~/components/Client/ProductCardSearch';
 import Fuse from 'fuse.js';
 import { stringToSlug } from '~/helpers/covertString';
+import { removeVietnameseTones } from '~/helpers/removeVietnameseTones';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
 function Search() {
+    const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition({
+        lang: 'vi-VN',
+    });
     const [searchQuery, setSearchQuery] = useState('');
+    const [useMicro, setUseMicro] = useState(false);
     const [listProducts, setListProducts] = useState([]);
     const { isLoading, data, isError, error } = useProductsClientData();
     const { isLoading: isLoadingPromotionProduct, data: dataPromotionProducts } = usePromotionProductsClientData();
@@ -30,7 +37,9 @@ function Search() {
                 keys: ['name'],
                 threshold: 0.5,
             });
-            let covertString = event.target.value.replace(/ào/g, 'ao').trim();
+
+            let covertString = removeVietnameseTones(event.target.value).trim();
+            console.log(covertString);
             let results = fuse.search(covertString);
             let resultProducts = results.map((resultProduct) => resultProduct.item);
             if (resultProducts.length === 0) {
@@ -43,6 +52,21 @@ function Search() {
         }
         setSearchQuery(event.target.value);
     };
+    useEffect(() => {
+        if (transcript && data && data.data && useMicro === true) {
+            const fuse = new Fuse(data.data, {
+                keys: ['name'],
+                threshold: 0.4,
+            });
+
+            let covertString = removeVietnameseTones(transcript).trim();
+            console.log(covertString);
+            let results = fuse.search(covertString);
+            let resultProducts = results.map((resultProduct) => resultProduct.item);
+            setListProducts(resultProducts);
+            setSearchQuery(transcript);
+        }
+    }, [transcript, data, useMicro]);
     const navigate = useNavigate();
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -52,13 +76,42 @@ function Search() {
         // Sử dụng navigate để điều hướng và cập nhật query parameter
         navigate(`/search-product/?search_product=${searchQuery}`);
     };
+    const handleDeleteSearch = (event) => {
+        setSearchQuery('');
+    };
+    const handleStartListening = (event) => {
+        setUseMicro(true);
+        SpeechRecognition.startListening({ language: 'vi-VN' });
+    };
     if (isLoading || isLoadingPromotionProduct) {
         <></>;
     }
+    useEffect(() => {
+        if (!listening) {
+            setUseMicro(false);
+        }
+    }, [listening]);
     return (
         <>
             <div className="hero__search__form SearchContainer">
                 <form onSubmit={handleSubmit}>
+                    {listening && useMicro === true ? (
+                        <>
+                            <i
+                                class="fas fa-stop-circle micro-stop-circle"
+                                onClick={SpeechRecognition.stopListening}
+                            ></i>
+                        </>
+                    ) : (
+                        <>
+                            {searchQuery && searchQuery !== '' && (
+                                <i class="fas fa-times delete-icon" onClick={() => handleDeleteSearch()}></i>
+                            )}
+
+                            <i class="fas fa-microphone micro" onClick={() => handleStartListening()}></i>
+                        </>
+                    )}
+
                     <input
                         autocomplete="off"
                         type="text"

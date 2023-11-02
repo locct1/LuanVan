@@ -15,6 +15,9 @@ import faker from 'faker';
 import { useOrdersData } from '~/hooks/react-query/orderData';
 import SaleReportMonth from '~/components/SaleReportMonth';
 import SaleReportDay from '~/components/SaleReportDay';
+import { useDashBoardsData } from '~/hooks/react-query/dashboardData';
+import LoadingAdmin from '~/components/LoadingAdmin';
+import TotalProductCategories from '~/components/TotalProductCategories';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend);
 export const options = {
     responsive: true,
@@ -91,14 +94,209 @@ export const data = {
     ],
 };
 function DashBoard() {
+    const { isLoading, data, isError, error } = useDashBoardsData();
+    if (isLoading) {
+        <LoadingAdmin />;
+    }
     return (
-        <div className="container">
+        <div className="container-flud">
             <div className="row mb-2">
                 <div className="col-12">
-                    <h4>Tổng quan</h4>
+                    <h4 className="font-weight-bold">Tổng quan</h4>
                 </div>
             </div>
-
+            <div className="row">
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số kho
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfWareHouses ? data.data.amountOfWareHouses : 0} kho
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số nhà cung cấp
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfSuppliers ? data.data.amountOfSuppliers : 0} nhà cung cấp
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số thương hiệu
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfBrands ? data.data.amountOfBrands : 0} thương hiệu
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số loại
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfProductCategories ? data.data.amountOfProductCategories : 0}{' '}
+                                        loại
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số màu sắc
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfColorProducts ? data.data.amountOfColorProducts : 0} màu sắc
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số điện thoại
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfPhones ? data.data.amountOfPhones : 0} điện thoại
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số phụ kiện
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfAccessories ? data.data.amountOfAccessories : 0} phụ kiện
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số mẫu sản phẩm
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfProductSamples ? data.data.amountOfProductSamples : 0} mẫu
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số mẫu điện thoại
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfProductSamplePhones
+                                            ? data.data.amountOfProductSamplePhones
+                                            : 0}{' '}
+                                        mẫu
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng số mẫu phụ kiện
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfProductSampleAccessories
+                                            ? data.data.amountOfProductSampleAccessories
+                                            : 0}{' '}
+                                        mẫu
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-3">
+                    <h5 className="font-weight-bold">Tổng sản phẩm: {data?.data.amountOfProducts} </h5>
+                    <TotalProductCategories totalListProductCategories={data?.data.totalListProductCategories} />
+                </div>
+                <div className="col-3">
+                    <h5 className="font-weight-bold">Tổng mẫu sản phẩm: {data?.data.amountOfProductSamples} </h5>
+                    <TotalProductCategories totalListProductCategories={data?.data.totalListProductSamples} />
+                </div>
+                <div className="col-3">
+                    <h5 className="font-weight-bold">
+                        Tổng mẫu sản phẩm theo thương hiệu: {data?.data.amountOfProductSamples}{' '}
+                    </h5>
+                    <TotalProductCategories totalListProductCategories={data?.data.totalProductSamplesByBrands} />
+                </div>
+                <div className="col-3">
+                    <h5 className="font-weight-bold">
+                        Tổng mẫu sản phẩm trong kho:{' '}
+                        {data?.data?.totalProductSamplesByWareHouses?.reduce((acc, item) => acc + (item.total || 0), 0)}{' '}
+                    </h5>
+                    <TotalProductCategories totalListProductCategories={data?.data.totalProductSamplesByWareHouses} />
+                </div>
+            </div>
             <div className="row d-flex justify-content-center">
                 <div className="col-8">
                     <SaleReportMonth />

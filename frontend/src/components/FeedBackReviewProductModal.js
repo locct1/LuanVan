@@ -39,7 +39,7 @@ function FeedBackReviewProductModal({ show, onClose, reviewProduct }) {
         if (data.success) {
             resetField('feedBackContent');
             onClose();
-            toast.success('Phẩn hồi thành công');
+            toast.success('Phản hồi hồi thành công');
         } else {
             setErrorsForm(data.errors);
         }

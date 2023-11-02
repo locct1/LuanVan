@@ -12,6 +12,7 @@ namespace BackendAPI.Data
         public string FileName { get; set; }
         [ForeignKey(nameof(OrderId))]
         public int? OrderId { get; set; }
+        public bool IsShockDeal { get; set; }
         public Order? Order { get; set; }
 
         [ForeignKey(nameof(ProductPurchaseOrderDetailId))]

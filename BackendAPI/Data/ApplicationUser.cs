@@ -19,6 +19,5 @@ namespace BackendAPI.Data
         public List<ReviewProduct>? ReviewProducts { get; set; }
         public List<FeedbackReviewProduct>? FeedbackReviewProducts { get; set; }
         public List<LikeReviewProduct>? LikeReviewProducts { get; set; }
-
     }
 }

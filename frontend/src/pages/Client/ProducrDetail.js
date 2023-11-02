@@ -1,3 +1,4 @@
+import { forEach } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Carousel } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,8 +14,10 @@ import {
     useProductSamplesClientData,
     useProductsClientData,
     usePromotionProductsClientData,
+    useShockDealsClientData,
 } from '~/hooks/react-query/client/pageData';
 import { usePhotosByProductIdData } from '~/hooks/react-query/productsampleData';
+import { useShockDealsData } from '~/hooks/react-query/shockdealData';
 import useScript from '~/hooks/useScript';
 import CartSlice from '~/redux/Slices/CartSlice';
 function ProductDetail() {
@@ -38,12 +41,15 @@ function ProductDetail() {
     const [productSample, setProductSample] = useState();
     const [productColorProduct, setProductColorProduct] = useState();
     const [discountedPrice, setDiscountedPrice] = useState(null);
+    const [listShockDeals, setListShockDeals] = useState([]);
+    const [selectedListShockDeals, setSelectedListShockDeals] = useState([]);
     const [quantity, setQuantity] = useState(1);
     const { id } = useParams();
     const dispatch = useDispatch();
     const { isLoading, data, isError, error } = useProductByIdClientData(id);
     const { isLoading: isLoadingProductSamples, data: dataProductSamples } = useProductSamplesClientData();
     const { isLoading: isLoadingPromotionProduct, data: dataPromotionProducts } = usePromotionProductsClientData();
+    const { isLoading: isLoadingShockDetails, data: dataShockDetails } = useShockDealsClientData();
     const { isLoading: isLoadingPhotosByProductId, data: dataPhotosByProductId } = usePhotosByProductIdData(id);
     const [show, setShow] = useState(false);
     const [imageProduct360, setImageProduct360] = useState(null);
@@ -51,7 +57,15 @@ function ProductDetail() {
     const handleShow = () => setShow(true);
     const [promotionProductDetails, setPromotionProductDetails] = useState([]);
     useEffect(() => {
-        if (data && data.data && dataProductSamples && dataProductSamples.data && dataPromotionProducts) {
+        if (
+            data &&
+            data.data &&
+            dataProductSamples &&
+            dataProductSamples.data &&
+            dataPromotionProducts &&
+            dataShockDetails &&
+            dataShockDetails.data
+        ) {
             window.scrollTo(0, 0);
             setSlideImages([data.data.image]);
             setProductVersion(data.data.productVersions[0]);
@@ -73,10 +87,21 @@ function ProductDetail() {
             });
             setPromotionProductDetails(list);
             let promotionDetail = list.find((x) => x.productVersionId === data.data.productVersions[0].id);
-            console.log(promotionDetail);
             if (promotionDetail) {
                 setDiscountedPrice(promotionDetail.discountedPrice);
             }
+            //shock Deals
+            let listShockDeals = [];
+            dataShockDetails.data.forEach((shockDeal) => {
+                shockDeal.shockDealDetails.forEach((detail) => {
+                    listShockDeals.push(detail);
+                });
+            });
+            const listFilterShockDeal = listShockDeals.filter(
+                (x) => x.shockDealId === listShockDeals[0].shockDealId && x.mainProductId === data.data.id,
+            );
+            setListShockDeals(listFilterShockDeal);
+            setSelectedListShockDeals(listFilterShockDeal);
         }
     }, [data, dataProductSamples, dataPromotionProducts]);
     const handleClickChangeSlideImages = (id) => {
@@ -109,6 +134,7 @@ function ProductDetail() {
     };
     const handleClickChangeProductColorProduct = (id) => {
         let findProductColorProduct = data.data.productColorProducts.find((x) => x.id === id);
+        setSlideImages([findProductColorProduct.fileName]);
         let productSample = dataProductSamples.data.find(
             (x) =>
                 x.productVersionId === productVersion.id && x.colorProductId === findProductColorProduct.colorProductId,
@@ -139,13 +165,13 @@ function ProductDetail() {
         setQuantity(parseInt(quantity) + 1);
     };
     const handleAddProductToCart = () => {
-        console.log(productSample);
         if (productSample === undefined || productSample === null) {
             toast.warning('Vui lòng chọn màu sản phẩm');
             return;
         }
         let productaddtoCart = {
             ...productSample,
+            gift: false,
             fileName: productColorProduct.fileName,
             priceOut: productSample.productVersion.priceOut,
             productName: data.data.name,
@@ -157,6 +183,25 @@ function ProductDetail() {
             quantityCart: quantity,
         };
         dispatch(CartSlice.actions.addProduct(productaddtoCart));
+        selectedListShockDeals.forEach((shockDeal) => {
+            let productShockDeal = {
+                productId: shockDeal.productShockDeal.id,
+                productMainId: productSample.id,
+                fileName: shockDeal.productShockDeal.image,
+                gift: true,
+                priceOut: shockDeal.productShockDeal.productVersions[0].priceOut,
+                productVersionId: shockDeal.productShockDeal.productVersions[0].id,
+                shockDealPrice: shockDeal.shockDealPrice,
+                productName: shockDeal.productShockDeal.name,
+                height: shockDeal.productShockDeal.height,
+                weight: shockDeal.productShockDeal.weight,
+                width: shockDeal.productShockDeal.width,
+                length: shockDeal.productShockDeal.length,
+                discountedPrice: null,
+                quantityCart: quantity,
+            };
+            dispatch(CartSlice.actions.addShockDealProduct(productShockDeal));
+        });
     };
     const handleClickShowImageProduct360 = async () => {
         setSlideImages([data.data.image]);
@@ -187,9 +232,23 @@ function ProductDetail() {
             // handleShow();
         }
     };
-    if (isLoading || isLoadingProductSamples || isLoadingPromotionProduct || isLoadingPhotosByProductId) {
+    const handleChange = (item) => {
+        if (selectedListShockDeals.some((selectedItem) => selectedItem.id === item.id)) {
+            setSelectedListShockDeals(selectedListShockDeals.filter((value) => value.id !== item.id));
+        } else {
+            setSelectedListShockDeals([...selectedListShockDeals, item]);
+        }
+    };
+    if (
+        isLoading ||
+        isLoadingProductSamples ||
+        isLoadingPromotionProduct ||
+        isLoadingPhotosByProductId ||
+        isLoadingShockDetails
+    ) {
         return <></>;
     }
+    console.log(slideImages);
     return (
         <>
             <section
@@ -253,7 +312,11 @@ function ProductDetail() {
                                             <img
                                                 style={{ maxWidth: '83%' }}
                                                 className="product__details__pic__item--large"
-                                                src={LINK_PRODUCT_IMAGE + data.data.image}
+                                                src={
+                                                    data.data.image === slideImages[0]
+                                                        ? LINK_PRODUCT_IMAGE + data.data.image
+                                                        : LINK_PRODUCT_COLOR_PRODUCT_DEFAULT_IMAGE + slideImages[0]
+                                                }
                                                 alt=""
                                             />
                                         </>
@@ -406,7 +469,10 @@ function ProductDetail() {
                                 </div>
 
                                 <div className="row">
-                                    {data && data.data.productVersions.length > 0 ? (
+                                    {data &&
+                                    data.data.productVersions.length > 0 &&
+                                    data.data.productVersions[0].ram &&
+                                    data.data.productVersions[0].rom ? (
                                         data.data.productVersions.map((item, index) => (
                                             <p
                                                 onClick={() => handleClickChangeProductVersion(item.id)}
@@ -510,6 +576,261 @@ function ProductDetail() {
                     </div>
                     <div>
                         <hr />
+                        <div className="row  justify-content-center">
+                            <div className="col-8">
+                                {listShockDeals && listShockDeals.length > 0 && (
+                                    <>
+                                        <div className="card mt-3">
+                                            <div className="card-header text-center">
+                                                <h5>Ưu đãi khi mua kèm</h5>
+                                            </div>
+                                            <div className="card-body">
+                                                <div className="row">
+                                                    <div className="col-3">
+                                                        <img src={LINK_PRODUCT_IMAGE + data.data.image} />
+                                                    </div>
+                                                    <div className="col-9">
+                                                        <h5>
+                                                            {data?.data.name}{' '}
+                                                            {data.data.isShowRam === true ? (
+                                                                <>
+                                                                    {productVersion?.ram &&
+                                                                    productVersion.ram.name !== null ? (
+                                                                        <>
+                                                                            {productVersion.ram.name}GB-
+                                                                            {productVersion.rom.name}GB
+                                                                        </>
+                                                                    ) : (
+                                                                        <></>
+                                                                    )}
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    {productVersion.rom &&
+                                                                    productVersion.rom.name !== null ? (
+                                                                        <>
+                                                                            {productVersion.ram.name}GB-
+                                                                            {productVersion.rom.name}GB
+                                                                        </>
+                                                                    ) : (
+                                                                        <></>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </h5>
+                                                        {discountedPrice && discountedPrice !== null ? (
+                                                            <>
+                                                                <div className="d-flex">
+                                                                    {' '}
+                                                                    <div
+                                                                        className="product__details__price mr-3 mt-1"
+                                                                        style={{
+                                                                            color: '#dd2222',
+                                                                            fontSize: '15px',
+                                                                            fontWeight: '700',
+                                                                            marginBottom: '0px', // Font-weight nhẹ (light)
+                                                                        }}
+                                                                    >
+                                                                        {String(discountedPrice).replace(
+                                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                            '$1,',
+                                                                        )}
+                                                                        <sup>đ</sup>
+                                                                    </div>
+                                                                    <div
+                                                                        className="product__details__price mt-1"
+                                                                        style={{
+                                                                            textDecoration: 'line-through', // Gạch ngang chữ
+                                                                            color: '#6c757d', // Màu chữ xám
+                                                                            fontWeight: 300,
+                                                                            fontSize: '15px', // Font-weight nhẹ (light)
+                                                                        }}
+                                                                    >
+                                                                        {String(productVersion?.priceOut).replace(
+                                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                            '$1,',
+                                                                        )}
+                                                                        <sup>đ</sup>
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <div
+                                                                    className="product__details__price mt-1"
+                                                                    style={{
+                                                                        color: '#dd2222',
+                                                                        fontWeight: '700',
+                                                                        fontSize: '15px', // Font-weight nhẹ (light)
+                                                                    }}
+                                                                >
+                                                                    {String(productVersion?.priceOut).replace(
+                                                                        /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                        '$1,',
+                                                                    )}
+                                                                    <sup>đ</sup>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                {listShockDeals && listShockDeals.length > 0 ? (
+                                                    listShockDeals.map((item, index) => (
+                                                        <div className="row mt-4" key={item.id}>
+                                                            <div className="col-3">
+                                                                <input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    onChange={() => handleChange(item)}
+                                                                    checked={selectedListShockDeals.some(
+                                                                        (selectedItem) => selectedItem.id === item.id,
+                                                                    )}
+                                                                />
+                                                                <img
+                                                                    src={
+                                                                        LINK_PRODUCT_IMAGE + item.productShockDeal.image
+                                                                    }
+                                                                />
+                                                            </div>
+                                                            <div className="col-9">
+                                                                <h5>{item.productShockDeal.name} </h5>
+
+                                                                <div className="d-flex">
+                                                                    <div
+                                                                        className="product__details__price mr-3 mt-1"
+                                                                        style={{
+                                                                            color: '#dd2222',
+                                                                            fontWeight: '700',
+                                                                            fontSize: '15px',
+                                                                            marginBottom: '0px', // Font-weight nhẹ (light)
+                                                                        }}
+                                                                    >
+                                                                        {String(item.shockDealPrice).replace(
+                                                                            /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                                            '$1,',
+                                                                        )}
+                                                                        <sup>đ</sup>
+                                                                    </div>
+                                                                    <div
+                                                                        className="product__details__price mt-1"
+                                                                        style={{
+                                                                            textDecoration: 'line-through', // Gạch ngang chữ
+                                                                            color: '#6c757d', // Màu chữ xám
+                                                                            fontWeight: 300,
+                                                                            fontSize: '15px', // Font-weight nhẹ (light)
+                                                                        }}
+                                                                    >
+                                                                        {String(
+                                                                            item.productShockDeal.productVersions[0]
+                                                                                ?.priceOut,
+                                                                        ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
+                                                                        <sup>đ</sup>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <></>
+                                                )}
+                                            </div>
+                                            <div class="card-footer text-muted">
+                                                <h6>
+                                                    Tổng tiền:{' '}
+                                                    {discountedPrice && discountedPrice !== null ? (
+                                                        <>
+                                                            <span
+                                                                className="mr-2"
+                                                                style={{
+                                                                    color: '#dd2222', // Màu chữ xám
+                                                                    fontWeight: 700,
+                                                                }}
+                                                            >
+                                                                {' '}
+                                                                {String(
+                                                                    discountedPrice +
+                                                                        selectedListShockDeals.reduce(
+                                                                            (total, deal) =>
+                                                                                total + deal.shockDealPrice,
+                                                                            0,
+                                                                        ),
+                                                                ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
+                                                                <sup>đ</sup>
+                                                            </span>
+                                                            <span
+                                                                style={{
+                                                                    textDecoration: 'line-through', // Gạch ngang chữ
+                                                                    color: '#6c757d', // Màu chữ xám
+                                                                    fontWeight: 300,
+                                                                    fontSize: '15px', // Font-weight nhẹ (light)
+                                                                }}
+                                                            >
+                                                                {' '}
+                                                                {String(
+                                                                    productVersion?.priceOut +
+                                                                        selectedListShockDeals.reduce(
+                                                                            (total, deal) =>
+                                                                                total +
+                                                                                deal.productShockDeal.productVersions[0]
+                                                                                    .priceOut,
+                                                                            0,
+                                                                        ),
+                                                                ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
+                                                                <sup>đ</sup>
+                                                            </span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            {' '}
+                                                            <span
+                                                                className="mr-2"
+                                                                style={{
+                                                                    color: '#dd2222', // Màu chữ xám
+                                                                    fontWeight: 700,
+                                                                }}
+                                                            >
+                                                                {' '}
+                                                                {String(
+                                                                    productVersion?.priceOut +
+                                                                        selectedListShockDeals.reduce(
+                                                                            (total, deal) =>
+                                                                                total + deal.shockDealPrice,
+                                                                            0,
+                                                                        ),
+                                                                ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
+                                                                <sup>đ</sup>
+                                                            </span>
+                                                            <span
+                                                                style={{
+                                                                    textDecoration: 'line-through', // Gạch ngang chữ
+                                                                    color: '#6c757d', // Màu chữ xám
+                                                                    fontWeight: 300,
+                                                                    fontSize: '15px', // Font-weight nhẹ (light)
+                                                                }}
+                                                            >
+                                                                {' '}
+                                                                {String(
+                                                                    productVersion?.priceOut +
+                                                                        selectedListShockDeals.reduce(
+                                                                            (total, deal) =>
+                                                                                total +
+                                                                                deal.productShockDeal.productVersions[0]
+                                                                                    .priceOut,
+                                                                            0,
+                                                                        ),
+                                                                ).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
+                                                                <sup>đ</sup>
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                        <hr />
                         <div className="row">
                             <div className="col-lg-8">
                                 <br />
@@ -533,47 +854,86 @@ function ProductDetail() {
                                 <br />
                                 <table class="table table-striped">
                                     <tbody>
-                                        <tr>
-                                            <td>Màn hình:</td>
-                                            <td>
-                                                {data.data.screenTechnology?.name} , {data.data?.screenWidth},{' '}
-                                                {data.data?.resolution}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Hệ điều hành:</td>
-                                            <td> {data.data?.operatingSystemProduct.name}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Camera sau:</td>
-                                            <td>{data.data?.rearCamera}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Camera trước:</td>
-                                            <td>{data.data?.frontCamera}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Chip:</td>
-                                            <td>{data.data?.chip.name}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sim:</td>
-                                            <td>{data.data?.sim}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>RAM:</td>
-                                            <td>{productVersion?.ram.name}GB</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Dung lượng lưu trữ: :</td>
-                                            <td>{productVersion?.rom.name}GB</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pin/Sạc:</td>
-                                            <td>
-                                                {data.data?.battery} mAh, {data.data?.charging} W
-                                            </td>
-                                        </tr>
+                                        {data.data?.operatingSystemProduct?.name && (
+                                            <tr>
+                                                <td>Hệ điều hành:</td>
+                                                <td> {data.data?.operatingSystemProduct?.name}</td>
+                                            </tr>
+                                        )}
+                                        {data.data.screenTechnology?.name &&
+                                            data.data.screenWidth &&
+                                            data.data.resolution && (
+                                                <tr>
+                                                    <td>Màn hình:</td>
+                                                    <td>
+                                                        {data.data.screenTechnology.name}, {data.data.screenWidth},{' '}
+                                                        {data.data.resolution}
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        {data.data?.rearCamera && (
+                                            <tr>
+                                                <td>Camera sau:</td>
+                                                <td>{data.data?.rearCamera}</td>
+                                            </tr>
+                                        )}
+                                        {data.data?.frontCamera && (
+                                            <tr>
+                                                <td>Camera trước:</td>
+                                                <td>{data.data?.frontCamera}</td>
+                                            </tr>
+                                        )}
+                                        {data.data?.chip?.name && (
+                                            <tr>
+                                                <td>Chip:</td>
+                                                <td>{data.data?.chip?.name}</td>
+                                            </tr>
+                                        )}
+                                        {data.data?.sim && (
+                                            <tr>
+                                                <td>Sim:</td>
+                                                <td>{data.data?.sim}</td>
+                                            </tr>
+                                        )}
+                                        {productVersion?.ram?.name && (
+                                            <tr>
+                                                <td>RAM:</td>
+                                                <td>{productVersion?.ram?.name}GB</td>
+                                            </tr>
+                                        )}
+
+                                        {productVersion?.rom?.name && (
+                                            <tr>
+                                                <td>Dung lượng lưu trữ: :</td>
+                                                <td>{productVersion.rom.name}GB</td>
+                                            </tr>
+                                        )}
+                                        {data.data?.battery && data.data?.charging && (
+                                            <tr>
+                                                <td>Pin/Công suất sạc:</td>
+                                                <td>
+                                                    {data.data?.battery} mAh, {data.data?.charging} W
+                                                </td>
+                                            </tr>
+                                        )}
+                                        {data.data?.headPhoneTime && (
+                                            <tr>
+                                                <td>Thời gian sử dụng:</td>
+                                                <td>{data.data?.headPhoneTime} giờ</td>
+                                            </tr>
+                                        )}
+                                        {data.data?.chargerPort?.name && (
+                                            <tr>
+                                                <td>Cổng sạc:</td>
+                                                <td>{data.data?.chargerPort?.name}</td>
+                                            </tr>
+                                        )}
+                                        {data.data?.jackPlug?.name && (
+                                            <tr>
+                                                <td>Jack cắm:</td>
+                                                <td>{data.data?.jackPlug?.name}</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>

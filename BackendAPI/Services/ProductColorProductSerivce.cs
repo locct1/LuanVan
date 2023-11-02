@@ -37,5 +37,10 @@ namespace BackendAPI.Services
         {
             await _unitOfWork.GetRepository<ProductColorProduct>().Delete(id);
         }
+
+        public async Task<ProductColorProduct> GetProductColorProductByProductIdAndColorProductId(int productId, int colorProductId)
+        {
+            return await _unitOfWork.GetRepository<ProductColorProduct>().Get(filter: x=>x.ProductId==productId&& x.ColorProductId==colorProductId);
+        }
     }
 }

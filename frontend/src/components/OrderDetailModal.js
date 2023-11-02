@@ -188,10 +188,14 @@ function OrderDetailModal({ show, onClose, dataOrder, onRefetch, onCreateOrderFo
             dataOrder.orderDetails.forEach((element) => {
                 let productSampleIdString = element.productSampleId.toString();
                 let item = {
-                    name: element.items[0].name,
+                    name:
+                        element.items[0].isShockDeal === true
+                            ? '[Deal sốc] ' + element.items[0].name
+                            : element.items[0].name,
                     code: productSampleIdString,
                     quantity: element.items.length,
                     price: element.items[0].priceOut,
+
                     category: {
                         level1: 'Điện thoại',
                     },
@@ -240,6 +244,9 @@ function OrderDetailModal({ show, onClose, dataOrder, onRefetch, onCreateOrderFo
                 };
                 updateOrderStatus(data);
                 onCreateOrderForDelivery();
+            }
+            if (response.code === 400) {
+                toast.error(response.message);
             }
         }
     };
@@ -355,7 +362,17 @@ function OrderDetailModal({ show, onClose, dataOrder, onRefetch, onCreateOrderFo
                                                 {dataOrder.orderDetails.map((item, index) => (
                                                     <tr key={index}>
                                                         <td>{++index}</td>
-                                                        <td>{item.items.length > 0 ? item.items[0].name : ''}</td>
+                                                        <td>
+                                                            {item.items.length > 0 &&
+                                                                item.items[0].isShockDeal === true && (
+                                                                    <>
+                                                                        <span className="mr-1 text-danger font-weight-bold">
+                                                                            [Deal sốc]
+                                                                        </span>
+                                                                    </>
+                                                                )}
+                                                            {item.items.length > 0 ? item.items[0].name : ''}
+                                                        </td>
                                                         <td>
                                                             <img
                                                                 style={{ maxWidth: '83%' }}

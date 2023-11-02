@@ -1,4 +1,6 @@
-﻿using BackendAPI.Data;
+﻿using AutoMapper;
+using BackendAPI.Data;
+using BackendAPI.DTO.Admin;
 using BackendAPI.Helpers;
 using BackendAPI.Interfaces;
 using BackendAPI.Models.ColorProduct;
@@ -6,6 +8,7 @@ using BackendAPI.Models.Product;
 using BackendAPI.Models.ProductSample;
 using BackendAPI.Services;
 using BackendAPI.UnitOfWorks;
+using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -21,14 +24,16 @@ namespace BackendAPI.Controllers
         private readonly IPhotoService _photoService;
         private readonly IProductVersionService _productVersionService;
         private readonly IProductColorProductService _productColorProductService;
+        private readonly IMapper _mapper;
 
-        public ProductSampleController(IProductSampleService productSampleService, IUnitOfWork unitOfWork, IPhotoService photoService, IProductVersionService productVersionService, IProductColorProductService productColorProductService)
+        public ProductSampleController(IProductSampleService productSampleService, IUnitOfWork unitOfWork, IPhotoService photoService, IProductVersionService productVersionService, IProductColorProductService productColorProductService, IMapper mapper)
         {
             _productSampleService = productSampleService;
             _unitOfWork = unitOfWork;
             _photoService = photoService;
             _productVersionService = productVersionService;
             _productColorProductService = productColorProductService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -38,10 +43,11 @@ namespace BackendAPI.Controllers
             {
                 if (page == 0 || page == null || limit == 0 || limit == null)
                 {
-                    var suppliers = await _productSampleService.GetAll();
+                    var productSamples = await _productSampleService.GetAll();
+                    var data = _mapper.Map<List<AdminProductSampleModel>>(productSamples);
                     return Ok(new Response
                     {
-                        Data = suppliers,
+                        Data = data,
                         Success = true,
 
                     });

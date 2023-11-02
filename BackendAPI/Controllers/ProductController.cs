@@ -1,10 +1,14 @@
-﻿using BackendAPI.Data;
+﻿using AutoMapper;
+using BackendAPI.Data;
+using BackendAPI.DTO.Admin;
+using BackendAPI.DTO.Client;
 using BackendAPI.Helpers;
 using BackendAPI.Interfaces;
 using BackendAPI.Models.ColorProduct;
 using BackendAPI.Models.Product;
 using BackendAPI.Models.ProductVersion;
 using BackendAPI.UnitOfWorks;
+using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Drawing;
@@ -23,8 +27,9 @@ namespace BackendAPI.Controllers
         private readonly IProductColorProductService _productColorProductService;
         private readonly IPhotoService _photoService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ProductController(IProductService productService, IProductSampleService productSampleService, IProductVersionService productVersionService, IProductColorProductService productColorProductService, IPhotoService photoService, IUnitOfWork unitOfWork)
+        public ProductController(IProductService productService, IProductSampleService productSampleService, IProductVersionService productVersionService, IProductColorProductService productColorProductService, IPhotoService photoService, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _productService = productService;
             _productSampleService = productSampleService;
@@ -32,6 +37,7 @@ namespace BackendAPI.Controllers
             _productColorProductService = productColorProductService;
             _photoService = photoService;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -41,9 +47,38 @@ namespace BackendAPI.Controllers
             {
 
                 var products = await _productService.GetAll();
+                var data = _mapper.Map<List<ClientProductViewModel>>(products);
+
                 return Ok(new Response
                 {
-                    Data = products,
+                    Data = data,
+                    Success = true,
+
+                });
+
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpGet("get-all-accessories")]
+        public async Task<IActionResult> GetAllAccessories(int page, int limit)
+        {
+            try
+            {
+
+                var products = await _productService.GetAllAccessories();
+                var data = _mapper.Map<List<ClientProductViewModel>>(products);
+
+                return Ok(new Response
+                {
+                    Data = data,
                     Success = true,
 
                 });
@@ -65,6 +100,8 @@ namespace BackendAPI.Controllers
             try
             {
                 Product findProduct = await this._productService.Get(id);
+                var data = _mapper.Map<ClientProductViewModel>(findProduct);
+
                 if (findProduct is null)
                 {
                     return BadRequest(new Response
@@ -215,7 +252,119 @@ namespace BackendAPI.Controllers
             }
 
         }
+        [HttpPost("add-accessory")]
+        public async Task<IActionResult> CreateAccessory([FromForm] CreateAccessoryRequest model)
+        {
+            try
+            {
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    if (!ModelState.IsValid)
+                    {
+                        var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                      .Select(e => e.ErrorMessage)
+                                                      .ToArray();
+                        return BadRequest(new Response { Success = false, Errors = errors });
+                    }
+                    string[] departmentArray = { ".png", ".jpeg", ".jpg", ".webp" };
+                    string checkEntentions = Path.GetExtension(model.Image.FileName).ToLower();
 
+                    if (departmentArray.Contains(checkEntentions) == false)
+                    {
+                        return BadRequest(new Response
+                        {
+                            Success = false,
+                            Errors = new[] { "File không đúng định dạng" }
+                        });
+                    }
+                    var file1 = Path.GetFileNameWithoutExtension(Path.GetRandomFileName())
+                + Path.GetExtension(model.Image.FileName);
+                    var fileTemp = Path.Combine("Uploads", "Product", file1);
+
+                    using (var filestream = new FileStream(fileTemp, FileMode.Create))
+                    {
+                        await model.Image.CopyToAsync(filestream);
+                    }
+                    List<CreateProductSampleRequest> colors =
+                        JsonConvert.DeserializeObject<List<CreateProductSampleRequest>>(model.ColorProducts);
+
+                    Product product = new Product
+                    {
+                        Name = model.Name,
+                        BrandId = model.BrandId,
+                        WareHouseId = model.WareHouseId,
+                        Infomation = model.Infomation,
+                        Image = file1,
+                        ProductCategoryCode = model.ProductCategoryCode,
+                        Battery = model.Battery,
+                        JackPlugId = model.JackPlugId,
+                        ChargerPortId = model.ChargerPortId,
+                        HeadPhoneTime = model.HeadPhoneTime,
+                        Charging = model.Charging,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        Height = model.Height,
+                        Length = model.Length,
+                        Width = model.Width,
+                        Weight = model.Weight,
+                        Disabled = false,
+                    };
+                    await _productService.CreateProduct(product);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    ProductVersion productVersion = new ProductVersion
+                    {
+
+                        ProductId = product.Id,
+                        PriceIn = model.PriceIn,
+                        PriceOut = model.PriceOut,
+                    };
+                    await _productVersionService.CreateProductVersion(productVersion);
+                    await _unitOfWork.SaveChangesAsync();
+                    foreach (var color in colors)
+                    {
+                        ProductSample productSample = new ProductSample
+                        {
+                            ColorProductId = int.Parse(color.Value),
+                            ProductVersionId = productVersion.Id,
+                            Quantity = 0,
+                            Disabled = true,
+                        };
+
+                        await _productSampleService.CreateProductSample(productSample);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                    foreach (var color in colors)
+                    {
+                        ProductColorProduct productColorProduct = new ProductColorProduct
+                        {
+                            ColorProductId = int.Parse(color.Value),
+                            ProductId = product.Id,
+                        };
+                        await _productColorProductService.CreateProductColorProduct(productColorProduct);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                    scope.Complete();
+                    return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, new Response
+                    {
+                        Data = product,
+                        Success = true,
+                        Message = "Lưu thành công"
+
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+                throw;
+            }
+
+        }
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromForm] UpdateProductRequest model)
         {
@@ -349,6 +498,200 @@ namespace BackendAPI.Controllers
                         }
 
                     }
+                    List<ProductVersion> productVersions = findProduct.ProductVersions.ToList();
+                    foreach (var item in findProduct.ProductColorProducts.ToList())
+                    {
+                        bool isColorProductContained = colors.Any(color => int.Parse(color.Value) == item.ColorProductId);
+                        if (!isColorProductContained)
+                        {
+                            await _productColorProductService.DeleteProductColorProduct(item.Id);
+                            foreach (var item1 in productVersions)
+                            {
+                                int colorProductId = item.ColorProductId.HasValue ? item.ColorProductId.Value : 0; // Trích xuất giá trị từ int?
+                                ProductSample productSample = await _productSampleService.GetProductSampleByProductVersionAndColorProduct(item1.Id, colorProductId);
+                                if (productSample != null)
+                                {
+                                    await _productSampleService.DeleteProductSample(productSample.Id);
+                                    await _unitOfWork.SaveChangesAsync();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var colorToRemove = colors.FirstOrDefault(color => int.Parse(color.Value) == item.ColorProductId);
+
+                            if (colorToRemove != null)
+                            {
+                                colors.Remove(colorToRemove);
+                            }
+                        }
+
+                    }
+                    foreach (var color in colors)
+                    {
+                        ProductColorProduct productColorProduct = new ProductColorProduct
+                        {
+                            ProductId = findProduct.Id,
+                            ColorProductId = int.Parse(color.Value),
+                        };
+                        foreach (var item1 in productVersions)
+                        {
+                            ProductSample productSample = new ProductSample
+                            {
+                                ColorProductId = int.Parse(color.Value),
+                                ProductVersionId = item1.Id,
+                                Quantity = 0,
+                                Disabled = true,
+                            };
+
+                            await _productSampleService.CreateProductSample(productSample);
+                            await _unitOfWork.SaveChangesAsync();
+
+                        }
+                        await _productColorProductService.CreateProductColorProduct(productColorProduct);
+
+                    }
+                    await _unitOfWork.SaveChangesAsync();
+                    scope.Complete();
+                    return CreatedAtAction(nameof(GetProductById), new { id = findProduct.Id }, new Response
+                    {
+                        Data = findProduct,
+                        Success = true,
+                        Message = "Lưu thành công"
+
+                    });
+                }
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+                throw;
+            }
+
+        }
+        [HttpPut("update-accessory/{id}")]
+        public async Task<IActionResult> UpdateAccessory(int id, [FromForm] UpdateAccessoryRequest model)
+        {
+            try
+            {
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+                    if (!ModelState.IsValid)
+                    {
+                        var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                                      .Select(e => e.ErrorMessage)
+                                                      .ToArray();
+                        return BadRequest(new Response { Success = false, Errors = errors });
+                    }
+
+                    if (id != model.Id)
+                    {
+                        return BadRequest(new Response
+                        {
+                            Success = false,
+                            Errors = new[] { "Không tìm thấy" }
+
+                        });
+
+                    }
+                    Product findProduct = await _productService.Get(id);
+                    if (findProduct is null)
+                    {
+                        return BadRequest(new Response
+                        {
+                            Success = false,
+                            Errors = new[] { "Không tìm thấy" }
+
+                        });
+                    }
+                    if (model.Image != null)
+                    {
+                        var filename = "Uploads/Product/" + findProduct.Image;
+                        System.IO.File.Delete(filename);
+                        string[] departmentArray = { ".png", ".jpeg", ".jpg", ".webp" };
+                        string checkEntentions = Path.GetExtension(model.Image.FileName).ToLower();
+
+                        if (departmentArray.Contains(checkEntentions) == false)
+                        {
+                            return BadRequest(new Response
+                            {
+                                Success = false,
+                                Errors = new[] { "File không đúng định dạng" }
+                            });
+                        }
+                        var file1 = Path.GetFileNameWithoutExtension(Path.GetRandomFileName())
+                    + Path.GetExtension(model.Image.FileName);
+                        var fileTemp = Path.Combine("Uploads", "Product", file1);
+
+                        using (var filestream = new FileStream(fileTemp, FileMode.Create))
+                        {
+                            await model.Image.CopyToAsync(filestream);
+                        }
+                        findProduct.Image = file1;
+                    }
+                    findProduct.Name = model.Name;
+                    findProduct.BrandId = model.BrandId;
+                    findProduct.WareHouseId = model.WareHouseId;
+                    findProduct.Infomation = model.Infomation;
+                    findProduct.Battery = model.Battery;
+                    findProduct.Charging = model.Charging;
+                    findProduct.HeadPhoneTime = model.HeadPhoneTime;
+                    findProduct.ChargerPortId = model.ChargerPortId;
+                    findProduct.JackPlugId = model.JackPlugId;
+                    findProduct.UpdatedAt = DateTime.Now;
+                    findProduct.Height = model.Height;
+                    findProduct.Weight = model.Weight;
+                    findProduct.Width = model.Width;
+                    findProduct.Length = model.Length;
+                    await _productService.UpdateProduct(id, findProduct);
+                    await _unitOfWork.SaveChangesAsync();
+                    List<CreateProductSampleRequest> colors =
+                       JsonConvert.DeserializeObject<List<CreateProductSampleRequest>>(model.ColorProducts);
+
+
+                    if (model.ProductVersionId != null)
+                    {
+                        ProductVersion productVersion = await _productVersionService.GetProductVersionById(model.ProductVersionId);
+                        if (productVersion != null)
+                        {
+                            productVersion.PriceOut = model.PriceOut;
+                            productVersion.PriceIn = model.PriceIn;
+                            await _productVersionService.UpdateProductVersion(productVersion.Id, productVersion);
+                            await _unitOfWork.SaveChangesAsync();
+                        }
+                    }
+                    else
+                    {
+                        ProductVersion productVersion = new ProductVersion
+                        {
+                            ProductId = findProduct.Id,
+                            PriceIn = model.PriceIn,
+                            PriceOut = model.PriceOut,
+                        };
+
+                        await _productVersionService.CreateProductVersion(productVersion);
+                        await _unitOfWork.SaveChangesAsync();
+                        List<ProductColorProduct> productColorProducts = findProduct.ProductColorProducts.ToList();
+                        foreach (var item1 in productColorProducts)
+                        {
+                            ProductSample productSample = new ProductSample
+                            {
+                                ColorProductId = item1.ColorProductId,
+                                ProductVersionId = productVersion.Id,
+                                Quantity = 0,
+                                Disabled = true,
+                            };
+
+                            await _productSampleService.CreateProductSample(productSample);
+                            await _unitOfWork.SaveChangesAsync();
+                        }
+                    }
+
                     List<ProductVersion> productVersions = findProduct.ProductVersions.ToList();
                     foreach (var item in findProduct.ProductColorProducts.ToList())
                     {
@@ -623,6 +966,7 @@ namespace BackendAPI.Controllers
             {
 
                 var chipTypes = await _productService.GetAllChipTypes();
+
                 return Ok(new Response
                 {
                     Data = chipTypes,
@@ -645,9 +989,10 @@ namespace BackendAPI.Controllers
             {
 
                 var chips = await _productService.GetAllChips();
+                var data = _mapper.Map<List<AdminChipModel>>(chips);
                 return Ok(new Response
                 {
-                    Data = chips,
+                    Data = data,
                     Success = true,
                 });
             }
@@ -688,10 +1033,11 @@ namespace BackendAPI.Controllers
             try
             {
 
-                var chips = await _productService.GetAllOpertingSystems();
+                var operatingSystemProducts = await _productService.GetAllOpertingSystems();
+                var data = _mapper.Map<List<AdminOperatingSystemProductModel>>(operatingSystemProducts);
                 return Ok(new Response
                 {
-                    Data = chips,
+                    Data = data,
                     Success = true,
                 });
             }
@@ -714,6 +1060,52 @@ namespace BackendAPI.Controllers
                 return Ok(new Response
                 {
                     Data = chips,
+                    Success = true,
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpGet("get-all-charge-ports")]
+
+        public async Task<IActionResult> GetAllChargePorts()
+        {
+            try
+            {
+
+                var rams = await _productService.GetAllChargePorts();
+                return Ok(new Response
+                {
+                    Data = rams,
+                    Success = true,
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpGet("get-all-jack-plugs")]
+
+        public async Task<IActionResult> GetAllJackPlugs()
+        {
+            try
+            {
+
+                var rams = await _productService.GetAllJackPlugs();
+                return Ok(new Response
+                {
+                    Data = rams,
                     Success = true,
                 });
             }

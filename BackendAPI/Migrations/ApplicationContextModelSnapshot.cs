@@ -146,6 +146,24 @@ namespace BackendAPI.Migrations
                     b.ToTable("Brand");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ChargerPort", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChargerPort");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Chip", b =>
                 {
                     b.Property<int>("Id")
@@ -235,6 +253,24 @@ namespace BackendAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("FeedbackReviewProduct");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.JackPlug", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JackPlug");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.LikeReviewProduct", b =>
@@ -411,6 +447,9 @@ namespace BackendAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsShockDeal")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -507,10 +546,13 @@ namespace BackendAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("Battery")
+                    b.Property<int?>("Battery")
                         .HasColumnType("int");
 
                     b.Property<int?>("BrandId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ChargerPortId")
                         .HasColumnType("int");
 
                     b.Property<int?>("Charging")
@@ -526,8 +568,10 @@ namespace BackendAPI.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FrontCamera")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("HeadPhoneTime")
+                        .HasColumnType("int");
 
                     b.Property<int?>("Height")
                         .HasColumnType("int");
@@ -543,6 +587,9 @@ namespace BackendAPI.Migrations
                     b.Property<bool>("IsVersionRam")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("JackPlugId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("Length")
                         .HasColumnType("int");
 
@@ -553,25 +600,25 @@ namespace BackendAPI.Migrations
                     b.Property<int?>("OperatingSystemProductId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ProductCategoryCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<string>("RearCamera")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Resolution")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ScreenTechnologyId")
                         .HasColumnType("int");
 
-                    b.Property<double>("ScreenWidth")
+                    b.Property<double?>("ScreenWidth")
                         .HasColumnType("float");
 
                     b.Property<string>("Sim")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -590,7 +637,11 @@ namespace BackendAPI.Migrations
 
                     b.HasIndex("BrandId");
 
+                    b.HasIndex("ChargerPortId");
+
                     b.HasIndex("ChipId");
+
+                    b.HasIndex("JackPlugId");
 
                     b.HasIndex("OperatingSystemProductId");
 
@@ -599,6 +650,29 @@ namespace BackendAPI.Migrations
                     b.HasIndex("WareHouseId");
 
                     b.ToTable("Product");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ProductCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductCategory");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.ProductColorProduct", b =>
@@ -945,6 +1019,63 @@ namespace BackendAPI.Migrations
                     b.ToTable("ScreenTechnology");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ShockDeal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Disabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShockDeal");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ShockDealDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("MainProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ShockDealId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("ShockDealPrice")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("ShockDealProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MainProductId");
+
+                    b.HasIndex("ShockDealId");
+
+                    b.HasIndex("ShockDealProductId");
+
+                    b.ToTable("ShockDealDetail");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Supplier", b =>
                 {
                     b.Property<int>("Id")
@@ -1246,9 +1377,17 @@ namespace BackendAPI.Migrations
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("BackendAPI.Data.ChargerPort", "ChargerPort")
+                        .WithMany("Products")
+                        .HasForeignKey("ChargerPortId");
+
                     b.HasOne("BackendAPI.Data.Chip", "Chip")
                         .WithMany("Products")
                         .HasForeignKey("ChipId");
+
+                    b.HasOne("BackendAPI.Data.JackPlug", "JackPlug")
+                        .WithMany("Products")
+                        .HasForeignKey("JackPlugId");
 
                     b.HasOne("BackendAPI.Data.OperatingSystemProduct", "OperatingSystemProduct")
                         .WithMany("Products")
@@ -1265,7 +1404,11 @@ namespace BackendAPI.Migrations
 
                     b.Navigation("Brand");
 
+                    b.Navigation("ChargerPort");
+
                     b.Navigation("Chip");
+
+                    b.Navigation("JackPlug");
 
                     b.Navigation("OperatingSystemProduct");
 
@@ -1410,6 +1553,27 @@ namespace BackendAPI.Migrations
                     b.Navigation("ReviewProduct");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ShockDealDetail", b =>
+                {
+                    b.HasOne("BackendAPI.Data.Product", "MainProduct")
+                        .WithMany()
+                        .HasForeignKey("MainProductId");
+
+                    b.HasOne("BackendAPI.Data.ShockDeal", "ShockDeal")
+                        .WithMany("ShockDealDetails")
+                        .HasForeignKey("ShockDealId");
+
+                    b.HasOne("BackendAPI.Data.Product", "ProductShockDeal")
+                        .WithMany()
+                        .HasForeignKey("ShockDealProductId");
+
+                    b.Navigation("MainProduct");
+
+                    b.Navigation("ProductShockDeal");
+
+                    b.Navigation("ShockDeal");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1479,6 +1643,11 @@ namespace BackendAPI.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("BackendAPI.Data.ChargerPort", b =>
+                {
+                    b.Navigation("Products");
+                });
+
             modelBuilder.Entity("BackendAPI.Data.Chip", b =>
                 {
                     b.Navigation("Products");
@@ -1492,6 +1661,11 @@ namespace BackendAPI.Migrations
             modelBuilder.Entity("BackendAPI.Data.ColorProduct", b =>
                 {
                     b.Navigation("ProductSamples");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.JackPlug", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.OperatingSystemProduct", b =>
@@ -1582,6 +1756,11 @@ namespace BackendAPI.Migrations
             modelBuilder.Entity("BackendAPI.Data.ScreenTechnology", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BackendAPI.Data.ShockDeal", b =>
+                {
+                    b.Navigation("ShockDealDetails");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Supplier", b =>
