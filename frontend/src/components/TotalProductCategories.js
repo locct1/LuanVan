@@ -31,7 +31,6 @@ export const data = {
 };
 function TotalProductCategories({ totalListProductCategories }) {
     const [dataProductCategories, setData] = useState();
-    console.log('dsds', totalListProductCategories);
     useEffect(() => {
         let data = {
             labels: [],

@@ -93,7 +93,7 @@ function ShockDealProductModal({ show, onClose, setShockDeal, listShockDeals }) 
         <>
             <Modal show={show} onHide={onClose} dialogClassName="modal-70w">
                 <Modal.Header closeButton className="bg-primary">
-                    <Modal.Title className="font-weight-bold text-light">Sản phẩm chính:</Modal.Title>
+                    <Modal.Title className="font-weight-bold text-light">Sản phẩm mua kèm:</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="row ml-1">

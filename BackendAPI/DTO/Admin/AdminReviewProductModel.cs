@@ -12,7 +12,7 @@ namespace BackendAPI.DTO.Admin
         public int? ProductId { get; set; }
         public ProductReviewProductModel? Product { get; set; }
         public string? UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
+        public bool? IsPositive { get; set; }
         public UserModel? User { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<FeedbackReviewProductModel>? FeedbackReviewProducts { get; set; }

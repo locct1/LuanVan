@@ -41,7 +41,7 @@ function HomeLayout({ children }) {
     useScript(LINK_APP_FRONTEND + 'js/client/owl.carousel.min.js');
     useScript(LINK_APP_FRONTEND + 'js/client/mixitup.min.js');
     useScript(LINK_APP_FRONTEND + 'js/client/main.js');
-    
+
     return (
         <>
             <div className="client-layout">
@@ -49,7 +49,7 @@ function HomeLayout({ children }) {
                 <ClientSideBar />
                 {children}
                 <ClientFooter />
-                <ChatMessageClient/>
+                <ChatMessageClient />
             </div>
         </>
     );

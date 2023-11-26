@@ -5,9 +5,11 @@ using BackendAPI.Helpers;
 using BackendAPI.Interfaces;
 using BackendAPI.Models.ColorProduct;
 using BackendAPI.Models.Order;
+using BackendAPI.Services;
 using BackendAPI.UnitOfWorks;
 using MailKit.Search;
 using Microsoft.AspNetCore.Mvc;
+using System.Transactions;
 
 namespace BackendAPI.Controllers
 {
@@ -18,12 +20,22 @@ namespace BackendAPI.Controllers
         private readonly IOrderService _orderService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IOrderDetailService _orderDetailService;
+        private readonly IProductPurchaseOrderDetailService _productPurchaseOrderDetailService;
+        private readonly IProductSampleService _productSampleService;
+        private readonly IProductColorProductService _productColorProductService;
+        private readonly IPromotionProductDetailService _promotionProductDetailService;
 
-        public OrderController(IOrderService orderService, IUnitOfWork unitOfWork, IMapper mapper)
+        public OrderController(IOrderService orderService, IUnitOfWork unitOfWork, IMapper mapper, IOrderDetailService orderDetailService, IProductPurchaseOrderDetailService productPurchaseOrderDetailService, IProductSampleService productSampleService, IProductColorProductService productColorProductService, IPromotionProductDetailService promotionProductDetailService)
         {
             _orderService = orderService;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _orderDetailService = orderDetailService;
+            _productPurchaseOrderDetailService = productPurchaseOrderDetailService;
+            _productSampleService = productSampleService;
+            _productColorProductService = productColorProductService;
+            _promotionProductDetailService = promotionProductDetailService;
         }
 
         [HttpGet]
@@ -110,36 +122,75 @@ namespace BackendAPI.Controllers
         {
             try
             {
-                Order order = await this._orderService.GetOrderById(id);
-                if (order is null)
+                using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    return BadRequest(new Response
+                    Order order = await this._orderService.Get(id);
+                    if (order is null)
                     {
-                        Success = false,
-                        Errors = new[] { "Không tìm thấy" }
+                        return BadRequest(new Response
+                        {
+                            Success = false,
+                            Errors = new[] { "Không tìm thấy" }
+
+                        });
+                    }
+                    var message = "Cập nhật trạng thái đơn hàng thành công";
+                    order.OrderStatusId = model.OrderStatusId;
+                    if (model.OrderStatusId == 2 && model.OrderCode != null)
+                    {
+                        order.OrderCode = model.OrderCode;
+                        message = "Tạo mã vân đơn thành công";
+                    }
+                    if (model.OrderStatusId == 6)
+                    {
+                        message = "Hủy đơn hàng thành công";
+                        foreach (var item in order.OrderDetails)
+                        {
+                            var productPurchaseDetail = await _productPurchaseOrderDetailService.GetProductPurchaseOrderDetailById(item.ProductPurchaseOrderDetailId);
+
+                            if (productPurchaseDetail != null)
+                            {
+                                productPurchaseDetail.StatusId = 0;
+                                ProductSample productSample = await _productSampleService.GetProductSampleById(productPurchaseDetail.ProductSampleId);
+                                if (productSample.Quantity > 0)
+                                {
+                                    productSample.Quantity = productSample.Quantity + 1;
+                                    productSample.SoldQuantity = productSample.SoldQuantity - 1;
+                                    await _productSampleService.UpdateProductSample(productSample.Id, productSample);
+
+                                }
+                                await _productPurchaseOrderDetailService.UpdateProductPurchaseOrderDetail(productPurchaseDetail.Id, productPurchaseDetail);
+
+                            }
+                            if (item != null && item.PromotionProductDetailId != null)
+                            {
+                                var promotionProductDetail = await _promotionProductDetailService.GetPromotionProductDetailById(item.PromotionProductDetailId.Value);
+                                // Tiếp tục xử lý promotionProductDetail
+                                if (promotionProductDetail != null && promotionProductDetail.Quantity > 0)
+                                {
+                                    promotionProductDetail.Quantity = promotionProductDetail.Quantity - 1;
+                                    await _promotionProductDetailService.UpdatePromotionProductDetail(promotionProductDetail.Id, promotionProductDetail);
+
+                                }
+                            }
+                            await _unitOfWork.SaveChangesAsync();
+
+                        }
+
+
+                    }
+                    order.UpdatedAt = DateTime.Now;
+                    await _orderService.UpdateOrder(order.Id, order);
+                    await _unitOfWork.SaveChangesAsync();
+                    scope.Complete();
+
+                    return Ok(new Response
+                    {
+                        Success = true,
+                        Message = message
 
                     });
                 }
-                var message = "Cập nhật trạng thái đơn hàng thành công";
-                order.OrderStatusId = model.OrderStatusId;
-                if (model.OrderStatusId == 2 && model.OrderCode != null)
-                {
-                    order.OrderCode = model.OrderCode;
-                    message = "Tạo mã vân đơn thành công";
-                }
-                if (model.OrderStatusId == 6 && model.OrderCode != null)
-                {
-                    message = "Hủy đơn hàng thành công";
-                }
-                order.UpdatedAt = DateTime.Now;
-                await _orderService.UpdateOrder(order.Id, order);
-                await _unitOfWork.SaveChangesAsync();
-                return Ok(new Response
-                {
-                    Success = true,
-                    Message = message
-
-                });
             }
             catch (Exception)
             {

@@ -75,3 +75,6 @@ export const deleteReviewProduct = async (id) => {
 export const requestCancelOrderClient = async (data) => {
     return await apiClient.put(`${END_POINT.PAGES}/request-cancel-order-client/${data.orderId}`, data);
 };
+export const requestConfirmReceivedOrderClient = async (data) => {
+    return await apiClient.put(`${END_POINT.PAGES}/request-confirm-received-client/${data.orderId}`, data);
+};

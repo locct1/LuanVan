@@ -19,5 +19,9 @@ namespace BackendAPI.Data
         public int ProductPurchaseOrderDetailId { get; set; }
         public ProductPurchaseOrderDetail ProductPurchaseOrderDetail { get; set; }
         public double PriceOut { get; set; }
+        [ForeignKey(nameof(PromotionProductDetailId))]
+        public int? PromotionProductDetailId { get; set; }
+        public PromotionProductDetail? PromotionProductDetail { get; set; }
+
     }
 }

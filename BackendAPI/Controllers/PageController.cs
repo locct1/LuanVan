@@ -41,10 +41,11 @@ namespace BackendAPI.Controllers
         private readonly ILikeReviewProductService _likeReviewProductService;
         private readonly IColorProductService _colorProductService;
         private readonly IProductColorProductService _productColorProductService;
+        private readonly IPromotionProductDetailService _promotionProductDetailService;
         private readonly IEmailSender _emailSender;
         private readonly IMapper _mapper;
 
-        public PageController(IPageService pageService, IPaymentMethodService paymentMethodService, IRecipientService recipientService, IOrderDetailService orderDetailService, IProductPurchaseOrderDetailService productPurchaseOrderDetailService, IOrderService orderService, IUnitOfWork unitOfWork, IGetValueToken getValueToken, IProductSampleService productSampleService, IReviewProductService reviewProductService, IReviewProductPhotoService reviewProductPhotoService, ILikeReviewProductService likeReviewProductService, IColorProductService colorProductService, IProductColorProductService productColorProductService, IEmailSender emailSender, IMapper mapper)
+        public PageController(IPageService pageService, IPaymentMethodService paymentMethodService, IRecipientService recipientService, IOrderDetailService orderDetailService, IProductPurchaseOrderDetailService productPurchaseOrderDetailService, IOrderService orderService, IUnitOfWork unitOfWork, IGetValueToken getValueToken, IProductSampleService productSampleService, IReviewProductService reviewProductService, IReviewProductPhotoService reviewProductPhotoService, ILikeReviewProductService likeReviewProductService, IColorProductService colorProductService, IProductColorProductService productColorProductService, IPromotionProductDetailService promotionProductDetailService, IEmailSender emailSender, IMapper mapper)
         {
             _pageService = pageService;
             _paymentMethodService = paymentMethodService;
@@ -60,6 +61,7 @@ namespace BackendAPI.Controllers
             _likeReviewProductService = likeReviewProductService;
             _colorProductService = colorProductService;
             _productColorProductService = productColorProductService;
+            _promotionProductDetailService = promotionProductDetailService;
             _emailSender = emailSender;
             _mapper = mapper;
         }
@@ -398,7 +400,7 @@ namespace BackendAPI.Controllers
                     await _unitOfWork.SaveChangesAsync();
                     var order = new Order
                     {
-                        Total = model.Order.Total,
+                        Total = model.Total,
                         PaymentMethodId = model.PaymentMethodId,
                         CreatedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,
@@ -428,11 +430,40 @@ namespace BackendAPI.Controllers
                     //}
                     await _orderService.CreateOrder(order);
                     await _unitOfWork.SaveChangesAsync();
+                    var promotionProducts = await _pageService.GetAllPromotionProducts();
+                    var currentDate = DateTime.Now;
+
+                    // Lọc danh sách sản phẩm dựa trên ngày hiện tại
+                    var filteredPromotionProducts = promotionProducts
+                        .Where(product => currentDate >= product.StartDate && currentDate <= product.EndDate)
+                        .ToList();
                     foreach (var item in model.Order.ListProducts)
                     {
                         var productSample = await _productSampleService.GetProductSampleById(item.Id);
                         productSample.Quantity = productSample.Quantity - item.QuantityCart;
+                        productSample.SoldQuantity = productSample.SoldQuantity + item.QuantityCart;
                         await _productSampleService.UpdateProductSample(productSample.Id, productSample);
+                        var promotionProductDetail = new PromotionProductDetail();
+                        bool foundMatch = false;
+                        foreach (var item1 in filteredPromotionProducts)
+                        {
+                            foreach (var item2 in item1.PromotionProductDetails)
+                            {
+                                if (item2.ProductVersionId == productSample.ProductVersionId && item2.ColorProductId == productSample.ColorProductId)
+                                {
+                                    item2.Quantity = item2.Quantity + item.QuantityCart;
+                                    promotionProductDetail = item2;
+                                    await _promotionProductDetailService.UpdatePromotionProductDetail(item2.Id, item2);
+                                    foundMatch = true;
+                                    break; // Kết thúc vòng lặp nội bộ
+                                }
+                            }
+
+                            if (foundMatch)
+                            {
+                                break; // Kết thúc vòng lặp bên ngoài
+                            }
+                        }
                         await _unitOfWork.SaveChangesAsync();
                         for (int i = 0; i < item.QuantityCart; i++)
                         {
@@ -440,7 +471,7 @@ namespace BackendAPI.Controllers
                             if (productPurchaseDetail != null)
                             {
                                 productPurchaseDetail.StatusId = 1;
-                                _productPurchaseOrderDetailService.UpdateProductPurchaseOrderDetail(productPurchaseDetail.Id, productPurchaseDetail);
+                                await _productPurchaseOrderDetailService.UpdateProductPurchaseOrderDetail(productPurchaseDetail.Id, productPurchaseDetail);
                                 string productName = "";
                                 if (item.ProductVersion.Ram != null && item.ProductVersion.Ram != null)
                                 {
@@ -453,6 +484,7 @@ namespace BackendAPI.Controllers
                                     PriceOut = item.DiscountedPrice ?? item.PriceOut,
                                     OrderId = order.Id,
                                     ProductPurchaseOrderDetailId = productPurchaseDetail.Id,
+                                    PromotionProductDetailId = promotionProductDetail.Id == 0 ? null : promotionProductDetail.Id,
                                     IsShockDeal = false,
                                 };
                                 _orderDetailService.CreateOrderDetail(OrderDetail);
@@ -505,7 +537,7 @@ namespace BackendAPI.Controllers
                                 <div  style='color: #000000;'><b>Email: </b>{model.InfoRecipient.Email}</div>
                                 <div  style='color: #000000;'><b>Số điện thoại: </b>{model.InfoRecipient.PhoneNumber}</div>
                                 <div  style='color: #000000;'><b>Địa chỉ:</b> {model.InfoRecipient.Address}</div>
-                                <div  style='color: #000000;'><b>Tổng tiền:</b> {model.Order.Total.ToString("N0")}đ</div>
+                                <div  style='color: #000000;'><b>Tổng tiền:</b> {model.Total.ToString("N0")}đ</div>
                                 ";
 
                     // Thêm bảng sản phẩm
@@ -518,7 +550,7 @@ namespace BackendAPI.Controllers
                     foreach (var product in model.Order.ListProducts)
                     {
                         string productName = "";
-                        if (product.ProductVersion.Ram != null && product.ProductVersion.Ram != null)
+                        if (product.ProductVersion.Ram != null && product.ProductVersion.Rom != null)
                         {
                             productName = product.ProductVersion.Ram.Name + "GB" + "-" + product.ProductVersion.Rom.Name + "GB";
                         }
@@ -535,27 +567,31 @@ namespace BackendAPI.Controllers
                     emailBody += "</table>";
 
                     // Thêm thông tin sản phẩm từ listShockDeals vào một bảng riêng
-                    emailBody += "<h3>Sản phẩm Shock Deal trong đơn hàng:</h3>";
-                    emailBody += "<table style='font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;'>";
-                    emailBody += "<tr><th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #000000; color: white;'>Tên sản phẩm Shock Deal</th>";
-                    emailBody += "<th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #000000; color: white;'>Giá</th>";
-                    emailBody += "<th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #000000; color: white;'>Số lượng</th></tr>";
 
-                    foreach (var shockDeal in model.Order.ListShockDeals)
+                    if (model.Order.ListShockDeals.Count > 0)
                     {
-                        var productSamples = await _productSampleService.GetAllProductSamplesByProductVersion(shockDeal.ProductVersionId);
-                        var firstProductSampleWithPositiveQuantity = productSamples.FirstOrDefault(ps => ps.Quantity > 0);
-                        firstProductSampleWithPositiveQuantity.Quantity = firstProductSampleWithPositiveQuantity.Quantity - shockDeal.QuantityCart;
-                        int colorProductId = firstProductSampleWithPositiveQuantity.ColorProductId.Value;
-                        ColorProduct colorProduct = await _colorProductService.GetColorProductById(colorProductId);
-                        string formattedShockDealPrice = shockDeal.ShockDealPrice.ToString("N0");
-                        string productName = $"<span style='color: red;'>[Deal sốc]</span> {shockDeal.ProductName} ({colorProduct.Name})";
-                        emailBody += $"<tr><td style='border: 1px solid #ddd; padding: 8px; text-align: left; color: #000000;'>{productName}</td>";
-                        emailBody += $"<td style='border: 1px solid #ddd; padding: 8px; text-align: left; color: #000000;'>{formattedShockDealPrice}đ</td>";
-                        emailBody += $"<td style='border: 1px solid #ddd; padding: 8px; text-align: left; color: #000000;'>{shockDeal.QuantityCart}</td></tr>";
+                        emailBody += "<h3>Sản phẩm Deal sốc trong đơn hàng:</h3>";
+                        emailBody += "<table style='font-family: Arial, Helvetica, sans-serif; border-collapse: collapse; width: 100%;'>";
+                        emailBody += "<tr><th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #000000; color: white;'>Tên sản phẩm Shock Deal</th>";
+                        emailBody += "<th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #000000; color: white;'>Giá</th>";
+                        emailBody += "<th style='border: 1px solid #ddd; padding: 8px; text-align: left; background-color: #000000; color: white;'>Số lượng</th></tr>";
+                        foreach (var shockDeal in model.Order.ListShockDeals)
+                        {
+                            var productSamples = await _productSampleService.GetAllProductSamplesByProductVersion(shockDeal.ProductVersionId);
+                            var firstProductSampleWithPositiveQuantity = productSamples.FirstOrDefault(ps => ps.Quantity > 0);
+                            //firstProductSampleWithPositiveQuantity.Quantity = firstProductSampleWithPositiveQuantity.Quantity - shockDeal.QuantityCart;
+                            int colorProductId = firstProductSampleWithPositiveQuantity.ColorProductId.Value;
+                            ColorProduct colorProduct = await _colorProductService.GetColorProductById(colorProductId);
+                            string formattedShockDealPrice = shockDeal.ShockDealPrice.ToString("N0");
+                            string productName = $"<span style='color: red;'>[Deal sốc]</span> {shockDeal.ProductName} ({colorProduct.Name})";
+                            emailBody += $"<tr><td style='border: 1px solid #ddd; padding: 8px; text-align: left; color: #000000;'>{productName}</td>";
+                            emailBody += $"<td style='border: 1px solid #ddd; padding: 8px; text-align: left; color: #000000;'>{formattedShockDealPrice}đ</td>";
+                            emailBody += $"<td style='border: 1px solid #ddd; padding: 8px; text-align: left; color: #000000;'>{shockDeal.QuantityCart}</td></tr>";
+                        }
+
+                        emailBody += "</table>";
                     }
 
-                    emailBody += "</table>";
 
                     emailBody += "<div style='color: #000000;'>Xin chân thành cảm ơn!</div>";
 
@@ -752,6 +788,7 @@ namespace BackendAPI.Controllers
                         Rating = model.Rating,
                         CommentContent = model.CommentContent,
                         CreatedAt = DateTime.Now,
+                        IsPositive=model.IsPositive,
 
                     };
                     await _reviewProductService.CreateReviewProduct(reviewProduct);
@@ -944,6 +981,42 @@ namespace BackendAPI.Controllers
                 {
                     Success = true,
                     Message = "Yêu cầu hủy đơn hàng thành công"
+
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Success = false,
+                    Errors = new[] { "Đã có lỗi xảy ra, vui lòng thử lại sau" }
+                });
+            }
+        }
+        [HttpPut("request-confirm-received-client/{id}")]
+        [Authorize]
+        public async Task<IActionResult> RequestConfirmReceivedOrderClient(int id, UpdateOrderStatusRequest model)
+        {
+            try
+            {
+                Order order = await this._orderService.GetOrderById(id);
+                if (order is null)
+                {
+                    return BadRequest(new Response
+                    {
+                        Success = false,
+                        Errors = new[] { "Không tìm thấy" }
+
+                    });
+                }
+                order.OrderStatusId = 4;
+                order.UpdatedAt = DateTime.Now;
+                await _orderService.UpdateOrder(order.Id, order);
+                await _unitOfWork.SaveChangesAsync();
+                return Ok(new Response
+                {
+                    Success = true,
+                    Message = "Xác nhận đã nhận hàng thành công"
 
                 });
             }

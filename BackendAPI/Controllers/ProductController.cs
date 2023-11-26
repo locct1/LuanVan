@@ -192,6 +192,7 @@ namespace BackendAPI.Controllers
                         CreatedAt = DateTime.Now,
                         UpdatedAt = DateTime.Now,
                         Disabled = false,
+                        ProductCategoryCode="DIENTHOAI"
                     };
                     await _productService.CreateProduct(product);
                     await _unitOfWork.SaveChangesAsync();

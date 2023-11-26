@@ -15,7 +15,7 @@ namespace BackendAPI.Services
         }
         public async Task<IEnumerable<PromotionProduct>> GetAll()
         {
-            return await _unitOfWork.GetRepository<PromotionProduct>().GetAll(orderBy: x => x.OrderByDescending(x => x.Id));
+            return await _unitOfWork.GetRepository<PromotionProduct>().GetAll(include: p => p.Include(p => p.PromotionProductDetails),orderBy: x => x.OrderByDescending(x => x.Id));
         }
         public async Task<IEnumerable<PromotionProduct>> GetPagedList(int page, int limit)
         {

@@ -18,6 +18,7 @@ import SaleReportDay from '~/components/SaleReportDay';
 import { useDashBoardsData } from '~/hooks/react-query/dashboardData';
 import LoadingAdmin from '~/components/LoadingAdmin';
 import TotalProductCategories from '~/components/TotalProductCategories';
+import PromotionProductDetailModal from '~/components/PromotionProductDetailModal';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend);
 export const options = {
     responsive: true,
@@ -95,6 +96,14 @@ export const data = {
 };
 function DashBoard() {
     const { isLoading, data, isError, error } = useDashBoardsData();
+    const [show, setShow] = useState(false);
+    const [promotionProduct, setPromotionProduct] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const handleGetPromotionProduct = async (promotionProduct) => {
+        setPromotionProduct(promotionProduct);
+        handleShow();
+    };
     if (isLoading) {
         <LoadingAdmin />;
     }
@@ -105,6 +114,9 @@ function DashBoard() {
                     <h4 className="font-weight-bold">Tổng quan</h4>
                 </div>
             </div>
+            {promotionProduct && (
+                <PromotionProductDetailModal show={show} onClose={handleClose} promotionProduct={promotionProduct} />
+            )}
             <div className="row">
                 <div className="col-xl-3 col-md-6 mb-4">
                     <div className="card border-left-primary shadow h-100 py-2">
@@ -123,11 +135,11 @@ function DashBoard() {
                     </div>
                 </div>
                 <div className="col-xl-3 col-md-6 mb-4">
-                    <div className="card border-left-primary shadow h-100 py-2">
+                    <div className="card border-left-secondary shadow h-100 py-2">
                         <div className="card-body">
                             <div className="row no-gutters align-items-center">
                                 <div className="col mr-2">
-                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    <div className="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                         Tổng số nhà cung cấp
                                     </div>
                                     <div className="h5 mb-0 font-weight-bold text-gray-800">
@@ -139,11 +151,11 @@ function DashBoard() {
                     </div>
                 </div>
                 <div className="col-xl-3 col-md-6 mb-4">
-                    <div className="card border-left-primary shadow h-100 py-2">
+                    <div className="card border-left-success shadow h-100 py-2">
                         <div className="card-body">
                             <div className="row no-gutters align-items-center">
                                 <div className="col mr-2">
-                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    <div className="text-xs font-weight-bold text-success text-uppercase mb-1">
                                         Tổng số thương hiệu
                                     </div>
                                     <div className="h5 mb-0 font-weight-bold text-gray-800">
@@ -155,11 +167,11 @@ function DashBoard() {
                     </div>
                 </div>
                 <div className="col-xl-3 col-md-6 mb-4">
-                    <div className="card border-left-primary shadow h-100 py-2">
+                    <div className="card border-left-danger shadow h-100 py-2">
                         <div className="card-body">
                             <div className="row no-gutters align-items-center">
                                 <div className="col mr-2">
-                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    <div className="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                         Tổng số loại
                                     </div>
                                     <div className="h5 mb-0 font-weight-bold text-gray-800">
@@ -172,11 +184,11 @@ function DashBoard() {
                     </div>
                 </div>
                 <div className="col-xl-3 col-md-6 mb-4">
-                    <div className="card border-left-primary shadow h-100 py-2">
+                    <div className="card border-left-warning shadow h-100 py-2">
                         <div className="card-body">
                             <div className="row no-gutters align-items-center">
                                 <div className="col mr-2">
-                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    <div className="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                         Tổng số màu sắc
                                     </div>
                                     <div className="h5 mb-0 font-weight-bold text-gray-800">
@@ -188,11 +200,11 @@ function DashBoard() {
                     </div>
                 </div>
                 <div className="col-xl-3 col-md-6 mb-4">
-                    <div className="card border-left-primary shadow h-100 py-2">
+                    <div className="card border-left-info shadow h-100 py-2">
                         <div className="card-body">
                             <div className="row no-gutters align-items-center">
                                 <div className="col mr-2">
-                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    <div className="text-xs font-weight-bold text-info text-uppercase mb-1">
                                         Tổng số điện thoại
                                     </div>
                                     <div className="h5 mb-0 font-weight-bold text-gray-800">
@@ -204,11 +216,11 @@ function DashBoard() {
                     </div>
                 </div>
                 <div className="col-xl-3 col-md-6 mb-4">
-                    <div className="card border-left-primary shadow h-100 py-2">
+                    <div className="card border-left-dark shadow h-100 py-2">
                         <div className="card-body">
                             <div className="row no-gutters align-items-center">
                                 <div className="col mr-2">
-                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    <div className="text-xs font-weight-bold text-dark text-uppercase mb-1">
                                         Tổng số phụ kiện
                                     </div>
                                     <div className="h5 mb-0 font-weight-bold text-gray-800">
@@ -220,11 +232,11 @@ function DashBoard() {
                     </div>
                 </div>
                 <div className="col-xl-3 col-md-6 mb-4">
-                    <div className="card border-left-primary shadow h-100 py-2">
+                    <div className="card border-left-danger shadow h-100 py-2">
                         <div className="card-body">
                             <div className="row no-gutters align-items-center">
                                 <div className="col mr-2">
-                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    <div className="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                         Tổng số mẫu sản phẩm
                                     </div>
                                     <div className="h5 mb-0 font-weight-bold text-gray-800">
@@ -254,12 +266,13 @@ function DashBoard() {
                         </div>
                     </div>
                 </div>
+
                 <div className="col-xl-3 col-md-6 mb-4">
-                    <div className="card border-left-primary shadow h-100 py-2">
+                    <div className="card border-left-secondary shadow h-100 py-2">
                         <div className="card-body">
                             <div className="row no-gutters align-items-center">
                                 <div className="col mr-2">
-                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    <div className="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                         Tổng số mẫu phụ kiện
                                     </div>
                                     <div className="h5 mb-0 font-weight-bold text-gray-800">
@@ -297,16 +310,136 @@ function DashBoard() {
                     <TotalProductCategories totalListProductCategories={data?.data.totalProductSamplesByWareHouses} />
                 </div>
             </div>
-            <div className="row d-flex justify-content-center">
+            <div className="row mb-2 mt-4">
+                <div className="col-12">
+                    <h4 className="font-weight-bold">Thống kê tổng doanh số</h4>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-primary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng giá trị phiếu nhập
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.totalOfProductPurchaseOrders
+                                            ? String(data?.data.totalOfProductPurchaseOrders).replace(
+                                                  /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                  '$1,',
+                                              )
+                                            : 0}
+                                        <sup>đ</sup>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-secondary shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                        Tổng giá trị đơn hàng
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.totalOfOrders
+                                            ? String(data?.data.totalOfOrders).replace(
+                                                  /(\d)(?=(\d\d\d)+(?!\d))/g,
+                                                  '$1,',
+                                              )
+                                            : 0}
+                                        <sup>đ</sup>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-info shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Tổng đơn hàng hoàn thành
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfOrdersCompleted}/{data?.data.amountOfOrders}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-xl-3 col-md-6 mb-4">
+                    <div className="card border-left-danger shadow h-100 py-2">
+                        <div className="card-body">
+                            <div className="row no-gutters align-items-center">
+                                <div className="col mr-2">
+                                    <div className="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                        Tổng đơn hàng bị hủy
+                                    </div>
+                                    <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                        {data?.data.amountOfOrdersCanceled}/{data?.data.amountOfOrders}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="row mb-2 mt-4">
+                <div className="col-12">
+                    <h4 className="font-weight-bold">Thống kê doanh số đợt khuyến mãi gần nhất</h4>
+                </div>
+            </div>
+            <div className="row">
+                {data && data.data && data.data.listPromotionProducts.length > 0 ? (
+                    data.data.listPromotionProducts.map((item, index) => {
+                        const totalValue = item.promotionProductDetails.reduce((acc, detail) => {
+                            return acc + detail.discountedPrice * detail.quantity;
+                        }, 0);
+                        return (
+                            <div
+                                className="col-xl-3 col-md-6 mb-4"
+                                key={index}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => handleGetPromotionProduct(item)}
+                            >
+                                <div className="card border-left-primary shadow h-100 py-2">
+                                    <div className="card-body">
+                                        <div className="row no-gutters align-items-center">
+                                            <div className="col mr-2">
+                                                <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                    {item.name}
+                                                </div>
+                                                <div className="h5 mb-0 font-weight-bold text-gray-800">
+                                                    {String(totalValue).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}
+                                                    <sup>đ</sup>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <></>
+                )}
+            </div>
+            {/* <div className="row d-flex justify-content-center">
                 <div className="col-8">
                     <SaleReportMonth />
                 </div>
-            </div>
-            <div className="row mt-5 d-flex justify-content-center">
-                <div className="col-8">
-                    <SaleReportDay />
-                </div>
-            </div>
+            </div> */}
+
+            <SaleReportDay />
         </div>
     );
 }

@@ -101,9 +101,7 @@ function ConfirmOrder() {
                     });
                 });
                 const listFilterShockDeal = listShockDeals.filter(
-                    (x) =>
-                        x.shockDealId === listShockDeals[0].shockDealId &&
-                        x.mainProductId === productSample.productVersion.productId,
+                    (x) => x.mainProductId === productSample.productVersion.productId,
                 );
                 let newList = cart.listShockDeals.filter((item) => item.productMainId === productSample.id);
                 newList = newList.map((productShockDeal) => {
@@ -150,6 +148,8 @@ function ConfirmOrder() {
                 const { shockDealPrice, quantityCart } = product;
                 if (quantityCart === 0) {
                     dispatch(CartSlice.actions.deleteShockDeal(product));
+                } else {
+                    totalCartValue += shockDealPrice * quantityCart;
                 }
             });
         }
@@ -331,6 +331,7 @@ function ConfirmOrder() {
         let dataCreateCart = {
             infoRecipient: UpdateInfoClient,
             order: cart,
+            total: total,
             paymentMethodId: checkedMethodPayment,
             note: data.note,
             height:

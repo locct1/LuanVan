@@ -463,11 +463,16 @@ namespace BackendAPI.Migrations
                     b.Property<int>("ProductPurchaseOrderDetailId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PromotionProductDetailId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductPurchaseOrderDetailId");
+
+                    b.HasIndex("PromotionProductDetailId");
 
                     b.ToTable("OrderDetail");
                 });
@@ -791,6 +796,9 @@ namespace BackendAPI.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<int>("SoldQuantity")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ColorProductId");
@@ -868,6 +876,9 @@ namespace BackendAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("ColorProductId")
+                        .HasColumnType("int");
+
                     b.Property<double>("DiscountedPrice")
                         .HasColumnType("float");
 
@@ -877,7 +888,12 @@ namespace BackendAPI.Migrations
                     b.Property<int?>("PromotionProductId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ColorProductId");
 
                     b.HasIndex("ProductVersionId");
 
@@ -945,6 +961,9 @@ namespace BackendAPI.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsPositive")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
@@ -1346,9 +1365,15 @@ namespace BackendAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BackendAPI.Data.PromotionProductDetail", "PromotionProductDetail")
+                        .WithMany()
+                        .HasForeignKey("PromotionProductDetailId");
+
                     b.Navigation("Order");
 
                     b.Navigation("ProductPurchaseOrderDetail");
+
+                    b.Navigation("PromotionProductDetail");
                 });
 
             modelBuilder.Entity("BackendAPI.Data.Photo", b =>
@@ -1515,6 +1540,10 @@ namespace BackendAPI.Migrations
 
             modelBuilder.Entity("BackendAPI.Data.PromotionProductDetail", b =>
                 {
+                    b.HasOne("BackendAPI.Data.ColorProduct", "ColorProduct")
+                        .WithMany()
+                        .HasForeignKey("ColorProductId");
+
                     b.HasOne("BackendAPI.Data.ProductVersion", "ProductVersion")
                         .WithMany("PromotionProductDetails")
                         .HasForeignKey("ProductVersionId")
@@ -1523,6 +1552,8 @@ namespace BackendAPI.Migrations
                     b.HasOne("BackendAPI.Data.PromotionProduct", "PromotionProduct")
                         .WithMany("PromotionProductDetails")
                         .HasForeignKey("PromotionProductId");
+
+                    b.Navigation("ColorProduct");
 
                     b.Navigation("ProductVersion");
 

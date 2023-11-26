@@ -17,5 +17,6 @@ namespace BackendAPI.Data
         public int? ColorProductId { get; set; }
         public bool Disabled { get; set; }
         public List<Photo> Photos { get; set; }
+        public int SoldQuantity { get; set; }
     }
 }

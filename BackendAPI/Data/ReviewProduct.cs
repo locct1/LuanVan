@@ -17,6 +17,7 @@ namespace BackendAPI.Data
         public string? UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public ApplicationUser? User { get; set; }
+        public bool IsPositive { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<FeedbackReviewProduct>? FeedbackReviewProducts { get; set; }
         public List<LikeReviewProduct>? LikeReviewProducts { get; set; }

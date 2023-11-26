@@ -51,7 +51,7 @@ function ProductCardSearch({ product, promotionProductDetails }) {
                                             : 'border border-light-custom text-dark'
                                     } p-1 mr-4 rounded`}
                                     onClick={() => handleChangeProductVersion(item)}
-                                    style={{ fontSize: '1vw', cursor: 'pointer' }}
+                                    style={{ fontSize: '0.8vw', cursor: 'pointer', fontWeight: '700' }}
                                 >
                                     {product.isShowRam === true ? <>{item.ram.name}GB</> : <>{item.rom.name}GB</>}
                                 </div>

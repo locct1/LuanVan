@@ -75,9 +75,7 @@ function Cart() {
                     });
                 });
                 const listFilterShockDeal = listShockDeals.filter(
-                    (x) =>
-                        x.shockDealId === listShockDeals[0].shockDealId &&
-                        x.mainProductId === productSample.productVersion.productId,
+                    (x) => x.mainProductId === productSample.productVersion.productId,
                 );
                 let newList = cart.listShockDeals.filter((item) => item.productMainId === productSample.id);
                 newList = newList.map((productShockDeal) => {

@@ -28,7 +28,7 @@ function ProductCard({ product, promotionProductDetails }) {
     };
     return (
         <>
-            <div className="featured__item ">
+            <div className="featured__item">
                 <div
                     className="featured__item__pic zoom set-bg"
                     data-setbg={LINK_PRODUCT_IMAGE + product.image}

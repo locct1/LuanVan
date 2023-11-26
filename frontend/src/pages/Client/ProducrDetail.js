@@ -1,6 +1,5 @@
 import { forEach } from 'lodash';
 import { useEffect, useState } from 'react';
-import { Carousel } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -20,10 +19,31 @@ import { usePhotosByProductIdData } from '~/hooks/react-query/productsampleData'
 import { useShockDealsData } from '~/hooks/react-query/shockdealData';
 import useScript from '~/hooks/useScript';
 import CartSlice from '~/redux/Slices/CartSlice';
+import Carousel from 'react-multi-carousel';
+import 'react-multi-carousel/lib/styles.css';
+const responsive = {
+    superLargeDesktop: {
+        // the naming can be any, depends on you.
+        breakpoint: { max: 4000, min: 3000 },
+        items: 5,
+    },
+    desktop: {
+        breakpoint: { max: 3000, min: 1024 },
+        items: 4,
+    },
+    tablet: {
+        breakpoint: { max: 1024, min: 464 },
+        items: 2,
+    },
+    mobile: {
+        breakpoint: { max: 464, min: 0 },
+        items: 1,
+    },
+};
 function ProductDetail() {
     // useScript('https://cdn.scaleflex.it/plugins/js-cloudimage-360-view/2.7.1/js-cloudimage-360-view.min.js');
     const [expanded, setExpanded] = useState(false);
-
+    const { isLoading: isLoadingListProducts, data: dataListProducts } = useProductsClientData();
     const toggleExpanded = () => {
         setExpanded(!expanded);
     };
@@ -97,9 +117,9 @@ function ProductDetail() {
                     listShockDeals.push(detail);
                 });
             });
-            const listFilterShockDeal = listShockDeals.filter(
-                (x) => x.shockDealId === listShockDeals[0].shockDealId && x.mainProductId === data.data.id,
-            );
+
+            const listFilterShockDeal = listShockDeals.filter((x) => x.mainProductId === data.data.id);
+
             setListShockDeals(listFilterShockDeal);
             setSelectedListShockDeals(listFilterShockDeal);
         }
@@ -241,6 +261,7 @@ function ProductDetail() {
     };
     if (
         isLoading ||
+        isLoadingListProducts ||
         isLoadingProductSamples ||
         isLoadingPromotionProduct ||
         isLoadingPhotosByProductId ||
@@ -826,11 +847,38 @@ function ProductDetail() {
                                                 </h6>
                                             </div>
                                         </div>
+                                        <hr />
                                     </>
                                 )}
                             </div>
                         </div>
-                        <hr />
+                        <div className="container">
+                            <div className="row mt-3">
+                                <div className="col-12">
+                                    <h4 className="font-weight-bold">Sản phẩm tương tự</h4>
+                                </div>
+                            </div>
+                            <div className="row featured__filter">
+                                <div className="col-12">
+                                    <Carousel responsive={responsive}>
+                                        {dataListProducts && dataListProducts.data.length > 0 ? (
+                                            dataListProducts.data
+                                                ?.filter((product) => product.brandId === data.data.brandId)
+                                                .map((item, index) => (
+                                                    <div className="mt-5" key={item.id}>
+                                                        <ProductCard
+                                                            product={item}
+                                                            promotionProductDetails={promotionProductDetails}
+                                                        />
+                                                    </div>
+                                                ))
+                                        ) : (
+                                            <></>
+                                        )}
+                                    </Carousel>
+                                </div>
+                            </div>
+                        </div>
                         <div className="row">
                             <div className="col-lg-8">
                                 <br />

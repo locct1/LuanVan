@@ -13,6 +13,10 @@ namespace BackendAPI.Data
         public int? ProductVersionId { get; set; }
         [ForeignKey(nameof(ProductVersionId))]
         public ProductVersion? ProductVersion { get; set; }
+        public ColorProduct? ColorProduct { get; set; }
+        [ForeignKey(nameof(ColorProductId))]
+        public int? ColorProductId { get; set; }
         public double DiscountedPrice { get; set; }
+        public int Quantity { get; set; }
     }
 }

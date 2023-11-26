@@ -22,11 +22,19 @@ namespace BackendAPI.Services
         }
         public async Task<PromotionProductDetail?> GetPromotionProductDetailById(int id)
         {
-            return await _unitOfWork.GetRepository<PromotionProductDetail>().GetByID(id);
+
+            var result = await _unitOfWork.GetRepository<PromotionProductDetail>().GetByID(id);
+            if (result == null)
+            {
+                return null;
+            }
+            // Process the result and return it
+            return result;
+
         }
-        public async Task<PromotionProductDetail?> GetPromotionProductDetailByPromotionProductIdAndProductVersionId(int promotionProductId,int productVersionId)
+        public async Task<PromotionProductDetail?> GetPromotionProductDetailByPromotionProductIdAndProductVersionId(int promotionProductId, int productVersionId)
         {
-            return await _unitOfWork.GetRepository<PromotionProductDetail>().Get(filter:x=>x.PromotionProductId==promotionProductId&&x.ProductVersionId==productVersionId);
+            return await _unitOfWork.GetRepository<PromotionProductDetail>().Get(filter: x => x.PromotionProductId == promotionProductId && x.ProductVersionId == productVersionId);
         }
         public async Task CreatePromotionProductDetail(PromotionProductDetail newPromotionProductDetail)
         {

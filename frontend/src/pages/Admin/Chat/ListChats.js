@@ -72,10 +72,11 @@ function ListChats() {
     const rooms = useFirestore('rooms');
     const users = useFirestore('users');
     const handleSelectedRoom = async (room) => {
-        let oldRoom = selectedRoom;
+        let oldRoom = room;
         const user = users.find((u) => u.uid === room.ownerRoomId);
         room.owner = user;
         setSelectedRoom(room);
+        console.log({ currenUser, oldRoom });
         selectedRoomRef.current = room;
         db.collection('messages')
             .where('isTyping', '==', true)
@@ -828,11 +829,9 @@ function ListChats() {
                                                 <div className="row">
                                                     <div className="col-12 text-center">
                                                         <p className="text-light font-weight-bold">
-                                                            Chịu trách nhiệm: {''}
-                                                            {
-                                                                users.find((u) => u.uid === selectedRoom?.members[1])
-                                                                    .fullName
-                                                            }
+                                                            Chịu trách nhiệm:{' '}
+                                                            {users.find((u) => u.uid === selectedRoom?.members[1])
+                                                                ?.fullName || 'Chưa có'}
                                                         </p>
                                                     </div>
                                                 </div>

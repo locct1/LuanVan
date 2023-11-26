@@ -116,6 +116,7 @@ function ListReviewProducts() {
                                     <th scope="col">Sao</th>
                                     <th scope="col">Nội dung</th>
                                     <th scope="col">Phản hồi</th>
+                                    <th scope="col">Phân loại</th>
                                     <th scope="col">Ngày tạo</th>
                                     <th scope="col" className="text-center" width="10%">
                                         Hành động
@@ -167,6 +168,13 @@ function ListReviewProducts() {
                                                             ))
                                                         ) : (
                                                             <></>
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        {item.isPositive === true ? (
+                                                            <span className="badge badge-success">Tích cực</span>
+                                                        ) : (
+                                                            <span className="badge badge-danger">Tiêu cực</span>
                                                         )}
                                                     </td>
                                                     <td>{moment(item.createdAt).format('DD/MM/YYYY HH:mm:ss')}</td>

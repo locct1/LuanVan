@@ -19,9 +19,9 @@ namespace BackendAPI.Services
         public async Task<Response> GetAll()
         {
             var amountOfProducts = _unitOfWork.GetRepository<Product>().Count();
-            var amountOfBrands =  _unitOfWork.GetRepository<Brand>().Count();
-            var allBrands = await  _unitOfWork.GetRepository<Brand>().GetAll();
-            var allWareHouses = await  _unitOfWork.GetRepository<WareHouse>().GetAll();
+            var amountOfBrands = _unitOfWork.GetRepository<Brand>().Count();
+            var allBrands = await _unitOfWork.GetRepository<Brand>().GetAll();
+            var allWareHouses = await _unitOfWork.GetRepository<WareHouse>().GetAll();
             var amountOfProductSamples = _unitOfWork.GetRepository<ProductSample>().Count();
             var amountOfProductSamplePhones = _unitOfWork.GetRepository<ProductSample>().Count(x => x.ProductVersion.Product.ProductCategoryCode == "DIENTHOAI");
             var amountOfProductSampleAccessories = _unitOfWork.GetRepository<ProductSample>().Count(x => x.ProductVersion.Product.ProductCategoryCode != "DIENTHOAI");
@@ -32,9 +32,9 @@ namespace BackendAPI.Services
             var amountOfPhones = _unitOfWork.GetRepository<Product>().Count(x => x.ProductCategoryCode == "DIENTHOAI");
             var amountOfAccessories = _unitOfWork.GetRepository<Product>().Count(x => x.ProductCategoryCode != "DIENTHOAI");
             var amountOfProductCategories = _unitOfWork.GetRepository<ProductCategory>().Count();
-
+            var totalOfProductPurchaseOrders = _unitOfWork.GetRepository<ProductPurchaseOrder>().Sum(null, x => (decimal)x.Total);
             var productCategories = await _unitOfWork.GetRepository<ProductCategory>().GetAll();
-
+            var totalOfOrders = _unitOfWork.GetRepository<Order>().Sum(x => x.OrderStatusId != 6, x => (decimal)x.Total);
             List<AdminListProductCategoriesModel> productList = new List<AdminListProductCategoriesModel>();
             List<object> totalProductSamplesByBrands = new List<object>();
             List<object> totalProductSamplesByWareHouses = new List<object>();
@@ -62,8 +62,8 @@ namespace BackendAPI.Services
             }
             foreach (var item in allBrands)
             {
-                var amountProductSample = _unitOfWork.GetRepository<ProductSample>().Count(x => x.ProductVersion.Product.Brand.Id==item.Id);
-                var newProductSample = new 
+                var amountProductSample = _unitOfWork.GetRepository<ProductSample>().Count(x => x.ProductVersion.Product.Brand.Id == item.Id);
+                var newProductSample = new
                 {
                     Id = item.Id,
                     Name = item.Name,
@@ -74,7 +74,7 @@ namespace BackendAPI.Services
             }
             foreach (var item in allWareHouses)
             {
-                var amountProductSample = _unitOfWork.GetRepository<ProductSample>().Sum(x => x.ProductVersion.Product.WareHouse.Id == item.Id,x=>x.Quantity);
+                var amountProductSample = _unitOfWork.GetRepository<ProductSample>().Sum(x => x.ProductVersion.Product.WareHouse.Id == item.Id, x => x.Quantity);
                 var newProductSample = new
                 {
                     Id = item.Id,
@@ -84,12 +84,28 @@ namespace BackendAPI.Services
 
                 totalProductSamplesByWareHouses.Add(newProductSample);
             }
+            var promotionProducts = await _unitOfWork.GetRepository<PromotionProduct>().GetAll(include: x => x.Include(x => x.PromotionProductDetails).ThenInclude(x => x.ProductVersion).ThenInclude(x => x.Product).Include(x => x.PromotionProductDetails).ThenInclude(x => x.ColorProduct).Include(x => x.PromotionProductDetails).ThenInclude(x => x.ProductVersion).ThenInclude(x => x.Ram).Include(x => x.PromotionProductDetails).ThenInclude(x => x.ProductVersion).ThenInclude(x => x.Rom), filter: x => x.Disabled == false, orderBy: x => x.OrderByDescending(x => x.StartDate)); ;
+            var currentDate = DateTime.Now;
+
+            // Lọc danh sách sản phẩm dựa trên ngày hiện tại
+            var filteredPromotionProducts = promotionProducts
+                .Where(product => currentDate >= product.StartDate && currentDate <= product.EndDate)
+                .ToList();
+            var amountOfOrdersCompleted= _unitOfWork.GetRepository<Order>().Count(x=>x.OrderStatusId==4);
+            var amountOfOrdersCanceled = _unitOfWork.GetRepository<Order>().Count(x => x.OrderStatusId == 6);
+            var amountOfOrders = _unitOfWork.GetRepository<Order>().Count();
             return (new Response
             {
                 Success = true,
                 Message = "Thành công",
                 Data = new
                 {
+                    AmountOfOrdersCompleted = amountOfOrdersCompleted,
+                    AmountOfOrdersCanceled = amountOfOrdersCanceled,
+                    AmountOfOrders = amountOfOrders,
+                    ListPromotionProducts = filteredPromotionProducts,
+                    TotalOfOrders = totalOfOrders,
+                    TotalOfProductPurchaseOrders = totalOfProductPurchaseOrders,
                     AmountOfProducts = amountOfProducts,
                     AmountOfProductSampleAccessories = amountOfProductSampleAccessories,
                     AmountOfBrands = amountOfBrands,

@@ -53,19 +53,30 @@ function UpdatePromotionProduct() {
             setStartDate(new Date(data.data.startDate));
             setEndDate(new Date(data.data.endDate));
             // Duyệt qua danh sách promotionProductDetails và tạo ra mảng mới
-            const newProductDetailsArray = data.data.promotionProductDetails.map((detail) => {
-                const product = listProducts.find((x) => x.id === detail.productVersion.productId);
+            const uniqueProductVersionIds = new Set();
+            const newProductDetailsArray = [];
 
-                return {
-                    productId: detail.productVersion.productId.toString(),
-                    productVersionId: detail.productVersion.id.toString(),
-                    discountedPrice: detail.discountedPrice || null,
-                    formatDiscountedPrice: detail.discountedPrice.toLocaleString() || '',
-                    priceIn: detail.productVersion.priceIn || 0,
-                    priceOut: detail.productVersion.priceOut || 0,
-                    productVersions: product ? product.productVersions : [], // Gán productVersions từ phần tử tìm thấy hoặc mảng rỗng nếu không tìm thấy
-                };
+            data.data.promotionProductDetails.forEach((detail) => {
+                const productVersionId = detail.productVersion.id.toString();
+
+                // Kiểm tra xem ProductVersionId đã tồn tại trong Set chưa
+                if (!uniqueProductVersionIds.has(productVersionId)) {
+                    uniqueProductVersionIds.add(productVersionId);
+
+                    const product = listProducts.find((x) => x.id === detail.productVersion.productId);
+
+                    newProductDetailsArray.push({
+                        productId: detail.productVersion.productId.toString(),
+                        productVersionId,
+                        discountedPrice: detail.discountedPrice || null,
+                        formatDiscountedPrice: detail.discountedPrice.toLocaleString() || '',
+                        priceIn: detail.productVersion.priceIn || 0,
+                        priceOut: detail.productVersion.priceOut || 0,
+                        productVersions: product ? product.productVersions : [],
+                    });
+                }
             });
+
             setListProductPurchaseOrders(newProductDetailsArray);
         }
     }, [data, listProducts]);

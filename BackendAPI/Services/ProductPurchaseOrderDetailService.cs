@@ -1,6 +1,7 @@
 ﻿using BackendAPI.Data;
 using BackendAPI.Interfaces;
 using BackendAPI.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendAPI.Services
 {
@@ -19,8 +20,7 @@ namespace BackendAPI.Services
 
         public async Task<ProductPurchaseOrderDetail> GetProductPurchaseOrderDetailById(int id)
         {
-            return await _unitOfWork.GetRepository<ProductPurchaseOrderDetail>().Get(filter: x => x.Id == id);
-
+            return await _unitOfWork.GetRepository<ProductPurchaseOrderDetail>().Get(filter: x => x.Id == id, include: p => p.Include(x => x.ProductSample));
         }
         public async Task<ProductPurchaseOrderDetail> GetProductPurchaseOrderDetailFirstĐefaultByStatus(int ProductSampleId)
         {

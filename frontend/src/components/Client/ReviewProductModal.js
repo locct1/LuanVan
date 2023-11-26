@@ -12,6 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { infoClientSelector, isAuthenticatedClientSelector } from '~/redux/selectors';
 import { useSelector } from 'react-redux';
 import { useCreateReviewProductClientData } from '~/hooks/react-query/client/pageData';
+import { callAPIClassifyComments } from '~/services/client/api_classify_vietnamese_comments.service';
 
 function ReviewProductModal({ show, onClose, product }) {
     const schema = yup
@@ -94,11 +95,16 @@ function ReviewProductModal({ show, onClose, product }) {
             setErrorsForm({ ...errorsForm, rating: 'Vui lòng chọn sao đánh giá' });
             return;
         }
+        let result = await callAPIClassifyComments({
+            text: data.commentContent,
+        });
+        console.log(result);
         const uploadImagesRequest = uploadImages.map((obj) => obj.file);
         formData.append('commentContent', data.commentContent);
         formData.append('productId', parseInt(product.id));
         formData.append('rating', parseInt(rating));
         formData.append('userId', infoClient.id);
+        formData.append('isPositive', result.sentiment);
         for (let i = 0; i < uploadImagesRequest.length; i++) {
             formData.append(`images`, uploadImagesRequest[i]);
         }

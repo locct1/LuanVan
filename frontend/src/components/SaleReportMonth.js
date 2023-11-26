@@ -92,7 +92,7 @@ function SaleReportMonth() {
             };
             // Loop through orders and accumulate sales by month if status is 3
             dataOrders.data.forEach((order) => {
-                if (order.orderStatusId === 4) {
+                if (order.orderStatusId !== 6) {
                     const updatedAt = new Date(order.updatedAt);
                     const month = updatedAt.getMonth(); // Get the month (0-11)
                     data.datasets[0].data[+month] += order.total;

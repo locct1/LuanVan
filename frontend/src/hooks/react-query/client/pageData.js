@@ -21,6 +21,7 @@ import {
     getProductByIdClient,
     likeReviewProduct,
     requestCancelOrderClient,
+    requestConfirmReceivedOrderClient,
     unLikeReviewProduct,
 } from '~/services/client/page.service';
 
@@ -73,6 +74,20 @@ export const useRequestCancelOrderClientData = (onSuccessRequestCancelOrderClien
         },
     });
 };
+export const useRequestConfirmReceivedOrderClientData = (
+    onSuccessRequestConfirmReceivedOrderClientData,
+    ColorProductId,
+) => {
+    const queryClient = useQueryClient();
+    return useMutation(requestConfirmReceivedOrderClient, {
+        onSuccess: (data) => {
+            queryClient.invalidateQueries('orders-client');
+            queryClient.invalidateQueries('order-client');
+            onSuccessRequestConfirmReceivedOrderClientData(data);
+        },
+    });
+};
+
 export const useProductSamplesClientData = (onSuccess, onError) => {
     return useQuery('client-productsamples', getAllProductSamplesClient);
 };

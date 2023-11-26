@@ -16,13 +16,16 @@ namespace BackendAPI.Controllers
         private readonly IPromotionProductService _promotionProductService;
         private readonly IPromotionProductDetailService _promotionProductDetailService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IProductSampleService _productSampleService;
 
-        public PromotionProductController(IPromotionProductService promotionProductService, IPromotionProductDetailService promotionProductDetailService, IUnitOfWork unitOfWork)
+        public PromotionProductController(IPromotionProductService promotionProductService, IPromotionProductDetailService promotionProductDetailService, IUnitOfWork unitOfWork, IProductSampleService productSampleService)
         {
             _promotionProductService = promotionProductService;
             _promotionProductDetailService = promotionProductDetailService;
             _unitOfWork = unitOfWork;
+            _productSampleService = productSampleService;
         }
+
         [HttpGet("get-all-products")]
         public async Task<IActionResult> GetAllProducts(int page, int limit)
         {
@@ -154,15 +157,22 @@ namespace BackendAPI.Controllers
                     await _unitOfWork.SaveChangesAsync();
                     foreach (var item in model.ListPromotionProducts)
                     {
-                        PromotionProductDetail promotionProductDetail = new PromotionProductDetail
+                        var listProductSamples = await _productSampleService.GetAllProductSamplesByProductVersion(item.ProductVersionId);
+                        foreach (var item1 in listProductSamples)
                         {
-                            ProductVersionId = item.ProductVersionId,
-                            DiscountedPrice = item.DiscountedPrice,
-                            PromotionProductId = promotionProduct.Id,
-                        };
-                        await _promotionProductDetailService.CreatePromotionProductDetail(promotionProductDetail);
-                        await _unitOfWork.SaveChangesAsync();
+                            PromotionProductDetail promotionProductDetail = new PromotionProductDetail
+                            {
+                                ProductVersionId = item.ProductVersionId,
+                                DiscountedPrice = item.DiscountedPrice,
+                                PromotionProductId = promotionProduct.Id,
+                                ColorProductId = item1.ColorProductId,
+                            };
+                            await _promotionProductDetailService.CreatePromotionProductDetail(promotionProductDetail);
+
+                        }
+
                     }
+                    await _unitOfWork.SaveChangesAsync();
                     scope.Complete();
                     return CreatedAtAction(nameof(GetPromotionProductById), new { id = promotionProduct.Id }, new Response
                     {

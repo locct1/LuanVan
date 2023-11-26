@@ -12,6 +12,8 @@ namespace BackendAPI.Models.ReviewProduct
         public int Rating { get; set; }
         [Required(ErrorMessage = "Vui lòng nhập cảm nhận của bạn")]
         public string CommentContent { get; set; }
+        [Required(ErrorMessage = "Vui lòng đánh giá bình luận")]
+        public bool IsPositive { get; set; }
         public List<IFormFile>? Images { get; set; }
     }
 }

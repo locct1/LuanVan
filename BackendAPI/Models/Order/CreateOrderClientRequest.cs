@@ -6,6 +6,7 @@ namespace BackendAPI.Models.Order
     {
         public InfoRecipientRequest InfoRecipient { get; set; }
         public int PaymentMethodId { get; set; }
+        public double Total { get; set; }
         public CreateOrderModel Order { get; set; }
         public string? Note { get; set; }
         public string? Onl_Amount { get; set; }
@@ -45,7 +46,6 @@ namespace BackendAPI.Models.Order
     public class CreateOrderModel
     {
         [Required(ErrorMessage = "Vui lòng tổng tiền")]
-        public double Total { get; set; }
         public List<CreateOrderDetailModel> ListProducts { get; set; }
         public List<CreateShockDealModel> ListShockDeals { get; set; }
         public string? Note { get; set; }

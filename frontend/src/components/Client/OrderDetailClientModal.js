@@ -6,7 +6,10 @@ import 'moment/locale/vi';
 import { useEffect, useState } from 'react';
 import { callAPIGetOrderDetail, callAPIGetOrderTrackingDetail } from '~/services/client/getaddress.service';
 import { capitalizeFirstLetter } from '~/helpers/covertString';
-import { useRequestCancelOrderClientData } from '~/hooks/react-query/client/pageData';
+import {
+    useRequestCancelOrderClientData,
+    useRequestConfirmReceivedOrderClientData,
+} from '~/hooks/react-query/client/pageData';
 import { toast } from 'react-toastify';
 function OrderDetailClientModal({ show, onClose, dataOrder }) {
     const classNameStatus = [
@@ -58,7 +61,15 @@ function OrderDetailClientModal({ show, onClose, dataOrder }) {
             toast.success(data?.message);
         }
     };
+    const onSuccessRequestConfirmReceivedOrderClientData = (data) => {
+        if (data.success) {
+            toast.success(data?.message);
+        }
+    };
     const { mutate: requestCancelOrderClient } = useRequestCancelOrderClientData(onSuccessRequestCancelOrderClientData);
+    const { mutate: requestConfirmReceivedOrderClient } = useRequestConfirmReceivedOrderClientData(
+        onSuccessRequestConfirmReceivedOrderClientData,
+    );
 
     const handleCancelOrder = async () => {
         let data = {
@@ -66,6 +77,13 @@ function OrderDetailClientModal({ show, onClose, dataOrder }) {
             orderId: dataOrder.order.id,
         };
         requestCancelOrderClient(data);
+    };
+    const handleConfirmReceivedOrder = async () => {
+        let data = {
+            orderStatusId: 4,
+            orderId: dataOrder.order.id,
+        };
+        requestConfirmReceivedOrderClient(data);
     };
     return (
         <>
@@ -622,7 +640,15 @@ function OrderDetailClientModal({ show, onClose, dataOrder }) {
                             </Button>
                         </>
                     )}
-
+                    {dataOrder.order.orderStatusId === 2 || dataOrder.order.orderStatusId === 3 ? (
+                        <>
+                            <Button type="submit" variant="success" onClick={() => handleConfirmReceivedOrder()}>
+                                Xác nhận đã nhận hàng
+                            </Button>
+                        </>
+                    ) : (
+                        <></>
+                    )}
                     <Button type="submit" variant="secondary" onClick={onClose}>
                         Hủy
                     </Button>
